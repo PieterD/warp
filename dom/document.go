@@ -1,0 +1,38 @@
+package dom
+
+import (
+	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/driver/driverutil"
+)
+
+type Document struct {
+	factory driver.Factory
+	obj     driver.Object
+}
+
+func (doc *Document) Body() *Elem {
+	dValue := doc.obj.Get("body")
+	dObj := dValue.IsObject()
+	if dObj == nil {
+		return nil
+	}
+	return &Elem{
+		factory: doc.factory,
+		obj:     dObj,
+	}
+}
+
+func (doc *Document) CreateElem(tag string, constructor func(newElem *Elem)) *Elem {
+	fCreateElement := driverutil.Bind(doc.obj, "createElement")
+	elementValue := fCreateElement(doc.factory.String(tag))
+	elementObject := elementValue.IsObject()
+	if elementObject == nil {
+		return nil
+	}
+	elem := &Elem{
+		factory: doc.factory,
+		obj:     elementObject,
+	}
+	constructor(elem)
+	return elem
+}

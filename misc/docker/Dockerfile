@@ -1,9 +1,11 @@
-FROM nginx
+FROM ubuntu:bionic
 
 LABEL maintainer="Pieter Droogendijk"
 
-COPY ./misc/static /usr/share/nginx/html
+WORKDIR /app
+ADD target/static ./static
+COPY target/contentserver .
 
 EXPOSE 8080
 
-CMD ["nginx"]
+CMD ["./contentserver", "-addr=:8080", "-static=./static"]
