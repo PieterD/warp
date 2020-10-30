@@ -18,7 +18,7 @@ func js2value(jsValue js.Value) (v driver.Value) {
 			v: jsValue,
 		}
 	case js.TypeBoolean:
-		return jsObject{
+		return jsBoolean{
 			v: jsValue,
 		}
 	case js.TypeNumber:

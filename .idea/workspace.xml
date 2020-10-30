@@ -4,11 +4,10 @@
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/elem.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/elem.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/types.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/factory.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/factory.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/wasmjs.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/wasmjs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/document.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/document.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/window.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/wasmjs/convert.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/convert.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,17 +45,18 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/misc/static" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/dom/gl" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoProjectSettingsConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\dev\warp\misc\static" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\dev\warp\misc" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\dev\warp\dom\gl" />
+      <recent name="C:\dev\warp\misc\static" />
     </key>
   </component>
   <component name="RunManager" selected="Makefile../misc/docker/target">
@@ -98,9 +98,9 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="461" y="185" key="SettingsEditor/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1603999842026" />
-    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1604018996173">
+    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1604028013693">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604018996173" />
+    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604028013693" />
   </component>
 </project>

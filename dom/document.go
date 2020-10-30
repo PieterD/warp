@@ -33,6 +33,8 @@ func (doc *Document) CreateElem(tag string, constructor func(newElem *Elem)) *El
 		factory: doc.factory,
 		obj:     elementObject,
 	}
-	constructor(elem)
+	if constructor != nil {
+		constructor(elem)
+	}
 	return elem
 }
