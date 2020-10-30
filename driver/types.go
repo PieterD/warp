@@ -21,6 +21,7 @@ type (
 		Call(this Object, args ...Value) Value
 	}
 	Factory interface {
+		Global() Object
 		Undefined() Value
 		Null() Value
 		Number(f float64) Value

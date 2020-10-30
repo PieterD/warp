@@ -7,10 +7,10 @@ type Global struct {
 	obj     driver.Object
 }
 
-func Open(global driver.Object, factory driver.Factory) *Global {
+func Open(factory driver.Factory) *Global {
 	return &Global{
 		factory: factory,
-		obj:     global,
+		obj:     factory.Global(),
 	}
 }
 

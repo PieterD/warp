@@ -3,11 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dom/elem.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/elem.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/driverutil/driverutil.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/driverutil/driverutil.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/convert.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/convert.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/global.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/types.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/wasmjs/factory.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/factory.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/wasmjs/wasmjs.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/wasmjs.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +39,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />

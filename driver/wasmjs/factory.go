@@ -8,6 +8,12 @@ import (
 
 type jsFactory struct{}
 
+func (j jsFactory) Global() driver.Object {
+	return jsObject{
+		v: js.Global(),
+	}
+}
+
 func (j jsFactory) Undefined() driver.Value {
 	return jsUndefined{
 		v: js.Undefined(),

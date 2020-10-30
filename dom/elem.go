@@ -2,6 +2,7 @@ package dom
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/PieterD/warp/driver"
@@ -11,6 +12,10 @@ import (
 type Elem struct {
 	factory driver.Factory
 	obj     driver.Object
+}
+
+func (e *Elem) Driver() (factory driver.Factory, obj driver.Object) {
+	return e.factory, e.obj
 }
 
 func (e *Elem) Tag() string {
@@ -23,6 +28,34 @@ func (e *Elem) Tag() string {
 
 func (e *Elem) SetText(text string) {
 	e.obj.Set("innerText", e.factory.String(text))
+}
+
+func (e *Elem) Classes() []string {
+	allClasses, ok := e.obj.Get("className").IsString()
+	if !ok {
+		return nil
+	}
+	return strings.Split(allClasses, " ")
+}
+
+func (e *Elem) AppendClasses(classNames ...string) {
+	set := make(map[string]struct{})
+	for _, name := range e.Classes() {
+		set[name] = struct{}{}
+	}
+	for _, name := range classNames {
+		set[name] = struct{}{}
+	}
+	list := make([]string, len(set))
+	for name := range set {
+		list = append(list, name)
+	}
+	sort.Strings(list)
+	e.obj.Set("className", e.factory.String(strings.Join(list, " ")))
+}
+
+func (e *Elem) ClearClasses() {
+	e.obj.Set("className", e.factory.String(""))
 }
 
 func (e *Elem) Children() (children []*Elem) {

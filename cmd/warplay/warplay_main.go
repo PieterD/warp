@@ -16,12 +16,13 @@ func main() {
 }
 
 func run() error {
-	dGlobal, factory := wasmjs.Open()
-	global := dom.Open(dGlobal, factory)
+	factory := wasmjs.Open()
+	global := dom.Open(factory)
 	doc := global.Window().Document()
 	doc.Body().AppendChildren(
 		doc.CreateElem("label", func(newElem *dom.Elem) {
 			newElem.SetText("hello!")
+			newElem.AppendClasses("first")
 		}),
 		doc.CreateElem("label", func(newElem *dom.Elem) {
 			newElem.SetText("world!")
@@ -30,7 +31,7 @@ func run() error {
 			})
 		}),
 		doc.CreateElem("label", func(newElem *dom.Elem) {
-			newElem.SetText("yees!")
+			newElem.SetText("yes!")
 		}),
 	)
 	return nil
