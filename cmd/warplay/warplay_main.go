@@ -23,6 +23,15 @@ func run() error {
 		doc.CreateElem("label", func(newElem *dom.Elem) {
 			newElem.SetText("hello!")
 		}),
+		doc.CreateElem("label", func(newElem *dom.Elem) {
+			newElem.SetText("world!")
+			newElem.EventHandler("click", func(this *dom.Elem, event *dom.Event) {
+				fmt.Printf("click!\n")
+			})
+		}),
+		doc.CreateElem("label", func(newElem *dom.Elem) {
+			newElem.SetText("yees!")
+		}),
 	)
 	return nil
 }

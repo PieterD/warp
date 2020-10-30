@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="" />
+    <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/elem.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/elem.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/driverutil/driverutil.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/driverutil/driverutil.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/wasmjs/convert.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/convert.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,10 +22,16 @@
     </option>
   </component>
   <component name="GOROOT" path="C:\dev\go1.15.2" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="1jZ4bBi33dUCMr2aCkqpoeztUxE" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -83,5 +96,9 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="461" y="185" key="SettingsEditor/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1603999842026" />
+    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1604018996173">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604018996173" />
   </component>
 </project>

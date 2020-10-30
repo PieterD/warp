@@ -44,8 +44,8 @@ func js2value(jsValue js.Value) (v driver.Value) {
 
 func value2js(dv driver.Value) (jsValue js.Value) {
 	switch j := dv.(type) {
-	//case nil:
-	//	return js.Null()
+	case nil:
+		return js.Null()
 	case jsUndefined:
 		return j.v
 	case jsNull:

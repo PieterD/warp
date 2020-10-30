@@ -12,3 +12,17 @@ func Bind(o driver.Object, methodName string) func(args ...driver.Value) driver.
 		return function.Call(o, args...)
 	}
 }
+
+func IndexableToSlice(factory driver.Factory, o driver.Object) []driver.Value {
+	numChildren, ok := o.Get("length").IsNumber()
+	if !ok {
+		return nil
+	}
+	var values []driver.Value
+	fIndex := Bind(o, "item")
+	for i := 0; i < int(numChildren); i++ {
+		dValue := fIndex(factory.Number(float64(i)))
+		values = append(values, dValue)
+	}
+	return values
+}
