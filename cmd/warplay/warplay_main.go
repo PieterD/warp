@@ -35,7 +35,6 @@ func run() error {
 		panic(fmt.Errorf("building renderer: %w", err))
 	}
 	global.Window().Animate(ctx, func(ctx context.Context, millis float64) error {
-		fmt.Printf("animate %f\n", millis)
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("animate call for renderSquares: %w", ctx.Err())
@@ -52,15 +51,12 @@ func run() error {
 }
 
 func buildRenderer(glx *gl.Context) (renderFunc func(w, h int) error, err error) {
-	//vertices := []float32{
-	//	0.75, 0.75, 0.0, 1.0,
-	//	0.75, -0.75, 0.0, 1.0,
-	//	-0.75, -0.75, 0.0, 1.0,
-	//}
-	//
-	//indices := []uint16{
-	//	0, 1, 2,
-	//}
+	vertices := []float32{
+		0.75, 0.75, 0.0, 1.0,
+		0.75, -0.75, 0.0, 1.0,
+		-0.75, -0.75, 0.0, 1.0,
+	}
+
 	programConfig := gl.ProgramConfig{
 		VertexCode: `
 attribute vec4 coordinates;
@@ -88,18 +84,36 @@ void main(void) {
 	if uniformHeight == nil {
 		return nil, fmt.Errorf("height uniform not found")
 	}
-	coordAttr := program.Attribute("coordinates")
-	if coordAttr == nil {
-		return nil, fmt.Errorf("coordinates attribute not found")
+	coordAttr, err := program.Attribute("coordinates")
+	if err != nil {
+		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
 	}
+	attrType, attrSize := coordAttr.Type()
+	fmt.Printf("attrType: %d, attrSize: %d\n", attrType, attrSize)
 	vertexBuffer, err := glx.Buffer()
 	if err != nil {
-		return nil, fmt.Errorf("creating buffer: %w", err)
+		return nil, fmt.Errorf("creating vertex buffer: %w", err)
 	}
-	vertexBuffer = vertexBuffer
+	vertexBuffer.VertexData(vertices)
 
 	return func(w, h int) error {
-		fmt.Printf("render\n")
+		glx.Use(program)
+		uniformHeight.SetFloat32(float32(h))
+		err := glx.Draw(gl.DrawConfig{
+			Attributes: []gl.DrawAttribute{
+				{
+					ArrayBuffer:    vertexBuffer,
+					Attr:           coordAttr,
+					ItemsPerVertex: 4,
+				},
+			},
+			DrawMode:          0,
+			FirstVertexOffset: 0,
+			VertexCount:       3,
+		})
+		if err != nil {
+			return fmt.Errorf("drawing: %w", err)
+		}
 		return nil
 	}, nil
 }

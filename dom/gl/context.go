@@ -39,3 +39,11 @@ func (glx *Context) Program(cfg ProgramConfig) (*Program, error) {
 func (glx *Context) Buffer() (*Buffer, error) {
 	return newBuffer(glx)
 }
+
+func (glx *Context) Use(p *Program) {
+	glx.functions.UseProgram(p.glObject)
+}
+
+func (glx *Context) Draw(cfg DrawConfig) error {
+	return doDraw(glx, cfg)
+}

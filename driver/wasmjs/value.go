@@ -127,6 +127,70 @@ func (j jsFunction) Call(this driver.Object, args ...driver.Value) driver.Value 
 	return js2value(jsReturn)
 }
 
+type jsBuffer struct {
+	jsEmpty
+	factory driver.Factory
+	v       js.Value
+	obj     driver.Object
+}
+
+func newBuffer(factory jsFactory, size int) jsBuffer {
+	fUint8Array := factory.Global().Get("Uint8Array").IsFunction()
+	if fUint8Array == nil {
+		panic(fmt.Errorf("Uint8Array constructor is missing"))
+	}
+	obj := fUint8Array.New(factory.Number(float64(size)))
+	ours, ok := obj.(jsObject)
+	if !ok {
+		panic(fmt.Errorf("buffer object was somehow not an object"))
+	}
+	return jsBuffer{
+		factory: factory,
+		v:       ours.v,
+		obj:     obj,
+	}
+}
+
+func (j jsBuffer) Size() int {
+	length, ok := j.obj.Get("length").IsNumber()
+	if !ok {
+		panic(fmt.Errorf("buffer length was not a number"))
+	}
+	return int(length)
+}
+
+func (j jsBuffer) Put(data []byte) int {
+	return js.CopyBytesToJS(j.v, data)
+}
+
+func (j jsBuffer) Get(data []byte) int {
+	return js.CopyBytesToGo(data, j.v)
+}
+
+func (j jsBuffer) AsUint8Array() driver.Object {
+	con := j.factory.Global().Get("Uint8Array").IsFunction()
+	if con == nil {
+		panic(fmt.Errorf("Uint8Array was not a function"))
+	}
+	return con.New(j.obj.Get("buffer"))
+}
+
+func (j jsBuffer) AsUint16Array() driver.Object {
+	con := j.factory.Global().Get("Uint16Array").IsFunction()
+	if con == nil {
+		panic(fmt.Errorf("Uint8Array was not a function"))
+	}
+	return con.New(j.obj.Get("buffer"))
+}
+
+func (j jsBuffer) AsFloat32Array() driver.Object {
+	con := j.factory.Global().Get("Float32Array").IsFunction()
+	if con == nil {
+		panic(fmt.Errorf("Uint8Array was not a function"))
+	}
+	return con.New(j.obj.Get("buffer"))
+}
+
 type jsEmpty struct{}
 
 func (j jsEmpty) IsBoolean() (value, ok bool) {

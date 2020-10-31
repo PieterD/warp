@@ -8,6 +8,16 @@ import (
 
 type jsFactory struct{}
 
+func (j jsFactory) Boolean(t bool) driver.Value {
+	return jsBoolean{
+		v: js.ValueOf(t),
+	}
+}
+
+func (j jsFactory) Buffer(size int) driver.Buffer {
+	return newBuffer(j, size)
+}
+
 func (j jsFactory) Global() driver.Object {
 	return jsObject{
 		v: js.Global(),

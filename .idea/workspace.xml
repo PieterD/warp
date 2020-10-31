@@ -4,10 +4,13 @@
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/document.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/document.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/window.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/convert.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/convert.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/gl/buffer.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/buffer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/gl/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/gl_constants.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/program.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/types.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/wasmjs/factory.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/factory.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/driver/wasmjs/value.go" beforeDir="false" afterPath="$PROJECT_DIR$/driver/wasmjs/value.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,9 +101,17 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="461" y="185" key="SettingsEditor/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1603999842026" />
-    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1604028013693">
+    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1604170947507">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604028013693" />
+    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604170947507" />
+    <state x="803" y="301" key="refactoring.ChangeSignatureDialog" timestamp="1604167516638">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="803" y="301" key="refactoring.ChangeSignatureDialog/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604167516638" />
+    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1604172302152">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604172302152" />
   </component>
 </project>
