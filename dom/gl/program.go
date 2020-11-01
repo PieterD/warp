@@ -69,7 +69,7 @@ type Attribute struct {
 	p     *Program
 	name  string
 	index int
-	typ   float64
+	typ   Type
 	siz   float64
 }
 
@@ -98,9 +98,9 @@ func (p *Program) Attribute(name string) (*Attribute, error) {
 	if attribName != name {
 		return nil, fmt.Errorf("attribute info name does not match request name: %s", attribName)
 	}
-	attribType, ok := attribInfo.Get("type").IsNumber()
-	if !ok {
-		return nil, fmt.Errorf("expected attribute type")
+	attribType, err := glx.typeConverter.FromJs(attribInfo.Get("type"))
+	if err != nil {
+		return nil, fmt.Errorf("fetching attr info type: %w", err)
 	}
 	attribSize, ok := attribInfo.Get("size").IsNumber()
 	if !ok {
@@ -116,8 +116,8 @@ func (p *Program) Attribute(name string) (*Attribute, error) {
 	}, nil
 }
 
-func (a *Attribute) Type() (glType, size int) {
-	return int(a.typ), int(a.siz)
+func (a *Attribute) Type() (typ Type, size int) {
+	return a.typ, int(a.siz)
 }
 
 type Uniform struct {

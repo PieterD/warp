@@ -21,8 +21,19 @@ type glConstants struct {
 	COLOR_BUFFER_BIT     driver.Value
 	DEPTH_TEST           driver.Value
 	TRIANGLES            driver.Value
-	UNSIGNED_SHORT       driver.Value
 	FLOAT                driver.Value
+	FLOAT_VEC2           driver.Value
+	FLOAT_VEC3           driver.Value
+	FLOAT_VEC4           driver.Value
+	FLOAT_MAT2           driver.Value
+	FLOAT_MAT3           driver.Value
+	FLOAT_MAT4           driver.Value
+	BYTE                 driver.Value
+	UNSIGNED_BYTE        driver.Value
+	SHORT                driver.Value
+	UNSIGNED_SHORT       driver.Value
+	INT                  driver.Value
+	UNSIGNED_INT         driver.Value
 }
 
 type glFunctions struct {

@@ -6,10 +6,11 @@ import (
 )
 
 type Context struct {
-	factory   driver.Factory
-	obj       driver.Object
-	constants glConstants
-	functions glFunctions
+	factory       driver.Factory
+	obj           driver.Object
+	constants     glConstants
+	functions     glFunctions
+	typeConverter *typeConverter
 }
 
 type Canvas interface {
@@ -24,12 +25,17 @@ func NewContext(canvas Canvas) *Context {
 		return nil
 	}
 
-	return &Context{
-		factory:   factory,
-		obj:       ctxObject,
-		constants: newGlConstants(ctxObject),
-		functions: newGlFunctions(ctxObject),
+	constants := newGlConstants(ctxObject)
+	functions := newGlFunctions(ctxObject)
+	typeConverter := newTypeConverter(constants)
+	glx := &Context{
+		factory:       factory,
+		obj:           ctxObject,
+		constants:     constants,
+		functions:     functions,
+		typeConverter: typeConverter,
 	}
+	return glx
 }
 
 func (glx *Context) Program(cfg ProgramConfig) (*Program, error) {

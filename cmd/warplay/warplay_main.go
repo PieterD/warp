@@ -89,7 +89,7 @@ void main(void) {
 		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
 	}
 	attrType, attrSize := coordAttr.Type()
-	fmt.Printf("attrType: %d, attrSize: %d\n", attrType, attrSize)
+	fmt.Printf("attrType: %s, attrSize: %d\n", attrType, attrSize)
 	vertexBuffer, err := glx.Buffer()
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex buffer: %w", err)
