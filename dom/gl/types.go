@@ -99,3 +99,18 @@ func (tc *typeConverter) ToJs(typ Type) driver.Value {
 	}
 	return v
 }
+
+func (t Type) asAttribute() (bufferType Type, itemsPerVertex int, err error) {
+	switch t {
+	case Float:
+		return Float, 1, nil
+	case Vec2:
+		return Float, 2, nil
+	case Vec3:
+		return Float, 3, nil
+	case Vec4:
+		return Float, 4, nil
+	default:
+		return 0, 0, fmt.Errorf("unable to decompose: %s", t)
+	}
+}

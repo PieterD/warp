@@ -20,7 +20,7 @@ type Canvas interface {
 func NewContext(canvas Canvas) *Context {
 	factory, canvasObject := canvas.Driver()
 	fGetContext := driverutil.Bind(canvasObject, "getContext")
-	ctxObject := fGetContext(factory.String("webgl")).IsObject()
+	ctxObject := fGetContext(factory.String("webgl2")).IsObject()
 	if ctxObject == nil {
 		return nil
 	}
@@ -44,6 +44,10 @@ func (glx *Context) Program(cfg ProgramConfig) (*Program, error) {
 
 func (glx *Context) Buffer() (*Buffer, error) {
 	return newBuffer(glx)
+}
+
+func (glx *Context) VertexArray(cfg VertexArrayConfig) (*VertexArray, error) {
+	return newVertexArray(glx, cfg)
 }
 
 func (glx *Context) Use(p *Program) {

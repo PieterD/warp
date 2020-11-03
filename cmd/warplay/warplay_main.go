@@ -88,8 +88,6 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
 	}
-	attrType, attrSize := coordAttr.Type()
-	fmt.Printf("attrType: %s, attrSize: %d\n", attrType, attrSize)
 	vertexBuffer, err := glx.Buffer()
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex buffer: %w", err)
@@ -102,14 +100,15 @@ void main(void) {
 		err := glx.Draw(gl.DrawConfig{
 			Attributes: []gl.DrawAttribute{
 				{
-					ArrayBuffer:    vertexBuffer,
-					Attr:           coordAttr,
-					ItemsPerVertex: 4,
+					ArrayBuffer: vertexBuffer,
+					Attr:        coordAttr,
 				},
 			},
-			DrawMode:          0,
-			FirstVertexOffset: 0,
-			VertexCount:       3,
+			DrawMode: gl.Triangles,
+			Vertices: gl.VertexRange{
+				FirstOffset: 0,
+				VertexCount: 3,
+			},
 		})
 		if err != nil {
 			return fmt.Errorf("drawing: %w", err)
