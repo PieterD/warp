@@ -139,7 +139,11 @@ func (p *Program) Uniform(name string) *Uniform {
 	}
 }
 
-func (u *Uniform) SetFloat32(v float32) {
-	glx := u.p.glx
+type UniformSetter struct {
+	glx *Context
+}
+
+func (us *UniformSetter) Float32(u *Uniform, v float32) {
+	glx := us.glx
 	glx.functions.Uniform1f(u.location, glx.factory.Number(float64(v)))
 }

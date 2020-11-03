@@ -93,17 +93,26 @@ void main(void) {
 		return nil, fmt.Errorf("creating vertex buffer: %w", err)
 	}
 	vertexBuffer.VertexData(vertices)
+	vao, err := glx.VertexArray(gl.VertexArrayConfig{
+		Attributes: []gl.VertexArrayAttribute{
+			{
+				ArrayBuffer: vertexBuffer,
+				Attr:        coordAttr,
+				Layout:      gl.VertexArrayAttributeLayout{},
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("creating vertex array object: %w", err)
+	}
 
 	return func(w, h int) error {
-		glx.Use(program)
-		uniformHeight.SetFloat32(float32(h))
 		err := glx.Draw(gl.DrawConfig{
-			Attributes: []gl.DrawAttribute{
-				{
-					ArrayBuffer: vertexBuffer,
-					Attr:        coordAttr,
-				},
+			Use: program,
+			Uniforms: func(us *gl.UniformSetter) {
+				us.Float32(uniformHeight, float32(h))
 			},
+			VAO:      vao,
 			DrawMode: gl.Triangles,
 			Vertices: gl.VertexRange{
 				FirstOffset: 0,
