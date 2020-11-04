@@ -58,6 +58,7 @@ type glFunctions struct {
 	CreateVertexArray       func(args ...driver.Value) driver.Value
 	BindVertexArray         func(args ...driver.Value) driver.Value
 	Uniform1f               func(args ...driver.Value) driver.Value
+	UniformMatrix4fv        func(args ...driver.Value) driver.Value
 	VertexAttribPointer     func(args ...driver.Value) driver.Value
 	EnableVertexAttribArray func(args ...driver.Value) driver.Value
 	ClearColor              func(args ...driver.Value) driver.Value

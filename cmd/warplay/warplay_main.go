@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/PieterD/warp/dom/gl"
+	"github.com/go-gl/mathgl/mgl32"
 
 	"github.com/PieterD/warp/dom"
+	"github.com/PieterD/warp/dom/gl"
 	"github.com/PieterD/warp/driver/wasmjs"
 )
 
@@ -60,8 +61,11 @@ func buildRenderer(glx *gl.Context) (renderFunc func(w, h int) error, err error)
 	programConfig := gl.ProgramConfig{
 		VertexCode: `
 attribute vec4 coordinates;
+
+uniform mat4 transform;
+
 void main(void) {
-	gl_Position = coordinates;
+	gl_Position = transform * coordinates;
 }
 `,
 		FragmentCode: `
@@ -84,6 +88,10 @@ void main(void) {
 	if uniformHeight == nil {
 		return nil, fmt.Errorf("height uniform not found")
 	}
+	uniformTransform := program.Uniform("transform")
+	if uniformTransform == nil {
+		return nil, fmt.Errorf("transform uniform not found")
+	}
 	coordAttr, err := program.Attribute("coordinates")
 	if err != nil {
 		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
@@ -96,21 +104,23 @@ void main(void) {
 	vao, err := glx.VertexArray(gl.VertexArrayConfig{
 		Attributes: []gl.VertexArrayAttribute{
 			{
-				ArrayBuffer: vertexBuffer,
-				Attr:        coordAttr,
-				Layout:      gl.VertexArrayAttributeLayout{},
+				Buffer: vertexBuffer,
+				Attr:   coordAttr,
+				Layout: gl.VertexArrayAttributeLayout{},
 			},
 		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
+	transform := mgl32.Ident4().Mul4(mgl32.HomogRotate3DZ(1.0))
 
 	return func(w, h int) error {
 		err := glx.Draw(gl.DrawConfig{
 			Use: program,
 			Uniforms: func(us *gl.UniformSetter) {
 				us.Float32(uniformHeight, float32(h))
+				us.Mat4(uniformTransform, transform)
 			},
 			VAO:      vao,
 			DrawMode: gl.Triangles,

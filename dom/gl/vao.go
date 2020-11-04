@@ -11,9 +11,9 @@ type VertexArrayConfig struct {
 }
 
 type VertexArrayAttribute struct {
-	ArrayBuffer *Buffer
-	Attr        *Attribute
-	Layout      VertexArrayAttributeLayout
+	Buffer *Buffer
+	Attr   *Attribute
+	Layout VertexArrayAttributeLayout
 }
 
 type VertexArrayAttributeLayout struct {
@@ -46,7 +46,7 @@ func newVertexArray(glx *Context, cfg VertexArrayConfig) (*VertexArray, error) {
 		glNormalized := glx.factory.Boolean(false)
 		glByteStride := glx.factory.Number(float64(da.Layout.ByteStride))
 		glByteOffset := glx.factory.Number(float64(da.Layout.ByteOffset))
-		glx.functions.BindBuffer(glx.constants.ARRAY_BUFFER, da.ArrayBuffer.glObject)
+		glx.functions.BindBuffer(glx.constants.ARRAY_BUFFER, da.Buffer.glObject)
 		glx.functions.VertexAttribPointer(
 			glAttrIndex,
 			glItemsPerVertex,

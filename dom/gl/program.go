@@ -3,6 +3,8 @@ package gl
 import (
 	"fmt"
 
+	"github.com/go-gl/mathgl/mgl32"
+
 	"github.com/PieterD/warp/driver"
 )
 
@@ -146,4 +148,11 @@ type UniformSetter struct {
 func (us *UniformSetter) Float32(u *Uniform, v float32) {
 	glx := us.glx
 	glx.functions.Uniform1f(u.location, glx.factory.Number(float64(v)))
+}
+
+func (us *UniformSetter) Mat4(u *Uniform, m mgl32.Mat4) {
+	glx := us.glx
+	buf := glx.factory.Buffer(4 * 4 * 4)
+	buf.Put(fastFloat32ToByte(m[:]))
+	glx.functions.UniformMatrix4fv(u.location, glx.factory.Boolean(false), buf.AsFloat32Array())
 }
