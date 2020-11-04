@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/gl_constants.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/program.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/vao.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/vao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

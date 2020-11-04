@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"math"
 	"os"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -42,7 +43,8 @@ func run() error {
 		default:
 		}
 		w, h := canvas.OuterSize()
-		if err := render(w, h); err != nil {
+		_, rot := math.Modf(millis / 2000.0)
+		if err := render(w, h, rot); err != nil {
 			return fmt.Errorf("calling render: %w", err)
 		}
 		return nil
@@ -51,7 +53,7 @@ func run() error {
 	return nil
 }
 
-func buildRenderer(glx *gl.Context) (renderFunc func(w, h int) error, err error) {
+func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) error, err error) {
 	vertices := []float32{
 		0.75, 0.75, 0.0, 1.0,
 		0.75, -0.75, 0.0, 1.0,
@@ -113,13 +115,15 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
-	transform := mgl32.Ident4().Mul4(mgl32.HomogRotate3DZ(1.0))
 
-	return func(w, h int) error {
+	return func(w, h int, rot float64) error {
 		err := glx.Draw(gl.DrawConfig{
 			Use: program,
 			Uniforms: func(us *gl.UniformSetter) {
 				us.Float32(uniformHeight, float32(h))
+				angle := 2 * math.Pi * rot
+				transform := mgl32.Ident4().
+					Mul4(mgl32.HomogRotate3DZ(float32(angle)))
 				us.Mat4(uniformTransform, transform)
 			},
 			VAO:      vao,
