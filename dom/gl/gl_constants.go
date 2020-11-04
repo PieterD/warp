@@ -5,9 +5,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/PieterD/warp/driver/driverutil"
-
 	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/driver/driverutil"
 )
 
 type glConstants struct {

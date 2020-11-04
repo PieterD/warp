@@ -58,6 +58,11 @@ func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) erro
 		0.75, 0.75, 0.0, 1.0,
 		0.75, -0.75, 0.0, 1.0,
 		-0.75, -0.75, 0.0, 1.0,
+		-0.75, 0.75, 0.0, 1.0,
+	}
+	elements := []uint16{
+		0, 1, 2,
+		0, 2, 3,
 	}
 
 	programConfig := gl.ProgramConfig{
@@ -115,22 +120,27 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
+	elementBuffer, err := glx.Buffer()
+	if err != nil {
+		return nil, fmt.Errorf("creating element buffer: %w", err)
+	}
+	elementBuffer.IndexData(elements)
 
 	return func(w, h int, rot float64) error {
 		err := glx.Draw(gl.DrawConfig{
 			Use: program,
 			Uniforms: func(us *gl.UniformSetter) {
-				us.Float32(uniformHeight, float32(h))
 				angle := 2 * math.Pi * rot
-				transform := mgl32.Ident4().
-					Mul4(mgl32.HomogRotate3DZ(float32(angle)))
+				transform := mgl32.HomogRotate3DZ(float32(angle))
 				us.Mat4(uniformTransform, transform)
+				us.Float32(uniformHeight, float32(h))
 			},
-			VAO:      vao,
-			DrawMode: gl.Triangles,
+			VAO:          vao,
+			ElementArray: elementBuffer,
+			DrawMode:     gl.Triangles,
 			Vertices: gl.VertexRange{
 				FirstOffset: 0,
-				VertexCount: 3,
+				VertexCount: 6,
 			},
 		})
 		if err != nil {
