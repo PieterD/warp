@@ -45,9 +45,9 @@ func run() error {
 			return fmt.Errorf("animate call for renderSquares: %w", ctx.Err())
 		default:
 		}
-		w, h := canvas.OuterSize()
+		//w, h := canvas.OuterSize()
 		_, rot := math.Modf(millis / 2000.0)
-		if err := render(w, h, rot); err != nil {
+		if err := render(rot); err != nil {
 			return fmt.Errorf("calling render: %w", err)
 		}
 		return nil
@@ -72,7 +72,7 @@ func loadTexture(fileName string) (image.Image, error) {
 	return img, nil
 }
 
-func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) error, err error) {
+func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err error) {
 	textureImage, err := loadTexture("texture.png")
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
@@ -120,13 +120,10 @@ void main(void) {
 precision mediump float; // highp
 varying vec4 color;
 varying vec2 texCoord;
-uniform float Height;
 uniform sampler2D Texture;
 
 void main(void) {
-	float lerpValue = gl_FragCoord.y / Height;
 	vec4 texColor = texture2D(Texture, texCoord);
-	gl_FragColor = mix(color, texColor, lerpValue);
 	gl_FragColor = mix(color, texColor, 0.5);
 }
 `,
@@ -135,10 +132,6 @@ void main(void) {
 	program, err := glx.Program(programConfig)
 	if err != nil {
 		return nil, fmt.Errorf("compiling shader: %w", err)
-	}
-	uniformHeight := program.Uniform("Height")
-	if uniformHeight == nil {
-		return nil, fmt.Errorf("height uniform not found")
 	}
 	uniformTransform := program.Uniform("Transform")
 	if uniformTransform == nil {
@@ -169,9 +162,6 @@ void main(void) {
 	}
 	texBuffer := glx.Buffer()
 	texBuffer.VertexData(texCoords)
-	{
-		texAttr = texAttr
-	}
 
 	vao, err := glx.VertexArray(gl.VertexArrayConfig{
 		Attributes: []gl.VertexArrayAttribute{
@@ -201,14 +191,13 @@ void main(void) {
 	texture := glx.Texture(gl.Texture2DConfig{}, textureImage)
 	glx.BindTextureUnits(texture)
 
-	return func(w, h int, rot float64) error {
+	return func(rot float64) error {
 		err := glx.Draw(gl.DrawConfig{
 			Use: program,
 			Uniforms: func(us *gl.UniformSetter) {
 				angle := 2 * math.Pi * rot
 				transform := mgl32.HomogRotate3DZ(float32(angle))
 				us.Mat4(uniformTransform, transform)
-				us.Float32(uniformHeight, float32(h))
 				us.Int(uniformSampler, 0)
 			},
 			VAO:          vao,
