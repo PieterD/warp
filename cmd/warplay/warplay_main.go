@@ -84,17 +84,17 @@ func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) erro
 		-0.75, -0.75, 0.0, 1.0,
 		-0.75, 0.75, 0.0, 1.0,
 	}
-	//texCoords := []float32{
-	//	0.0, 1.0,
-	//	1.0, 1.0,
-	//	1.0, 0.0,
-	//	0.0, 0.0,
-	//}
+	texCoords := []float32{
+		0.0, 1.0,
+		1.0, 1.0,
+		1.0, 0.0,
+		0.0, 0.0,
+	}
 	color := []float32{
 		1.0, 0.0, 0.0,
 		0.0, 1.0, 0.0,
 		0.0, 0.0, 1.0,
-		1.0, 0.0, 1.0,
+		1.0, 1.0, 1.0,
 	}
 	elements := []uint16{
 		0, 1, 2,
@@ -105,22 +105,29 @@ func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) erro
 		VertexCode: `#version 100
 attribute vec4 Coordinates;
 attribute vec3 Color;
-varying vec4 color;
+attribute vec2 TexCoord;
 uniform mat4 Transform;
+varying vec4 color;
+varying vec2 texCoord;
 
 void main(void) {
 	color = vec4(Color, 1.0);
+	texCoord = TexCoord;
 	gl_Position = Transform * Coordinates;
 }
 `,
 		FragmentCode: `#version 100
 precision mediump float; // highp
 varying vec4 color;
+varying vec2 texCoord;
 uniform float Height;
+uniform sampler2D Texture;
 
 void main(void) {
 	float lerpValue = gl_FragCoord.y / Height;
-	gl_FragColor = mix(color, vec4(1.0, 1.0, 1.0, 1.0), lerpValue);
+	vec4 texColor = texture2D(Texture, texCoord);
+	gl_FragColor = mix(color, texColor, lerpValue);
+	gl_FragColor = mix(color, texColor, 0.5);
 }
 `,
 	}
@@ -137,6 +144,10 @@ void main(void) {
 	if uniformTransform == nil {
 		return nil, fmt.Errorf("transform uniform not found")
 	}
+	uniformSampler := program.Uniform("Texture")
+	if uniformSampler == nil {
+		return nil, fmt.Errorf("sampler uniform not found")
+	}
 
 	coordAttr, err := program.Attribute("Coordinates")
 	if err != nil {
@@ -151,6 +162,16 @@ void main(void) {
 	}
 	colorBuffer := glx.Buffer()
 	colorBuffer.VertexData(color)
+
+	texAttr, err := program.Attribute("TexCoord")
+	if err != nil {
+		return nil, fmt.Errorf("fetching TexCoord attribute: %w", err)
+	}
+	texBuffer := glx.Buffer()
+	texBuffer.VertexData(texCoords)
+	{
+		texAttr = texAttr
+	}
 
 	vao, err := glx.VertexArray(gl.VertexArrayConfig{
 		Attributes: []gl.VertexArrayAttribute{
@@ -173,9 +194,7 @@ void main(void) {
 	elementBuffer.IndexData(elements)
 
 	texture := glx.Texture(gl.Texture2DConfig{}, textureImage)
-	{
-		texture = texture
-	}
+	glx.BindTextureUnits(texture)
 
 	return func(w, h int, rot float64) error {
 		err := glx.Draw(gl.DrawConfig{
@@ -185,6 +204,7 @@ void main(void) {
 				transform := mgl32.HomogRotate3DZ(float32(angle))
 				us.Mat4(uniformTransform, transform)
 				us.Float32(uniformHeight, float32(h))
+				us.Int(uniformSampler, 0)
 			},
 			VAO:          vao,
 			ElementArray: elementBuffer,

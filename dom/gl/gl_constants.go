@@ -38,6 +38,7 @@ type glConstants struct {
 	GetActiveUniform        func(args ...driver.Value) driver.Value
 	CreateVertexArray       func(args ...driver.Value) driver.Value
 	BindVertexArray         func(args ...driver.Value) driver.Value
+	Uniform1i               func(args ...driver.Value) driver.Value
 	Uniform1f               func(args ...driver.Value) driver.Value
 	UniformMatrix4fv        func(args ...driver.Value) driver.Value
 	VertexAttribPointer     func(args ...driver.Value) driver.Value
@@ -48,6 +49,11 @@ type glConstants struct {
 	Viewport                func(args ...driver.Value) driver.Value
 	DrawArrays              func(args ...driver.Value) driver.Value
 	DrawElements            func(args ...driver.Value) driver.Value
+
+	/* Parameters. */
+
+	MAX_COMBINED_TEXTURE_IMAGE_UNITS driver.Value
+	GetParameter                     func(args ...driver.Value) driver.Value
 
 	/* Drawn modes. */
 
@@ -82,13 +88,17 @@ type glConstants struct {
 	TEXTURE_MIN_FILTER driver.Value
 	TEXTURE_MAG_FILTER driver.Value
 	NEAREST            driver.Value
+	LINEAR             driver.Value
 	TEXTURE_WRAP_S     driver.Value
 	TEXTURE_WRAP_T     driver.Value
 	CLAMP_TO_EDGE      driver.Value
+	TEXTURE0           driver.Value
+	ActiveTexture      func(args ...driver.Value) driver.Value
 	CreateTexture      func(args ...driver.Value) driver.Value
 	BindTexture        func(args ...driver.Value) driver.Value
 	TexParameteri      func(args ...driver.Value) driver.Value
 	TexImage2D         func(args ...driver.Value) driver.Value
+	GenerateMipmap     func(args ...driver.Value) driver.Value
 }
 
 func newGlConstants(obj driver.Object) (c glConstants) {

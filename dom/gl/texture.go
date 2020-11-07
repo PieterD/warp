@@ -3,6 +3,7 @@ package gl
 import (
 	"fmt"
 	"image"
+	"image/color"
 
 	"github.com/PieterD/warp/driver"
 )
@@ -35,10 +36,12 @@ func newTexture2D(glx *Context, cfg Texture2DConfig, img image.Image) *Texture2D
 	glx.constants.TexImage2D(texTarget, texLevel, texFormat, texWidth, texHeight, texBorder, texFormat, texType, texPixels)
 
 	//TODO: config this
-	glx.constants.TexParameteri(glx.constants.TEXTURE_2D, glx.constants.TEXTURE_MIN_FILTER, glx.constants.NEAREST)
-	glx.constants.TexParameteri(glx.constants.TEXTURE_2D, glx.constants.TEXTURE_MAG_FILTER, glx.constants.NEAREST)
+	glx.constants.TexParameteri(glx.constants.TEXTURE_2D, glx.constants.TEXTURE_MIN_FILTER, glx.constants.LINEAR)
+	glx.constants.TexParameteri(glx.constants.TEXTURE_2D, glx.constants.TEXTURE_MAG_FILTER, glx.constants.LINEAR)
 	glx.constants.TexParameteri(glx.constants.TEXTURE_2D, glx.constants.TEXTURE_WRAP_S, glx.constants.CLAMP_TO_EDGE)
 	glx.constants.TexParameteri(glx.constants.TEXTURE_2D, glx.constants.TEXTURE_WRAP_T, glx.constants.CLAMP_TO_EDGE)
+
+	glx.constants.GenerateMipmap(glx.constants.TEXTURE_2D)
 
 	return &Texture2D{
 		glx:      glx,
@@ -57,9 +60,23 @@ func imageToBytes(img image.Image, bounds image.Rectangle) (width, height int, p
 	buffer := make([]byte, 0, bufferSize)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			color := img.At(x, y)
-			r, g, b, a := color.RGBA()
-			buffer = append(buffer, byte(r/0xff), byte(g/0xff), byte(b/0xff), byte(a/0xff))
+			iPixel := img.At(x, y)
+			switch pixel := iPixel.(type) {
+			case color.NRGBA:
+				r := pixel.R
+				g := pixel.G
+				b := pixel.B
+				a := pixel.A
+				buffer = append(buffer, r, g, b, a)
+			case color.RGBA:
+				r := pixel.R
+				g := pixel.G
+				b := pixel.B
+				a := pixel.A
+				buffer = append(buffer, r, g, b, a)
+			default:
+				panic(fmt.Errorf("unknown pixel type: %T", iPixel))
+			}
 		}
 	}
 	if len(buffer) != bufferSize {

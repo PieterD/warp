@@ -1,6 +1,7 @@
 package gl
 
 import (
+	"fmt"
 	"image"
 
 	"github.com/PieterD/warp/driver"
@@ -59,4 +60,30 @@ func (glx *Context) Draw(cfg DrawConfig) error {
 
 func (glx *Context) Texture(cfg Texture2DConfig, img image.Image) *Texture2D {
 	return newTexture2D(glx, cfg, img)
+}
+
+func (glx *Context) BindTextureUnits(textures ...*Texture2D) {
+	maxUnits := glx.Parameters().MaxCombinedTextureImageUnits()
+	if len(textures) >= maxUnits {
+		panic(fmt.Errorf("only %d texture units allowed, got: %d", maxUnits, len(textures)))
+	}
+	fTexture0, ok := glx.constants.TEXTURE0.IsNumber()
+	if !ok {
+		panic(fmt.Errorf("expected TEXTURE0 to be a number: %T", glx.constants.TEXTURE0))
+	}
+	t0 := int(fTexture0)
+	for textureUnit := 0; textureUnit < maxUnits; textureUnit++ {
+		jsTextureUnit := glx.factory.Number(float64(t0 + textureUnit))
+		glx.constants.ActiveTexture(jsTextureUnit)
+		glObject := glx.factory.Null()
+		if textureUnit < len(textures) && textures[textureUnit] != nil {
+			glObject = textures[textureUnit].glObject
+		}
+		glx.constants.BindTexture(glx.constants.TEXTURE_2D, glObject)
+	}
+	glx.constants.ActiveTexture(glx.constants.TEXTURE0)
+}
+
+func (glx *Context) Parameters() *ParameterSet {
+	return newParameterSet(glx)
 }

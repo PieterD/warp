@@ -145,6 +145,11 @@ type UniformSetter struct {
 	glx *Context
 }
 
+func (us *UniformSetter) Int(u *Uniform, v int) {
+	glx := us.glx
+	glx.constants.Uniform1i(u.location, glx.factory.Number(float64(v)))
+}
+
 func (us *UniformSetter) Float32(u *Uniform, v float32) {
 	glx := us.glx
 	glx.constants.Uniform1f(u.location, glx.factory.Number(float64(v)))
