@@ -77,7 +77,18 @@ type glConstants struct {
 
 	/* Texture stuff */
 
-	CreateTexture func(args ...driver.Value) driver.Value
+	RGBA               driver.Value
+	TEXTURE_2D         driver.Value
+	TEXTURE_MIN_FILTER driver.Value
+	TEXTURE_MAG_FILTER driver.Value
+	NEAREST            driver.Value
+	TEXTURE_WRAP_S     driver.Value
+	TEXTURE_WRAP_T     driver.Value
+	CLAMP_TO_EDGE      driver.Value
+	CreateTexture      func(args ...driver.Value) driver.Value
+	BindTexture        func(args ...driver.Value) driver.Value
+	TexParameteri      func(args ...driver.Value) driver.Value
+	TexImage2D         func(args ...driver.Value) driver.Value
 }
 
 func newGlConstants(obj driver.Object) (c glConstants) {

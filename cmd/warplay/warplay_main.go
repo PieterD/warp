@@ -72,27 +72,11 @@ func loadTexture(fileName string) (image.Image, error) {
 	return img, nil
 }
 
-func imageToBytes(img image.Image) []byte {
-	bounds := img.Bounds()
-	width := bounds.Dx()
-	height := bounds.Dy()
-	buffer := make([]byte, 0, 4*width*height)
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Min.Y; x++ {
-			color := img.At(x, y)
-			r, g, b, a := color.RGBA()
-			buffer = append(buffer, byte(r/0xff), byte(g/0xff), byte(b/0xff), byte(a/0xff))
-		}
-	}
-	return buffer
-}
-
 func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) error, err error) {
-	//textureImage, err := loadTexture("texture.png")
-	//if err != nil {
-	//	return nil, fmt.Errorf("getting texture: %w", err)
-	//}
-	//textureBytes := imageToBytes(textureImage)
+	textureImage, err := loadTexture("texture.png")
+	if err != nil {
+		return nil, fmt.Errorf("getting texture: %w", err)
+	}
 
 	vertices := []float32{
 		0.75, 0.75, 0.0, 1.0,
@@ -187,6 +171,11 @@ void main(void) {
 	}
 	elementBuffer := glx.Buffer()
 	elementBuffer.IndexData(elements)
+
+	texture := glx.Texture(gl.Texture2DConfig{}, textureImage)
+	{
+		texture = texture
+	}
 
 	return func(w, h int, rot float64) error {
 		err := glx.Draw(gl.DrawConfig{

@@ -5,16 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/misc/static/texture.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/buffer.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/buffer.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dom/gl/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/draw.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/draw.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/gl_constants.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/program.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/vao.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/vao.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dom/gl/texture.go" beforeDir="false" afterPath="$PROJECT_DIR$/dom/gl/texture.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,10 +104,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="777" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604238710365" />
-    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1604170947507">
+    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1604783179957">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604170947507" />
+    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604783179957" />
     <state x="803" y="301" key="refactoring.ChangeSignatureDialog" timestamp="1604167516638">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>

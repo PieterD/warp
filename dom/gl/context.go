@@ -1,6 +1,8 @@
 package gl
 
 import (
+	"image"
+
 	"github.com/PieterD/warp/driver"
 	"github.com/PieterD/warp/driver/driverutil"
 )
@@ -55,6 +57,6 @@ func (glx *Context) Draw(cfg DrawConfig) error {
 	return doDraw(glx, cfg)
 }
 
-func (glx *Context) Texture(cfg TextureConfig) (*Texture, error) {
-	return newTexture(glx, cfg)
+func (glx *Context) Texture(cfg Texture2DConfig, img image.Image) *Texture2D {
+	return newTexture2D(glx, cfg, img)
 }
