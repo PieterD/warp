@@ -8,12 +8,12 @@ type Buffer struct {
 	currentType driver.Value
 }
 
-func newBuffer(glx *Context) (*Buffer, error) {
-	bufferObject := glx.functions.CreateBuffer()
+func newBuffer(glx *Context) *Buffer {
+	bufferObject := glx.constants.CreateBuffer()
 	return &Buffer{
 		glx:      glx,
 		glObject: bufferObject,
-	}, nil
+	}
 }
 
 func (b *Buffer) VertexData(data []float32) {
@@ -23,9 +23,9 @@ func (b *Buffer) VertexData(data []float32) {
 	vertexArray := jsBuffer.AsFloat32Array()
 	glx := b.glx
 
-	glx.functions.BindBuffer(glx.constants.ARRAY_BUFFER, b.glObject)
-	glx.functions.BufferData(glx.constants.ARRAY_BUFFER, vertexArray, glx.constants.STATIC_DRAW)
-	glx.functions.BindBuffer(glx.constants.ARRAY_BUFFER, glx.factory.Null())
+	glx.constants.BindBuffer(glx.constants.ARRAY_BUFFER, b.glObject)
+	glx.constants.BufferData(glx.constants.ARRAY_BUFFER, vertexArray, glx.constants.STATIC_DRAW)
+	glx.constants.BindBuffer(glx.constants.ARRAY_BUFFER, glx.factory.Null())
 }
 
 func (b *Buffer) IndexData(data []uint16) {
@@ -35,7 +35,7 @@ func (b *Buffer) IndexData(data []uint16) {
 	indexArray := jsBuffer.AsUint16Array()
 	glx := b.glx
 
-	glx.functions.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, b.glObject)
-	glx.functions.BufferData(glx.constants.ELEMENT_ARRAY_BUFFER, indexArray, glx.constants.STATIC_DRAW)
-	glx.functions.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, glx.factory.Null())
+	glx.constants.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, b.glObject)
+	glx.constants.BufferData(glx.constants.ELEMENT_ARRAY_BUFFER, indexArray, glx.constants.STATIC_DRAW)
+	glx.constants.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, glx.factory.Null())
 }

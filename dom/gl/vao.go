@@ -27,9 +27,9 @@ type VertexArray struct {
 }
 
 func newVertexArray(glx *Context, cfg VertexArrayConfig) (*VertexArray, error) {
-	glVAO := glx.functions.CreateVertexArray()
-	glx.functions.BindVertexArray(glVAO)
-	defer glx.functions.BindVertexArray(glx.factory.Null())
+	glVAO := glx.constants.CreateVertexArray()
+	glx.constants.BindVertexArray(glVAO)
+	defer glx.constants.BindVertexArray(glx.factory.Null())
 
 	for _, da := range cfg.Attributes {
 		glAttrIndex := glx.factory.Number(float64(da.Attr.index))
@@ -46,8 +46,8 @@ func newVertexArray(glx *Context, cfg VertexArrayConfig) (*VertexArray, error) {
 		glNormalized := glx.factory.Boolean(false)
 		glByteStride := glx.factory.Number(float64(da.Layout.ByteStride))
 		glByteOffset := glx.factory.Number(float64(da.Layout.ByteOffset))
-		glx.functions.BindBuffer(glx.constants.ARRAY_BUFFER, da.Buffer.glObject)
-		glx.functions.VertexAttribPointer(
+		glx.constants.BindBuffer(glx.constants.ARRAY_BUFFER, da.Buffer.glObject)
+		glx.constants.VertexAttribPointer(
 			glAttrIndex,
 			glItemsPerVertex,
 			glBufferType,
@@ -55,9 +55,9 @@ func newVertexArray(glx *Context, cfg VertexArrayConfig) (*VertexArray, error) {
 			glByteStride,
 			glByteOffset,
 		)
-		glx.functions.EnableVertexAttribArray(glx.factory.Number(float64(da.Attr.index)))
+		glx.constants.EnableVertexAttribArray(glx.factory.Number(float64(da.Attr.index)))
 	}
-	glx.functions.BindBuffer(glx.constants.ARRAY_BUFFER, glx.factory.Null())
+	glx.constants.BindBuffer(glx.constants.ARRAY_BUFFER, glx.factory.Null())
 
 	return &VertexArray{
 		glx:      glx,

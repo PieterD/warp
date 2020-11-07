@@ -35,24 +35,24 @@ func doDraw(glx *Context, cfg DrawConfig) error {
 		return fmt.Errorf("unsupported draw mode: %v", cfg.DrawMode)
 	}
 
-	glx.functions.UseProgram(cfg.Use.glObject)
-	defer glx.functions.UseProgram(glx.factory.Null())
+	glx.constants.UseProgram(cfg.Use.glObject)
+	defer glx.constants.UseProgram(glx.factory.Null())
 	if cfg.Uniforms != nil {
 		cfg.Uniforms(&UniformSetter{glx: glx})
 	}
-	glx.functions.BindVertexArray(cfg.VAO.glObject)
-	defer glx.functions.BindVertexArray(glx.factory.Null())
+	glx.constants.BindVertexArray(cfg.VAO.glObject)
+	defer glx.constants.BindVertexArray(glx.factory.Null())
 	if cfg.ElementArray == nil {
-		glx.functions.DrawArrays(
+		glx.constants.DrawArrays(
 			glDrawMode,
 			glx.factory.Number(float64(cfg.Vertices.FirstOffset)),
 			glx.factory.Number(float64(cfg.Vertices.VertexCount)),
 		)
 		return nil
 	}
-	glx.functions.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, cfg.ElementArray.glObject)
-	defer glx.functions.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, glx.factory.Null())
-	glx.functions.DrawElements(
+	glx.constants.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, cfg.ElementArray.glObject)
+	defer glx.constants.BindBuffer(glx.constants.ELEMENT_ARRAY_BUFFER, glx.factory.Null())
+	glx.constants.DrawElements(
 		glDrawMode,
 		glx.factory.Number(float64(cfg.Vertices.VertexCount)),
 		glx.constants.UNSIGNED_SHORT,

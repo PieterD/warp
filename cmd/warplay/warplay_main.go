@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"image"
+	_ "image/png"
 	"math"
+	"net/http"
 	"os"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -53,12 +56,61 @@ func run() error {
 	return nil
 }
 
+func loadTexture(fileName string) (image.Image, error) {
+	resp, err := http.DefaultClient.Get(fmt.Sprintf("/%s", fileName))
+	if err != nil {
+		return nil, fmt.Errorf("getting texture: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode/100 != 2 {
+		return nil, fmt.Errorf("unsuccessful status code while getting texture: %d", resp.StatusCode)
+	}
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("decoding image: %w", err)
+	}
+	return img, nil
+}
+
+func imageToBytes(img image.Image) []byte {
+	bounds := img.Bounds()
+	width := bounds.Dx()
+	height := bounds.Dy()
+	buffer := make([]byte, 0, 4*width*height)
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Min.Y; x++ {
+			color := img.At(x, y)
+			r, g, b, a := color.RGBA()
+			buffer = append(buffer, byte(r/0xff), byte(g/0xff), byte(b/0xff), byte(a/0xff))
+		}
+	}
+	return buffer
+}
+
 func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) error, err error) {
+	//textureImage, err := loadTexture("texture.png")
+	//if err != nil {
+	//	return nil, fmt.Errorf("getting texture: %w", err)
+	//}
+	//textureBytes := imageToBytes(textureImage)
+
 	vertices := []float32{
 		0.75, 0.75, 0.0, 1.0,
 		0.75, -0.75, 0.0, 1.0,
 		-0.75, -0.75, 0.0, 1.0,
 		-0.75, 0.75, 0.0, 1.0,
+	}
+	//texCoords := []float32{
+	//	0.0, 1.0,
+	//	1.0, 1.0,
+	//	1.0, 0.0,
+	//	0.0, 0.0,
+	//}
+	color := []float32{
+		1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 1.0,
+		1.0, 0.0, 1.0,
 	}
 	elements := []uint16{
 		0, 1, 2,
@@ -66,23 +118,25 @@ func buildRenderer(glx *gl.Context) (renderFunc func(w, h int, rot float64) erro
 	}
 
 	programConfig := gl.ProgramConfig{
-		VertexCode: `
-attribute vec4 coordinates;
-
-uniform mat4 transform;
+		VertexCode: `#version 100
+attribute vec4 Coordinates;
+attribute vec3 Color;
+varying vec4 color;
+uniform mat4 Transform;
 
 void main(void) {
-	gl_Position = transform * coordinates;
+	color = vec4(Color, 1.0);
+	gl_Position = Transform * Coordinates;
 }
 `,
-		FragmentCode: `
+		FragmentCode: `#version 100
 precision mediump float; // highp
-
-uniform float height;
+varying vec4 color;
+uniform float Height;
 
 void main(void) {
-	float lerpValue = gl_FragCoord.y / height;
-	gl_FragColor = mix(vec4(0.25, 0.25, 0.25, 1.0), vec4(1.0, 1.0, 1.0, 1.0), lerpValue);
+	float lerpValue = gl_FragCoord.y / Height;
+	gl_FragColor = mix(color, vec4(1.0, 1.0, 1.0, 1.0), lerpValue);
 }
 `,
 	}
@@ -91,23 +145,29 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("compiling shader: %w", err)
 	}
-	uniformHeight := program.Uniform("height")
+	uniformHeight := program.Uniform("Height")
 	if uniformHeight == nil {
 		return nil, fmt.Errorf("height uniform not found")
 	}
-	uniformTransform := program.Uniform("transform")
+	uniformTransform := program.Uniform("Transform")
 	if uniformTransform == nil {
 		return nil, fmt.Errorf("transform uniform not found")
 	}
-	coordAttr, err := program.Attribute("coordinates")
+
+	coordAttr, err := program.Attribute("Coordinates")
 	if err != nil {
 		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
 	}
-	vertexBuffer, err := glx.Buffer()
-	if err != nil {
-		return nil, fmt.Errorf("creating vertex buffer: %w", err)
-	}
+	vertexBuffer := glx.Buffer()
 	vertexBuffer.VertexData(vertices)
+
+	colorAttr, err := program.Attribute("Color")
+	if err != nil {
+		return nil, fmt.Errorf("fetching color attribute: %w", err)
+	}
+	colorBuffer := glx.Buffer()
+	colorBuffer.VertexData(color)
+
 	vao, err := glx.VertexArray(gl.VertexArrayConfig{
 		Attributes: []gl.VertexArrayAttribute{
 			{
@@ -115,15 +175,17 @@ void main(void) {
 				Attr:   coordAttr,
 				Layout: gl.VertexArrayAttributeLayout{},
 			},
+			{
+				Buffer: colorBuffer,
+				Attr:   colorAttr,
+				Layout: gl.VertexArrayAttributeLayout{},
+			},
 		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
-	elementBuffer, err := glx.Buffer()
-	if err != nil {
-		return nil, fmt.Errorf("creating element buffer: %w", err)
-	}
+	elementBuffer := glx.Buffer()
 	elementBuffer.IndexData(elements)
 
 	return func(w, h int, rot float64) error {

@@ -9,7 +9,6 @@ type Context struct {
 	factory       driver.Factory
 	obj           driver.Object
 	constants     glConstants
-	functions     glFunctions
 	typeConverter *typeConverter
 }
 
@@ -26,13 +25,11 @@ func NewContext(canvas Canvas) *Context {
 	}
 
 	constants := newGlConstants(ctxObject)
-	functions := newGlFunctions(ctxObject)
 	typeConverter := newTypeConverter(constants)
 	glx := &Context{
 		factory:       factory,
 		obj:           ctxObject,
 		constants:     constants,
-		functions:     functions,
 		typeConverter: typeConverter,
 	}
 	return glx
@@ -42,7 +39,7 @@ func (glx *Context) Program(cfg ProgramConfig) (*Program, error) {
 	return newProgram(glx, cfg)
 }
 
-func (glx *Context) Buffer() (*Buffer, error) {
+func (glx *Context) Buffer() *Buffer {
 	return newBuffer(glx)
 }
 
@@ -51,9 +48,13 @@ func (glx *Context) VertexArray(cfg VertexArrayConfig) (*VertexArray, error) {
 }
 
 func (glx *Context) Use(p *Program) {
-	glx.functions.UseProgram(p.glObject)
+	glx.constants.UseProgram(p.glObject)
 }
 
 func (glx *Context) Draw(cfg DrawConfig) error {
 	return doDraw(glx, cfg)
+}
+
+func (glx *Context) Texture(cfg TextureConfig) (*Texture, error) {
+	return newTexture(glx, cfg)
 }

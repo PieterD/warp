@@ -27,16 +27,16 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 	if err != nil {
 		return nil, fmt.Errorf("compiling fragment shader: %w", err)
 	}
-	programObject := glx.functions.CreateProgram()
-	glx.functions.AttachShader(programObject, vertShaderObject)
-	glx.functions.AttachShader(programObject, fragShaderObject)
-	glx.functions.LinkProgram(programObject)
-	linkStatus, ok := glx.functions.GetProgramParameter(programObject, glx.constants.LINK_STATUS).IsBoolean()
+	programObject := glx.constants.CreateProgram()
+	glx.constants.AttachShader(programObject, vertShaderObject)
+	glx.constants.AttachShader(programObject, fragShaderObject)
+	glx.constants.LinkProgram(programObject)
+	linkStatus, ok := glx.constants.GetProgramParameter(programObject, glx.constants.LINK_STATUS).IsBoolean()
 	if !ok {
 		return nil, fmt.Errorf("LINK_STATUS program parameter did not return boolean")
 	}
 	if !linkStatus {
-		info, ok := glx.functions.GetProgramInfoLog(programObject).IsString()
+		info, ok := glx.constants.GetProgramInfoLog(programObject).IsString()
 		if !ok {
 			return nil, fmt.Errorf("programInfoLog did not return string")
 		}
@@ -49,16 +49,16 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 }
 
 func compileShader(glx *Context, shaderType driver.Value, code string) (driver.Value, error) {
-	shaderObject := glx.functions.CreateShader(shaderType)
-	glx.functions.ShaderSource(shaderObject, glx.factory.String(code))
-	glx.functions.CompileShader(shaderObject)
-	csValue := glx.functions.GetShaderParameter(shaderObject, glx.constants.COMPILE_STATUS)
+	shaderObject := glx.constants.CreateShader(shaderType)
+	glx.constants.ShaderSource(shaderObject, glx.factory.String(code))
+	glx.constants.CompileShader(shaderObject)
+	csValue := glx.constants.GetShaderParameter(shaderObject, glx.constants.COMPILE_STATUS)
 	compileStatus, ok := csValue.IsBoolean()
 	if !ok {
 		return nil, fmt.Errorf("COMPILE_STATUS shader parameteer did not return boolean: %T", csValue)
 	}
 	if !compileStatus {
-		info, ok := glx.functions.GetShaderInfoLog(shaderObject).IsString()
+		info, ok := glx.constants.GetShaderInfoLog(shaderObject).IsString()
 		if !ok {
 			return nil, fmt.Errorf("shaderInfoLog did not return string")
 		}
@@ -77,7 +77,7 @@ type Attribute struct {
 
 func (p *Program) Attribute(name string) (*Attribute, error) {
 	glx := p.glx
-	glIndex := glx.functions.GetAttribLocation(p.glObject, glx.factory.String(name))
+	glIndex := glx.constants.GetAttribLocation(p.glObject, glx.factory.String(name))
 	fIndex, ok := glIndex.IsNumber()
 	if !ok {
 		return nil, fmt.Errorf("returned attribute index is somehow not a number: %T", glIndex)
@@ -85,7 +85,7 @@ func (p *Program) Attribute(name string) (*Attribute, error) {
 	if fIndex == -1 {
 		return nil, fmt.Errorf("attribute does not exist")
 	}
-	attribInfoValue := glx.functions.GetActiveAttrib(p.glObject, glIndex)
+	attribInfoValue := glx.constants.GetActiveAttrib(p.glObject, glIndex)
 	if attribInfoValue.IsNull() {
 		return nil, fmt.Errorf("no attribute info found")
 	}
@@ -130,7 +130,7 @@ type Uniform struct {
 
 func (p *Program) Uniform(name string) *Uniform {
 	glx := p.glx
-	location := glx.functions.GetUniformLocation(p.glObject, glx.factory.String(name))
+	location := glx.constants.GetUniformLocation(p.glObject, glx.factory.String(name))
 	if location.IsNull() {
 		return nil
 	}
@@ -147,12 +147,12 @@ type UniformSetter struct {
 
 func (us *UniformSetter) Float32(u *Uniform, v float32) {
 	glx := us.glx
-	glx.functions.Uniform1f(u.location, glx.factory.Number(float64(v)))
+	glx.constants.Uniform1f(u.location, glx.factory.Number(float64(v)))
 }
 
 func (us *UniformSetter) Mat4(u *Uniform, m mgl32.Mat4) {
 	glx := us.glx
 	buf := glx.factory.Buffer(4 * 4 * 4)
 	buf.Put(fastFloat32ToByte(m[:]))
-	glx.functions.UniformMatrix4fv(u.location, glx.factory.Boolean(false), buf.AsFloat32Array())
+	glx.constants.UniformMatrix4fv(u.location, glx.factory.Boolean(false), buf.AsFloat32Array())
 }
