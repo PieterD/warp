@@ -27,7 +27,7 @@ func NewContext(canvas Canvas) *Context {
 		return nil
 	}
 
-	constants := newGlConstants(ctxObject)
+	constants := newGlConstants(ctxObject, false)
 	typeConverter := newTypeConverter(constants)
 	glx := &Context{
 		factory:       factory,
@@ -78,6 +78,10 @@ func (glx *Context) BindTextureUnits(textures ...*Texture2D) {
 		glObject := glx.factory.Null()
 		if textureUnit < len(textures) && textures[textureUnit] != nil {
 			glObject = textures[textureUnit].glObject
+		} else {
+			// Do we want to disable all non-selected units, or do we leave them alone?
+			// For now, leave them alone.
+			break
 		}
 		glx.constants.BindTexture(glx.constants.TEXTURE_2D, glObject)
 	}

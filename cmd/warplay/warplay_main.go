@@ -185,6 +185,11 @@ void main(void) {
 				Attr:   colorAttr,
 				Layout: gl.VertexArrayAttributeLayout{},
 			},
+			{
+				Buffer: texBuffer,
+				Attr:   texAttr,
+				Layout: gl.VertexArrayAttributeLayout{},
+			},
 		},
 	})
 	if err != nil {

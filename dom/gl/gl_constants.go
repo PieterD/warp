@@ -101,7 +101,7 @@ type glConstants struct {
 	GenerateMipmap     func(args ...driver.Value) driver.Value
 }
 
-func newGlConstants(obj driver.Object) (c glConstants) {
+func newGlConstants(obj driver.Object, trace bool) (c glConstants) {
 	var driverValue driver.Value
 	var driverFunc func(args ...driver.Value) driver.Value
 	typeDriverValue := reflect.TypeOf(&driverValue).Elem()
@@ -124,10 +124,46 @@ func newGlConstants(obj driver.Object) (c glConstants) {
 			if function == nil {
 				panic(fmt.Errorf("function %s is apparently not a function", functionName))
 			}
+			if trace {
+				function = wrapTrace(functionName, function)
+			}
 			fieldValue.Set(reflect.ValueOf(function))
 		default:
 			panic(fmt.Errorf("unhandled type: %v", fieldValue.Type()))
 		}
 	}
 	return c
+}
+
+func wrapTrace(functionName string, f func(args ...driver.Value) driver.Value) func(args ...driver.Value) driver.Value {
+	return func(args ...driver.Value) driver.Value {
+		fmt.Printf("[TRACE] %s(", functionName)
+		for i, arg := range args {
+			isLastArg := i == len(args)-1
+			if arg.IsNull() {
+				fmt.Printf("null")
+			} else if arg.IsUndefined() {
+				fmt.Printf("undefined")
+			} else if v, ok := arg.IsBoolean(); ok {
+				fmt.Printf("%t", v)
+			} else if v, ok := arg.IsNumber(); ok {
+				fmt.Printf("%f", v)
+			} else if v, ok := arg.IsString(); ok {
+				fmt.Printf("%q", v)
+			} else if v := arg.IsObject(); v != nil {
+				fmt.Printf("object")
+			} else if v := arg.IsFunction(); v != nil {
+				fmt.Printf("function")
+			} else {
+				fmt.Printf("UNKNOWN")
+			}
+			if !isLastArg {
+				fmt.Printf(", ")
+			}
+		}
+		fmt.Printf(")\n")
+		rv := f(args...)
+		return rv
+	}
+
 }
