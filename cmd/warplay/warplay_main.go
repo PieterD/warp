@@ -79,16 +79,16 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 	}
 
 	vertices := []float32{
-		0.75, 0.75, 0.0, 1.0,
-		0.75, -0.75, 0.0, 1.0,
-		-0.75, -0.75, 0.0, 1.0,
-		-0.75, 0.75, 0.0, 1.0,
+		0.5, 0.5, 0.0, 1.0,
+		-0.5, -0.5, 0.0, 1.0,
+		-0.5, 0.5, 0.0, 1.0,
+		0.5, -0.5, 0.0, 1.0,
 	}
 	texCoords := []float32{
-		0.0, 1.0,
 		1.0, 1.0,
-		1.0, 0.0,
 		0.0, 0.0,
+		0.0, 1.0,
+		1.0, 0.0,
 	}
 	color := []float32{
 		1.0, 0.0, 0.0,
@@ -98,11 +98,13 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 	}
 	elements := []uint16{
 		0, 1, 2,
-		0, 2, 3,
+		3, 1, 0,
 	}
 
 	programConfig := gl.ProgramConfig{
 		VertexCode: `#version 100
+precision highp float; // mediump
+
 attribute vec4 Coordinates;
 attribute vec3 Color;
 attribute vec2 TexCoord;
@@ -117,7 +119,8 @@ void main(void) {
 }
 `,
 		FragmentCode: `#version 100
-precision mediump float; // highp
+precision highp float; // mediump
+
 varying vec4 color;
 varying vec2 texCoord;
 uniform sampler2D Texture;
