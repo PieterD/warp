@@ -4,6 +4,10 @@
 - Matrices
 - Elements
 
+# Notes
+
+- Mind coordinates: Opengl to top right, texture coordinates to bottom right.
+
 # Links
 
 http://webglsamples.org/WebGL2Samples

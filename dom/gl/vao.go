@@ -6,10 +6,6 @@ import (
 	"github.com/PieterD/warp/driver"
 )
 
-type VertexArrayConfig struct {
-	Attributes []VertexArrayAttribute
-}
-
 type VertexArrayAttribute struct {
 	Buffer *Buffer
 	Attr   *Attribute
@@ -26,12 +22,12 @@ type VertexArray struct {
 	glObject driver.Value
 }
 
-func newVertexArray(glx *Context, cfg VertexArrayConfig) (*VertexArray, error) {
+func newVertexArray(glx *Context, attrs ...VertexArrayAttribute) (*VertexArray, error) {
 	glVAO := glx.constants.CreateVertexArray()
 	glx.constants.BindVertexArray(glVAO)
 	defer glx.constants.BindVertexArray(glx.factory.Null())
 
-	for _, da := range cfg.Attributes {
+	for _, da := range attrs {
 		glAttrIndex := glx.factory.Number(float64(da.Attr.index))
 		attrType, attrSize := da.Attr.Type()
 		if attrSize != 1 {

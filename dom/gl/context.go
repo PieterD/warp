@@ -46,8 +46,8 @@ func (glx *Context) Buffer() *Buffer {
 	return newBuffer(glx)
 }
 
-func (glx *Context) VertexArray(cfg VertexArrayConfig) (*VertexArray, error) {
-	return newVertexArray(glx, cfg)
+func (glx *Context) VertexArray(attrs ...VertexArrayAttribute) (*VertexArray, error) {
+	return newVertexArray(glx, attrs...)
 }
 
 func (glx *Context) Use(p *Program) {

@@ -17,14 +17,15 @@ import (
 )
 
 func main() {
-	if err := run(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if err := run(ctx); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "running warplay: %v", err)
 	}
 	<-make(chan struct{})
 }
 
-func run() error {
-	ctx, _ := context.WithCancel(context.Background())
+func run(ctx context.Context) error {
 	factory := wasmjs.Open()
 	global := dom.Open(factory)
 	doc := global.Window().Document()
@@ -57,7 +58,7 @@ func run() error {
 }
 
 func loadTexture(fileName string) (image.Image, error) {
-	resp, err := http.DefaultClient.Get(fmt.Sprintf("/%s", fileName))
+	resp, err := http.DefaultClient.Get(fileName)
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
 	}
@@ -73,7 +74,7 @@ func loadTexture(fileName string) (image.Image, error) {
 }
 
 func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err error) {
-	textureImage, err := loadTexture("texture.png")
+	textureImage, err := loadTexture("/texture.png")
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
 	}
@@ -85,10 +86,10 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 		0.5, -0.5, 0.0, 1.0,
 	}
 	texCoords := []float32{
-		1.0, 1.0,
-		0.0, 0.0,
-		0.0, 1.0,
 		1.0, 0.0,
+		0.0, 1.0,
+		0.0, 0.0,
+		1.0, 1.0,
 	}
 	color := []float32{
 		1.0, 0.0, 0.0,
@@ -149,8 +150,8 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
 	}
-	vertexBuffer := glx.Buffer()
-	vertexBuffer.VertexData(vertices)
+	coordBuffer := glx.Buffer()
+	coordBuffer.VertexData(vertices)
 
 	colorAttr, err := program.Attribute("Color")
 	if err != nil {
@@ -166,25 +167,20 @@ void main(void) {
 	texBuffer := glx.Buffer()
 	texBuffer.VertexData(texCoords)
 
-	vao, err := glx.VertexArray(gl.VertexArrayConfig{
-		Attributes: []gl.VertexArrayAttribute{
-			{
-				Buffer: vertexBuffer,
-				Attr:   coordAttr,
-				Layout: gl.VertexArrayAttributeLayout{},
-			},
-			{
-				Buffer: colorBuffer,
-				Attr:   colorAttr,
-				Layout: gl.VertexArrayAttributeLayout{},
-			},
-			{
-				Buffer: texBuffer,
-				Attr:   texAttr,
-				Layout: gl.VertexArrayAttributeLayout{},
-			},
+	vao, err := glx.VertexArray(
+		gl.VertexArrayAttribute{
+			Buffer: coordBuffer,
+			Attr:   coordAttr,
 		},
-	})
+		gl.VertexArrayAttribute{
+			Buffer: colorBuffer,
+			Attr:   colorAttr,
+		},
+		gl.VertexArrayAttribute{
+			Buffer: texBuffer,
+			Attr:   texAttr,
+		},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
