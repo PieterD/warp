@@ -3,7 +3,7 @@ package gl
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/pkg/driver"
 )
 
 type VertexArrayAttribute struct {

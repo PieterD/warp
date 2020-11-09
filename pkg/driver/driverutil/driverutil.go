@@ -1,6 +1,6 @@
 package driverutil
 
-import "github.com/PieterD/warp/driver"
+import "github.com/PieterD/warp/pkg/driver"
 
 func Bind(o driver.Object, methodName string) func(args ...driver.Value) driver.Value {
 	got := o.Get(methodName)

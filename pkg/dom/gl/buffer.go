@@ -1,6 +1,6 @@
 package gl
 
-import "github.com/PieterD/warp/driver"
+import "github.com/PieterD/warp/pkg/driver"
 
 type Buffer struct {
 	glx         *Context

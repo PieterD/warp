@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/pkg/driver"
 )
 
 func js2value(jsValue js.Value) (v driver.Value) {

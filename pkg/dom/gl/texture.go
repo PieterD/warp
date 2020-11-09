@@ -5,7 +5,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/pkg/driver"
 )
 
 type Texture2D struct {

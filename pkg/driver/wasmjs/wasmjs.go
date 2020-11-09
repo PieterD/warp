@@ -1,7 +1,7 @@
 package wasmjs
 
 import (
-	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/pkg/driver"
 )
 
 func Open() (factory driver.Factory) {

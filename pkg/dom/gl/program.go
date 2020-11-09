@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-gl/mathgl/mgl32"
 
-	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/pkg/driver"
 )
 
 type ProgramConfig struct {

@@ -3,7 +3,7 @@ package wasmjs
 import (
 	"syscall/js"
 
-	"github.com/PieterD/warp/driver"
+	"github.com/PieterD/warp/pkg/driver"
 )
 
 type jsFactory struct{}

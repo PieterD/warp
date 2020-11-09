@@ -11,9 +11,9 @@ import (
 
 	"github.com/go-gl/mathgl/mgl32"
 
-	"github.com/PieterD/warp/dom"
-	"github.com/PieterD/warp/dom/gl"
-	"github.com/PieterD/warp/driver/wasmjs"
+	"github.com/PieterD/warp/pkg/dom"
+	"github.com/PieterD/warp/pkg/dom/gl"
+	"github.com/PieterD/warp/pkg/driver/wasmjs"
 )
 
 func main() {

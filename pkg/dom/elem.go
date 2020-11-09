@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/PieterD/warp/driver"
-	"github.com/PieterD/warp/driver/driverutil"
+	"github.com/PieterD/warp/pkg/driver"
+	"github.com/PieterD/warp/pkg/driver/driverutil"
 )
 
 type Elem struct {

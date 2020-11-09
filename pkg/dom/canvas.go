@@ -3,7 +3,7 @@ package dom
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/dom/gl"
+	"github.com/PieterD/warp/pkg/dom/gl"
 )
 
 type Canvas struct {

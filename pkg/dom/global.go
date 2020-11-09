@@ -1,6 +1,6 @@
 package dom
 
-import "github.com/PieterD/warp/driver"
+import "github.com/PieterD/warp/pkg/driver"
 
 type Global struct {
 	factory driver.Factory
