@@ -96,7 +96,7 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
 	}
-	heartModel, err := loadModel("/models/square.obj")
+	heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
 	}
@@ -161,8 +161,6 @@ void main(void) {
 	heartElementBuffer := glx.Buffer()
 	heartElementBuffer.IndexData(heartIndices)
 
-	fmt.Printf("%v %v\n", heartVertices, heartIndices)
-
 	stride := (heartModel.VertexItems + heartModel.TextureItems + heartModel.VertexItems) * 4
 	vao, err := glx.VertexArray(
 		gl.VertexArrayAttribute{
@@ -190,17 +188,17 @@ void main(void) {
 	glx.BindTextureUnits(texture)
 
 	return func(rot float64) error {
+		glx.Clear()
 		err := glx.Draw(gl.DrawConfig{
 			Use: program,
 			Uniforms: func(us *gl.UniformSetter) {
 				angle := 2 * math.Pi * rot
-				//translateMat := mgl32.Translate3D(0, 0, 1.0)
-				scaleMat := mgl32.Scale3D(1/10.0, 1/10.0, 1/10.0)
-				rotateMat := mgl32.HomogRotate3DY(float32(angle))
 				transform := mgl32.Ident4()
-				//transform = transform.Mul4(translateMat)
-				transform = transform.Mul4(rotateMat)
-				transform = transform.Mul4(scaleMat)
+				transform = transform.Mul4(mgl32.Perspective(2*math.Pi/4.0, 4.0/3.0, 0.1, 100.0))
+				transform = transform.Mul4(mgl32.Translate3D(0.0, -10.0, -20.0))
+				transform = transform.Mul4(mgl32.HomogRotate3DY(float32(angle)))
+				transform = transform.Mul4(mgl32.HomogRotate3DX(float32(-math.Pi / 2.0)))
+				//transform = transform.Mul4(mgl32.Scale3D(1/20.0, 1/20.0, 1/20.0))
 				us.Mat4(uniformTransform, transform)
 				us.Int(uniformSampler, 0)
 			},
@@ -210,6 +208,9 @@ void main(void) {
 			Vertices: gl.VertexRange{
 				FirstOffset: 0,
 				VertexCount: verticesToRender,
+			},
+			Options: gl.DrawOptions{
+				DepthTest: true,
 			},
 		})
 		if err != nil {

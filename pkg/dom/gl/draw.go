@@ -13,6 +13,13 @@ type DrawConfig struct {
 	ElementArray *Buffer // Optional
 	DrawMode     DrawMode
 	Vertices     VertexRange
+	Options      DrawOptions
+}
+
+type DrawOptions struct {
+	DepthTest     bool
+	DepthReadOnly bool // DepthMask
+	//TODO: DepthFunc
 }
 
 type VertexRange struct {
@@ -33,6 +40,13 @@ func doDraw(glx *Context, cfg DrawConfig) error {
 		glDrawMode = glx.constants.TRIANGLES
 	default:
 		return fmt.Errorf("unsupported draw mode: %v", cfg.DrawMode)
+	}
+
+	if cfg.Options.DepthTest {
+		glx.constants.Enable(glx.constants.DEPTH_TEST)
+		defer glx.constants.Disable(glx.constants.DEPTH_TEST)
+		glx.constants.DepthMask(glx.factory.Boolean(!cfg.Options.DepthReadOnly))
+		glx.constants.DepthFunc(glx.constants.LESS)
 	}
 
 	glx.constants.UseProgram(cfg.Use.glObject)

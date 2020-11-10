@@ -54,6 +54,11 @@ func (glx *Context) Use(p *Program) {
 	glx.constants.UseProgram(p.glObject)
 }
 
+func (glx *Context) Clear() {
+	glx.constants.Clear(glx.constants.COLOR_BUFFER_BIT)
+	glx.constants.Clear(glx.constants.DEPTH_BUFFER_BIT)
+}
+
 func (glx *Context) Draw(cfg DrawConfig) error {
 	return doDraw(glx, cfg)
 }

@@ -19,7 +19,6 @@ type glConstants struct {
 	ARRAY_BUFFER            driver.Value
 	ELEMENT_ARRAY_BUFFER    driver.Value
 	STATIC_DRAW             driver.Value
-	COLOR_BUFFER_BIT        driver.Value
 	DEPTH_TEST              driver.Value
 	CreateShader            func(args ...driver.Value) driver.Value
 	ShaderSource            func(args ...driver.Value) driver.Value
@@ -45,19 +44,37 @@ type glConstants struct {
 	EnableVertexAttribArray func(args ...driver.Value) driver.Value
 	ClearColor              func(args ...driver.Value) driver.Value
 	Enable                  func(args ...driver.Value) driver.Value
-	Clear                   func(args ...driver.Value) driver.Value
+	Disable                 func(args ...driver.Value) driver.Value
 	Viewport                func(args ...driver.Value) driver.Value
-	DrawArrays              func(args ...driver.Value) driver.Value
-	DrawElements            func(args ...driver.Value) driver.Value
+
+	/* Depth. */
+
+	ALWAYS    driver.Value
+	NEVER     driver.Value
+	LESS      driver.Value
+	LEQUAL    driver.Value
+	GREATER   driver.Value
+	GEQUAL    driver.Value
+	NOTEQUAL  driver.Value
+	DepthMask func(args ...driver.Value) driver.Value
+	DepthFunc func(args ...driver.Value) driver.Value
 
 	/* Parameters. */
 
 	MAX_COMBINED_TEXTURE_IMAGE_UNITS driver.Value
 	GetParameter                     func(args ...driver.Value) driver.Value
 
-	/* Drawn modes. */
+	/* Clearing. */
 
-	TRIANGLES driver.Value
+	COLOR_BUFFER_BIT driver.Value
+	DEPTH_BUFFER_BIT driver.Value
+	Clear            func(args ...driver.Value) driver.Value
+
+	/* Drawing. */
+
+	TRIANGLES    driver.Value
+	DrawArrays   func(args ...driver.Value) driver.Value
+	DrawElements func(args ...driver.Value) driver.Value
 
 	/* Data types. */
 
