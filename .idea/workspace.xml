@@ -72,6 +72,16 @@
       <pattern value="^\QTestFromObj\E$" />
       <method v="2" />
     </configuration>
+    <configuration name="obj_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="warp" />
+      <working_directory value="$PROJECT_DIR$/pkg/mdl" />
+      <framework value="gotest" />
+      <kind value="FILE" />
+      <package value="github.com/PieterD/warp" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/pkg/mdl/obj_test.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="./misc/docker/target" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/Makefile" target="./misc/docker/target" workingDirectory="" arguments="">
         <envs />
@@ -93,6 +103,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl" />
+        <item itemvalue="Go Test.obj_test.go" />
         <item itemvalue="Makefile../misc/docker/target" />
         <item itemvalue="Makefile.clean" />
         <item itemvalue="Makefile.build-docker" />

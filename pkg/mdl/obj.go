@@ -174,7 +174,7 @@ func parseVertexItems(raw string) (vertex []float32, err error) {
 }
 
 func (p *objParser) toModel() (*Model, error) {
-	fmt.Printf("vertices[%d]:%d, normals[%d]:%d, textures[%d]:%d faces[%d]:%d\n", p.itemsPerVertex, len(p.vertices), p.itemsPerNormal, len(p.normals), p.itemsPerTexture, len(p.textures), p.itemsPerFace, len(p.faces))
+	//fmt.Printf("vertices[%d]:%d, normals[%d]:%d, textures[%d]:%d faces[%d]:%d\n", p.itemsPerVertex, len(p.vertices), p.itemsPerNormal, len(p.normals), p.itemsPerTexture, len(p.textures), p.itemsPerFace, len(p.faces))
 	var vertices []Vertex
 	for faceIndex := 0; faceIndex < len(p.faces); faceIndex += p.itemsPerFace {
 		face := p.faces[faceIndex : faceIndex+p.itemsPerFace]

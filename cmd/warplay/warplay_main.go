@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/PieterD/warp/pkg/mdl"
+
 	"github.com/go-gl/mathgl/mgl32"
 
 	"github.com/PieterD/warp/pkg/dom"
@@ -73,10 +75,30 @@ func loadTexture(fileName string) (image.Image, error) {
 	return img, nil
 }
 
+func loadModel(fileName string) (*mdl.Model, error) {
+	resp, err := http.DefaultClient.Get(fileName)
+	if err != nil {
+		return nil, fmt.Errorf("getting texture: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode/100 != 2 {
+		return nil, fmt.Errorf("unsuccessful status code while getting texture: %d", resp.StatusCode)
+	}
+	model, err := mdl.FromObj(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("creating model from obj file: %w", err)
+	}
+	return model, nil
+}
+
 func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err error) {
 	textureImage, err := loadTexture("/texture.png")
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
+	}
+	heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
+	if err != nil {
+		return nil, fmt.Errorf("getting model: %w", err)
 	}
 
 	vertices := []float32{
