@@ -3,11 +3,10 @@ package mdl
 import "fmt"
 
 type Model struct {
-	Vertices          []Vertex
-	VertexItems       int
-	TextureItems      int
-	NormalItems       int
-	IndicesPerPolygon int
+	Vertices     []Vertex
+	VertexItems  int
+	TextureItems int
+	NormalItems  int
 }
 
 type Vertex struct {
@@ -40,25 +39,24 @@ func (model *Model) Interleaved() (vs []float32, is []uint16, err error) {
 	is = make([]uint16, 0, len(model.Vertices))
 	vs = make([]float32, 0, len(is))
 	vertices := model.Vertices
+	vertexLocation := 0
 	vertexLocations := make(map[Vertex]int)
-	verticesSaved := 0
-	for i, vertex := range vertices {
-		vertexIndex := i + 1
-		if vertexIndex > 0xffff {
-			return nil, nil, fmt.Errorf("index does not fit in uint16: %d", vertexIndex)
+	for _, vertex := range vertices {
+		if vertexLocation > 0xffff {
+			return nil, nil, fmt.Errorf("index does not fit in uint16: %d", vertexLocation)
 		}
 		vIndex, ok := vertexLocations[vertex]
 		if ok {
-			verticesSaved++
 			is = append(is, uint16(vIndex))
 			continue
 		}
-		vertexLocations[vertex] = vertexIndex
+		vertexLocations[vertex] = vertexLocation
 
-		is = append(is, uint16(vertexIndex))
 		vs = append(vs, vertex.Vs[:model.VertexItems]...)
 		vs = append(vs, vertex.Ts[:model.TextureItems]...)
 		vs = append(vs, vertex.Ns[:model.NormalItems]...)
+		is = append(is, uint16(vertexLocation))
+		vertexLocation++
 	}
 	return vs, is, nil
 }

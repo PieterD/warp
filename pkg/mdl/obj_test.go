@@ -1,12 +1,14 @@
 package mdl
 
 import (
+	"fmt"
 	"os"
 	"testing"
 )
 
 func TestFromObj(t *testing.T) {
-	h, err := os.Open("../../misc/static/models/12190_Heart_v1_L3.obj")
+	//h, err := os.Open("../../misc/static/models/12190_Heart_v1_L3.obj")
+	h, err := os.Open("../../misc/static/models/square.obj")
 	if err != nil {
 		t.Fatalf("opening object file: %v", err)
 	}
@@ -19,4 +21,5 @@ func TestFromObj(t *testing.T) {
 	vs, is, err := model.Interleaved()
 	_ = vs
 	_ = is
+	fmt.Printf("safe\n")
 }

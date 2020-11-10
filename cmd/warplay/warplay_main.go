@@ -96,61 +96,34 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
 	}
-	heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
+	heartModel, err := loadModel("/models/square.obj")
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
-	}
-
-	vertices := []float32{
-		0.5, 0.5, 0.0, 1.0,
-		-0.5, -0.5, 0.0, 1.0,
-		-0.5, 0.5, 0.0, 1.0,
-		0.5, -0.5, 0.0, 1.0,
-	}
-	texCoords := []float32{
-		1.0, 0.0,
-		0.0, 1.0,
-		0.0, 0.0,
-		1.0, 1.0,
-	}
-	color := []float32{
-		1.0, 0.0, 0.0,
-		0.0, 1.0, 0.0,
-		0.0, 0.0, 1.0,
-		1.0, 1.0, 1.0,
-	}
-	elements := []uint16{
-		0, 1, 2,
-		3, 1, 0,
 	}
 
 	programConfig := gl.ProgramConfig{
 		VertexCode: `#version 100
 precision highp float; // mediump
 
-attribute vec4 Coordinates;
-attribute vec3 Color;
+attribute vec3 Coordinates;
 attribute vec2 TexCoord;
 uniform mat4 Transform;
-varying vec4 color;
 varying vec2 texCoord;
 
 void main(void) {
-	color = vec4(Color, 1.0);
 	texCoord = TexCoord;
-	gl_Position = Transform * Coordinates;
+	gl_Position = Transform * vec4(Coordinates, 1.0);
 }
 `,
 		FragmentCode: `#version 100
 precision highp float; // mediump
 
-varying vec4 color;
 varying vec2 texCoord;
 uniform sampler2D Texture;
 
 void main(void) {
 	vec4 texColor = texture2D(Texture, texCoord);
-	gl_FragColor = mix(color, texColor, 0.5);
+	gl_FragColor = mix(vec4(1.0,0.0,0.0,1.0), texColor, 0.5);
 }
 `,
 	}
@@ -172,42 +145,46 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
 	}
-	coordBuffer := glx.Buffer()
-	coordBuffer.VertexData(vertices)
-
-	colorAttr, err := program.Attribute("Color")
-	if err != nil {
-		return nil, fmt.Errorf("fetching color attribute: %w", err)
-	}
-	colorBuffer := glx.Buffer()
-	colorBuffer.VertexData(color)
 
 	texAttr, err := program.Attribute("TexCoord")
 	if err != nil {
 		return nil, fmt.Errorf("fetching TexCoord attribute: %w", err)
 	}
-	texBuffer := glx.Buffer()
-	texBuffer.VertexData(texCoords)
 
+	heartVertices, heartIndices, err := heartModel.Interleaved()
+	if err != nil {
+		return nil, fmt.Errorf("generating interleaved arrays: %w", err)
+	}
+	verticesToRender := len(heartIndices)
+	heartVertexBuffer := glx.Buffer()
+	heartVertexBuffer.VertexData(heartVertices)
+	heartElementBuffer := glx.Buffer()
+	heartElementBuffer.IndexData(heartIndices)
+
+	fmt.Printf("%v %v\n", heartVertices, heartIndices)
+
+	stride := (heartModel.VertexItems + heartModel.TextureItems + heartModel.VertexItems) * 4
 	vao, err := glx.VertexArray(
 		gl.VertexArrayAttribute{
-			Buffer: coordBuffer,
+			Buffer: heartVertexBuffer,
 			Attr:   coordAttr,
+			Layout: gl.VertexArrayAttributeLayout{
+				ByteOffset: 0,
+				ByteStride: stride,
+			},
 		},
 		gl.VertexArrayAttribute{
-			Buffer: colorBuffer,
-			Attr:   colorAttr,
-		},
-		gl.VertexArrayAttribute{
-			Buffer: texBuffer,
+			Buffer: heartVertexBuffer,
 			Attr:   texAttr,
+			Layout: gl.VertexArrayAttributeLayout{
+				ByteOffset: 4 * heartModel.VertexItems,
+				ByteStride: stride,
+			},
 		},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
-	elementBuffer := glx.Buffer()
-	elementBuffer.IndexData(elements)
 
 	texture := glx.Texture(gl.Texture2DConfig{}, textureImage)
 	glx.BindTextureUnits(texture)
@@ -217,16 +194,22 @@ void main(void) {
 			Use: program,
 			Uniforms: func(us *gl.UniformSetter) {
 				angle := 2 * math.Pi * rot
-				transform := mgl32.HomogRotate3DZ(float32(angle))
+				//translateMat := mgl32.Translate3D(0, 0, 1.0)
+				scaleMat := mgl32.Scale3D(1/10.0, 1/10.0, 1/10.0)
+				rotateMat := mgl32.HomogRotate3DY(float32(angle))
+				transform := mgl32.Ident4()
+				//transform = transform.Mul4(translateMat)
+				transform = transform.Mul4(rotateMat)
+				transform = transform.Mul4(scaleMat)
 				us.Mat4(uniformTransform, transform)
 				us.Int(uniformSampler, 0)
 			},
 			VAO:          vao,
-			ElementArray: elementBuffer,
+			ElementArray: heartElementBuffer,
 			DrawMode:     gl.Triangles,
 			Vertices: gl.VertexRange{
 				FirstOffset: 0,
-				VertexCount: 6,
+				VertexCount: verticesToRender,
 			},
 		})
 		if err != nil {

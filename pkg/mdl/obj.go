@@ -179,15 +179,15 @@ func (p *objParser) toModel() (*Model, error) {
 	for faceIndex := 0; faceIndex < len(p.faces); faceIndex += p.itemsPerFace {
 		face := p.faces[faceIndex : faceIndex+p.itemsPerFace]
 		for vertexIndex, faceIndexGroup := range face {
-			vStart := faceIndexGroup[0] - 1
+			vStart := (faceIndexGroup[0] - 1) * p.itemsPerVertex
 			vEnd := vStart + p.itemsPerVertex
 			vertexItems := p.vertices[vStart:vEnd]
 
-			tStart := faceIndexGroup[1] - 1
+			tStart := (faceIndexGroup[1] - 1) * p.itemsPerTexture
 			tEnd := tStart + p.itemsPerTexture
 			textureItems := p.textures[tStart:tEnd]
 
-			nStart := faceIndexGroup[2] - 1
+			nStart := (faceIndexGroup[2] - 1) * p.itemsPerNormal
 			nEnd := nStart + p.itemsPerNormal
 			normalItems := p.normals[nStart:nEnd]
 
@@ -198,11 +198,39 @@ func (p *objParser) toModel() (*Model, error) {
 			vertices = append(vertices, vertex)
 		}
 	}
+	switch p.itemsPerFace {
+	case 3:
+	case 4:
+		var err error
+		vertices, err = quadsToTriangles(vertices)
+		if err != nil {
+			return nil, fmt.Errorf("transforming quads to triangles: %w", err)
+		}
+	default:
+		return nil, fmt.Errorf("unhandled amount of items per face: %d", p.itemsPerFace)
+	}
 	return &Model{
-		Vertices:          vertices,
-		VertexItems:       p.itemsPerVertex,
-		TextureItems:      p.itemsPerTexture,
-		NormalItems:       p.itemsPerNormal,
-		IndicesPerPolygon: p.itemsPerFace,
+		Vertices:     vertices,
+		VertexItems:  p.itemsPerVertex,
+		TextureItems: p.itemsPerTexture,
+		NormalItems:  p.itemsPerNormal,
 	}, nil
+}
+
+func quadsToTriangles(quadVertices []Vertex) (triVertices []Vertex, err error) {
+	if len(quadVertices)%4 != 0 {
+		return nil, fmt.Errorf("number of quad vertices not divisible by 4")
+	}
+	for i := 0; i < len(quadVertices); i += 4 {
+		vertices := quadVertices[i : i+4]
+		triVertices = append(triVertices,
+			vertices[0],
+			vertices[1],
+			vertices[3],
+			vertices[3],
+			vertices[1],
+			vertices[2],
+		)
+	}
+	return triVertices, nil
 }
