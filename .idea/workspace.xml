@@ -7,30 +7,6 @@
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/canvas.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/canvas.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/document.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/document.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/elem.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/elem.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/buffer.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/buffer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/draw.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/draw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/fastcast.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/fastcast.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/parameters.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/parameters.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/program.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/texture.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/texture.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/type_string.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/type_string.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/types.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/gl/vao.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/vao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/global.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/global.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dom/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/window.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/driverutil/driverutil.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/driver/driverutil/driverutil.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/driver/types.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/convert.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/driver/wasmjs/convert.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/factory.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/driver/wasmjs/factory.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/value.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/driver/wasmjs/value.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/driver/wasmjs/wasmjs.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/driver/wasmjs/wasmjs.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +60,18 @@
       <recent name="C:\dev\warp\misc" />
     </key>
   </component>
-  <component name="RunManager" selected="Makefile../misc/docker/target">
+  <component name="RunManager" selected="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl">
+    <configuration name="TestFromObj in github.com/PieterD/warp/pkg/mdl" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="warp" />
+      <working_directory value="$PROJECT_DIR$/pkg/mdl" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/PieterD/warp/pkg/mdl" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestFromObj\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="./misc/docker/target" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/Makefile" target="./misc/docker/target" workingDirectory="" arguments="">
         <envs />
@@ -105,6 +92,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl" />
         <item itemvalue="Makefile../misc/docker/target" />
         <item itemvalue="Makefile.clean" />
         <item itemvalue="Makefile.build-docker" />
@@ -115,10 +103,45 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.obj" />
+  </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state width="1877" height="363" key="GridCell.Tab.0.bottom" timestamp="1604977358896">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.0.bottom/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977358896" />
+    <state width="1877" height="363" key="GridCell.Tab.0.center" timestamp="1604977358896">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.0.center/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977358896" />
+    <state width="1877" height="363" key="GridCell.Tab.0.left" timestamp="1604977358895">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.0.left/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977358895" />
+    <state width="1877" height="363" key="GridCell.Tab.0.right" timestamp="1604977358896">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.0.right/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977358896" />
+    <state width="1877" height="363" key="GridCell.Tab.1.bottom" timestamp="1604977359383">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.1.bottom/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977359383" />
+    <state width="1877" height="363" key="GridCell.Tab.1.center" timestamp="1604977359383">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.1.center/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977359383" />
+    <state width="1877" height="363" key="GridCell.Tab.1.left" timestamp="1604977359383">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.1.left/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977359383" />
+    <state width="1877" height="363" key="GridCell.Tab.1.right" timestamp="1604977359383">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="363" key="GridCell.Tab.1.right/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604977359383" />
     <state x="461" y="185" key="SettingsEditor" timestamp="1603999842026">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
