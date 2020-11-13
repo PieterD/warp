@@ -25,66 +25,67 @@ func main() {
 	<-make(chan struct{})
 }
 
+type rendererState struct {
+	currentlyRotating bool
+	startVec          mgl32.Vec3
+	startCamera       mgl32.Vec3
+	currentVec        mgl32.Vec3
+	currentCamera     mgl32.Vec3
+}
+
 func run(ctx context.Context) error {
 	factory := wasmjs.Open()
 	global := dom.Open(factory)
 	doc := global.Window().Document()
-	rotating := struct{
-		now bool
-		start mgl32.Vec3
-		current mgl32.Vec3
-	}{}
-	currentQuat := mgl32.QuatIdent()
+	rs := &rendererState{
+		currentCamera: mgl32.Vec3{0, 0, 5},
+	}
+	mouseVec := func(canvasElem *dom.Elem, event *dom.Event) mgl32.Vec3 {
+		me, ok := event.AsMouse()
+		if !ok {
+			panic(fmt.Errorf("expected mouse event"))
+		}
+		x := me.OffsetX
+		y := me.OffsetY
+		w, h := dom.AsCanvas(canvasElem).OuterSize()
+		v := mgl32.Vec3{
+			float32(w-x)/float32(w) - 0.5,
+			float32(y)/float32(h) - 0.5,
+			1,
+		}.Normalize()
+		return v
+	}
 	canvasElem := doc.CreateElem("canvas", func(canvasElem *dom.Elem) {
-		canvasElem.EventHandler("mousemove", func(this *dom.Elem, event *dom.Event) {
-			me, ok := event.AsMouse()
-			if !ok {
-				panic(fmt.Errorf("expected mouse event"))
-			}
-			x := me.OffsetX
-			y := me.OffsetY
-			w, h := dom.AsCanvas(canvasElem).OuterSize()
-			v := mgl32.Vec3{
-				float32(x) / float32(w) - 0.5,
-				float32(y) / float32(h) - 0.5,
-				1.0,
-			}.Normalize()
-			rotating.now = true
-			rotating.current = v
-		})
 		canvasElem.EventHandler("mousedown", func(this *dom.Elem, event *dom.Event) {
-			me, ok := event.AsMouse()
-			if !ok {
-				panic(fmt.Errorf("expected mouse event"))
+			v := mouseVec(canvasElem, event)
+			rs.currentlyRotating = true
+			rs.startVec = v
+			rs.startCamera = rs.currentCamera
+			rs.currentVec = v
+		})
+		canvasElem.EventHandler("mousemove", func(this *dom.Elem, event *dom.Event) {
+			v := mouseVec(canvasElem, event)
+			if rs.currentlyRotating {
+				rs.currentVec = v
+				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Rotate(rs.startCamera)
 			}
-			x := me.OffsetX
-			y := me.OffsetY
-			w, h := dom.AsCanvas(canvasElem).OuterSize()
-			v := mgl32.Vec3{
-				float32(x) / float32(w) - 0.5,
-				float32(y) / float32(h) - 0.5,
-				1.0,
-			}.Normalize()
-			rotating.now = true
-			rotating.start = v
-			rotating.current = v
 		})
 		canvasElem.EventHandler("mouseup", func(this *dom.Elem, event *dom.Event) {
-			me, ok := event.AsMouse()
-			if !ok {
-				panic(fmt.Errorf("expected mouse event"))
+			v := mouseVec(canvasElem, event)
+			if rs.currentlyRotating {
+				rs.currentVec = v
+				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Rotate(rs.startCamera)
+				rs.currentlyRotating = false
+				fmt.Printf("%v %v\n", rs.startCamera, rs.currentCamera)
 			}
-			x := me.OffsetX
-			y := me.OffsetY
-			w, h := dom.AsCanvas(canvasElem).OuterSize()
-			v := mgl32.Vec3{
-				float32(x) / float32(w) - 0.5,
-				float32(y) / float32(h) - 0.5,
-				1.0,
-			}.Normalize()
-			rotating.now = false
-			rotating.current = v
-			currentQuat = mgl32.QuatBetweenVectors(rotating.start, rotating.current).Mul(currentQuat)
+		})
+		canvasElem.EventHandler("mouseout", func(this *dom.Elem, event *dom.Event) {
+			v := mouseVec(canvasElem, event)
+			if rs.currentlyRotating {
+				rs.currentVec = v
+				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Rotate(rs.startCamera)
+				rs.currentlyRotating = false
+			}
 		})
 	})
 	doc.Body().AppendChildren(
@@ -93,7 +94,7 @@ func run(ctx context.Context) error {
 
 	canvas := dom.AsCanvas(canvasElem)
 	glx := canvas.GetContextWebgl()
-	render, err := buildRenderer(glx)
+	render, err := buildRenderer(glx, rs)
 	if err != nil {
 		panic(fmt.Errorf("building renderer: %w", err))
 	}
@@ -150,7 +151,7 @@ func loadModel(fileName string) (*mdl.Model, error) {
 	return model, nil
 }
 
-func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err error) {
+func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot float64) error, err error) {
 	textureImage, err := loadTexture("/texture.png")
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
@@ -294,13 +295,10 @@ void main(void) {
 	return func(rot float64) error {
 		glx.Clear()
 		program.Update(func(us *gl.UniformSetter) {
-			angle := 2 * math.Pi * rot
 			deg2rad := float32(math.Pi) / 180.0
 			fov := 70 * deg2rad
-			modelMatrix := mgl32.Ident4().
-				Mul4(mgl32.HomogRotate3DY(float32(angle)))
-			cameraLocation := mgl32.Vec3{0, 0, 5}
-
+			modelMatrix := mgl32.Ident4()
+			cameraLocation := rs.currentCamera
 			cameraTarget := mgl32.Vec3{0, 0, 0}
 			up := mgl32.Vec3{0, 1, 0}
 			viewMatrix := mgl32.Ident4().
@@ -317,7 +315,7 @@ void main(void) {
 			us.Int(uniformSampler, 0)
 		})
 		err := glx.Draw(gl.DrawConfig{
-			Use: program,
+			Use:          program,
 			VAO:          vao,
 			ElementArray: heartElementBuffer,
 			DrawMode:     gl.Triangles,
