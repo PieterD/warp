@@ -198,28 +198,28 @@ out vec4 FragColor;
 
 void main(void) {
 	vec3 lightColor = vec3(1.0, 0.0, 0.0);
-
+	float shininess = 32.0;
 	float ambientStrength = 0.1;
+	float diffuseStrength = 0.5;
+    float specularStrength = 0.5;
+
 	vec3 ambient = ambientStrength * lightColor;
 
-	float diffuseStrength = 0.5;
 	vec3 norm = normalize(normal);
 	vec3 lightDir = normalize(LightLocation - fragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diffuseStrength * diff * lightColor;
 
-    float specularStrength = 0.5;
     vec3 viewDir = normalize(CameraLocation - fragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
     vec3 specular = specularStrength * spec * lightColor;
 
 	vec4 texColor = texture(Texture, texCoord);
 	vec4 objectColor = vec4(1.0, 0.5, 0.3, 1.0);
 	FragColor = vec4(ambient + diffuse + specular, 1.0) * objectColor;
 }
-`,
-	}
+`}
 
 	program, err := glx.Program(programConfig)
 	if err != nil {
@@ -349,7 +349,7 @@ void main(void) {
 		program.Update(func(us *gl.UniformSetter) {
 			modelMatrix := mgl32.Ident4().
 				Mul4(mgl32.Translate3D(lightLocation[0], lightLocation[1], lightLocation[2]).
-				Mul4(mgl32.Scale3D(0.2, 0.2, 0.2)))
+					Mul4(mgl32.Scale3D(0.2, 0.2, 0.2)))
 			us.Mat4(uniformModel, modelMatrix)
 		})
 		err = glx.Draw(gl.DrawConfig{
