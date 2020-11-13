@@ -28,9 +28,11 @@ func main() {
 type rendererState struct {
 	currentlyRotating bool
 	startVec          mgl32.Vec3
-	startCamera       mgl32.Vec3
+	startCamera       mgl32.Quat
 	currentVec        mgl32.Vec3
-	currentCamera     mgl32.Vec3
+
+	currentCamera  mgl32.Quat
+	cameraDistance float32
 }
 
 func run(ctx context.Context) error {
@@ -38,7 +40,8 @@ func run(ctx context.Context) error {
 	global := dom.Open(factory)
 	doc := global.Window().Document()
 	rs := &rendererState{
-		currentCamera: mgl32.Vec3{0, 0, 5},
+		currentCamera:  mgl32.QuatIdent(),
+		cameraDistance: 5.0,
 	}
 	mouseVec := func(canvasElem *dom.Elem, event *dom.Event) mgl32.Vec3 {
 		me, ok := event.AsMouse()
@@ -49,9 +52,9 @@ func run(ctx context.Context) error {
 		y := me.OffsetY
 		w, h := dom.AsCanvas(canvasElem).OuterSize()
 		v := mgl32.Vec3{
-			float32(w-x)/float32(w) - 0.5,
-			float32(y)/float32(h) - 0.5,
-			1,
+			float32(x)/float32(w) - 0.5,
+			float32(h-y)/float32(h) - 0.5,
+			0.5,
 		}.Normalize()
 		return v
 	}
@@ -67,23 +70,22 @@ func run(ctx context.Context) error {
 			v := mouseVec(canvasElem, event)
 			if rs.currentlyRotating {
 				rs.currentVec = v
-				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Rotate(rs.startCamera)
+				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 			}
 		})
 		canvasElem.EventHandler("mouseup", func(this *dom.Elem, event *dom.Event) {
 			v := mouseVec(canvasElem, event)
 			if rs.currentlyRotating {
 				rs.currentVec = v
-				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Rotate(rs.startCamera)
+				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 				rs.currentlyRotating = false
-				fmt.Printf("%v %v\n", rs.startCamera, rs.currentCamera)
 			}
 		})
 		canvasElem.EventHandler("mouseout", func(this *dom.Elem, event *dom.Event) {
 			v := mouseVec(canvasElem, event)
 			if rs.currentlyRotating {
 				rs.currentVec = v
-				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Rotate(rs.startCamera)
+				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 				rs.currentlyRotating = false
 			}
 		})
@@ -298,15 +300,10 @@ void main(void) {
 			deg2rad := float32(math.Pi) / 180.0
 			fov := 70 * deg2rad
 			modelMatrix := mgl32.Ident4()
-			cameraLocation := rs.currentCamera
-			cameraTarget := mgl32.Vec3{0, 0, 0}
-			up := mgl32.Vec3{0, 1, 0}
+			cameraMatrix := rs.currentCamera.Mat4()
 			viewMatrix := mgl32.Ident4().
-				Mul4(mgl32.LookAtV(
-					cameraLocation,
-					cameraTarget,
-					up,
-				))
+				Mul4(mgl32.Translate3D(0, 0, -rs.cameraDistance)).
+				Mul4(cameraMatrix)
 			projectionMatrix := mgl32.Ident4().
 				Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
 			us.Mat4(uniformModel, modelMatrix)
