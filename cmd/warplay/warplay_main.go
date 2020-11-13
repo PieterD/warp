@@ -109,12 +109,12 @@ precision highp float; // mediump
 
 attribute vec3 Coordinates;
 attribute vec2 TexCoord;
-uniform mat4 Transform;
+uniform mat4 MVP;
 varying vec2 texCoord;
 
 void main(void) {
 	texCoord = TexCoord;
-	gl_Position = Transform * vec4(Coordinates, 1.0);
+	gl_Position = MVP * vec4(Coordinates, 1.0);
 }
 `,
 		FragmentCode: `#version 100
@@ -134,9 +134,9 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("compiling shader: %w", err)
 	}
-	uniformTransform := program.Uniform("Transform")
-	if uniformTransform == nil {
-		return nil, fmt.Errorf("transform uniform not found")
+	uniformMVP := program.Uniform("MVP")
+	if uniformMVP == nil {
+		return nil, fmt.Errorf("MVP uniform not found")
 	}
 	uniformSampler := program.Uniform("Texture")
 	if uniformSampler == nil {
@@ -197,18 +197,17 @@ void main(void) {
 				angle := 2 * math.Pi * rot
 				deg2rad := float32(math.Pi) / 180.0
 				fov := 70*deg2rad
-				transform := mgl32.Ident4()
-				transform = transform.Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
-				//transform = transform.Mul4(mgl32.LookAtV(
-				//	mgl32.Vec3{0, 0, 0},
-				//	mgl32.Vec3{0, 10, 25},
-				//	mgl32.Vec3{0, 1, 0},
-				//))
-				transform = transform.Mul4(mgl32.Translate3D(0.0, 0.0, -5.0))
-				transform = transform.Mul4(mgl32.HomogRotate3DY(float32(angle)))
-				//transform = transform.Mul4(mgl32.HomogRotate3DX(float32(-math.Pi / 2.0)))
-				//transform = transform.Mul4(mgl32.Scale3D(1/20.0, 1/20.0, 1/20.0))
-				us.Mat4(uniformTransform, transform)
+				modelMatrix := mgl32.Ident4().
+					Mul4(mgl32.HomogRotate3DY(float32(angle)))
+				viewMatrix := mgl32.Ident4().
+					Mul4(mgl32.Translate3D(0.0, 0.0, -5.0))
+				projectionMatrix := mgl32.Ident4().
+					Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
+				mvp := mgl32.Ident4().
+					Mul4(projectionMatrix).
+					Mul4(viewMatrix).
+					Mul4(modelMatrix)
+				us.Mat4(uniformMVP, mvp)
 				us.Int(uniformSampler, 0)
 			},
 			VAO:          vao,
