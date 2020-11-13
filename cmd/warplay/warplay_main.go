@@ -9,13 +9,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/PieterD/warp/pkg/mdl"
-
-	"github.com/go-gl/mathgl/mgl32"
-
 	"github.com/PieterD/warp/pkg/dom"
 	"github.com/PieterD/warp/pkg/dom/gl"
 	"github.com/PieterD/warp/pkg/driver/wasmjs"
+	"github.com/PieterD/warp/pkg/mdl"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 func main() {
@@ -48,7 +46,10 @@ func run(ctx context.Context) error {
 			return fmt.Errorf("animate call for renderSquares: %w", ctx.Err())
 		default:
 		}
-		//w, h := canvas.OuterSize()
+		w, h := canvas.OuterSize()
+		canvas.SetInnerSize(w, h)
+		glx.Viewport(0, 0, w, h)
+
 		_, rot := math.Modf(millis / 2000.0)
 		if err := render(rot); err != nil {
 			return fmt.Errorf("calling render: %w", err)
@@ -96,7 +97,8 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
 	}
-	heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
+	//heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
+	heartModel, err := loadModel("/models/square.obj")
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
 	}
@@ -193,11 +195,18 @@ void main(void) {
 			Use: program,
 			Uniforms: func(us *gl.UniformSetter) {
 				angle := 2 * math.Pi * rot
+				deg2rad := float32(math.Pi) / 180.0
+				fov := 70*deg2rad
 				transform := mgl32.Ident4()
-				transform = transform.Mul4(mgl32.Perspective(2*math.Pi/4.0, 4.0/3.0, 0.1, 100.0))
-				transform = transform.Mul4(mgl32.Translate3D(0.0, -10.0, -20.0))
+				transform = transform.Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
+				//transform = transform.Mul4(mgl32.LookAtV(
+				//	mgl32.Vec3{0, 0, 0},
+				//	mgl32.Vec3{0, 10, 25},
+				//	mgl32.Vec3{0, 1, 0},
+				//))
+				transform = transform.Mul4(mgl32.Translate3D(0.0, 0.0, -5.0))
 				transform = transform.Mul4(mgl32.HomogRotate3DY(float32(angle)))
-				transform = transform.Mul4(mgl32.HomogRotate3DX(float32(-math.Pi / 2.0)))
+				//transform = transform.Mul4(mgl32.HomogRotate3DX(float32(-math.Pi / 2.0)))
 				//transform = transform.Mul4(mgl32.Scale3D(1/20.0, 1/20.0, 1/20.0))
 				us.Mat4(uniformTransform, transform)
 				us.Int(uniformSampler, 0)

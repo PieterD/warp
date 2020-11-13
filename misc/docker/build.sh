@@ -8,4 +8,4 @@ mkdir -p target/static/binary
 GOOS=js GOARCH=wasm go build -o target/static/binary/raw 'github.com/PieterD/warp/cmd/warplay'
 HASH=`./target/hashfile target/static/binary/raw`
 mv target/static/binary/raw target/static/binary/$HASH
-sed -i -e"s/ZZZ-ZZZ.ZZZ!ZZZ.ZZZ-ZZZ/$HASH/" target/static/index.html
+sed -i -e "s/ZZZ-ZZZ.ZZZ!ZZZ.ZZZ-ZZZ/$HASH/" target/static/index.html

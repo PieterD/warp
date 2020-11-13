@@ -35,6 +35,11 @@ func (c *Canvas) InnerSize() (width, height int) {
 	return int(fWidth), int(fHeight)
 }
 
+func (c *Canvas) SetInnerSize(width, height int) {
+	c.elem.obj.Set("width", c.elem.factory.Number(float64(width)))
+	c.elem.obj.Set("height", c.elem.factory.Number(float64(height)))
+}
+
 func (c *Canvas) OuterSize() (width, height int) {
 	fWidth, ok := c.elem.obj.Get("clientWidth").IsNumber()
 	if !ok {

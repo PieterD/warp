@@ -96,3 +96,12 @@ func (glx *Context) BindTextureUnits(textures ...*Texture2D) {
 func (glx *Context) Parameters() *ParameterSet {
 	return newParameterSet(glx)
 }
+
+func (glx *Context) Viewport(x, y, w, h int) {
+	glx.constants.Viewport(
+		glx.factory.Number(float64(x)),
+		glx.factory.Number(float64(y)),
+		glx.factory.Number(float64(w)),
+		glx.factory.Number(float64(h)),
+	)
+}

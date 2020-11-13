@@ -1,6 +1,6 @@
 module github.com/PieterD/warp
 
-go 1.15
+go 1.13
 
 require (
 	github.com/go-gl/mathgl v1.0.0

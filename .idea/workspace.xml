@@ -5,11 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/misc/static/go1_13_1_wasm_exec.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/docker/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/misc/docker/build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/static/models/square.obj" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/models/square.obj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/static/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/dom/canvas.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/canvas.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/dom/gl/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/draw.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/draw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +28,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:\dev\go1.15.2" />
+  <component name="GOROOT" path="$USER_HOME$/go1.13.1" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -44,13 +49,15 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/dom/gl" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoProjectSettingsConfigurable" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -107,23 +114,37 @@
       <list>
         <item itemvalue="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl" />
         <item itemvalue="Go Test.obj_test.go" />
-        <item itemvalue="Makefile../misc/docker/target" />
-        <item itemvalue="Makefile.clean" />
-        <item itemvalue="Makefile.build-docker" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="" />
+      <created>1605008524544</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1605008524544</updated>
+      <workItem from="1605008525608" duration="750000" />
+      <workItem from="1605009290033" duration="5250000" />
+    </task>
+    <servers />
+  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="UnknownFeatures">
+    <option featureType="com.intellij.configurationType" implementationName="MAKEFILE_TARGET_RUN_CONFIGURATION" />
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.obj" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state x="696" y="508" key="#GOROOT" timestamp="1605009048476">
+      <screen x="0" y="0" width="1792" height="1120" />
+    </state>
+    <state x="696" y="508" key="#GOROOT/0.0.1792.1120@0.0.1792.1120" timestamp="1605009048476" />
     <state x="717" y="342" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1604980385150">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -160,9 +181,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state width="1877" height="363" key="GridCell.Tab.1.right/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state x="461" y="185" key="SettingsEditor" timestamp="1603999842026">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state x="430" y="192" key="SettingsEditor" timestamp="1605010665973">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state x="430" y="192" key="SettingsEditor/0.0.1792.1120@0.0.1792.1120" timestamp="1605010665973" />
     <state x="461" y="185" key="SettingsEditor/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1603999842026" />
     <state x="777" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604238710365">
       <screen x="0" y="0" width="1920" height="1080" />
