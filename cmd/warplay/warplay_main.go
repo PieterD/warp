@@ -33,6 +33,7 @@ type rendererState struct {
 
 	currentCamera  mgl32.Quat
 	cameraDistance float32
+	cameraTarget   mgl32.Vec3
 }
 
 func run(ctx context.Context) error {
@@ -300,9 +301,11 @@ void main(void) {
 			deg2rad := float32(math.Pi) / 180.0
 			fov := 70 * deg2rad
 			modelMatrix := mgl32.Ident4()
-			cameraMatrix := rs.currentCamera.Mat4()
-			viewMatrix := mgl32.Ident4().
+			cameraMatrix := mgl32.Ident4().
 				Mul4(mgl32.Translate3D(0, 0, -rs.cameraDistance)).
+				Mul4(rs.currentCamera.Mat4()).
+				Mul4(mgl32.Translate3D(rs.cameraTarget[0], rs.cameraTarget[1], rs.cameraTarget[2]))
+			viewMatrix := mgl32.Ident4().
 				Mul4(cameraMatrix)
 			projectionMatrix := mgl32.Ident4().
 				Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
