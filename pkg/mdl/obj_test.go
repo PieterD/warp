@@ -8,7 +8,8 @@ import (
 
 func TestFromObj(t *testing.T) {
 	//h, err := os.Open("../../misc/static/models/12190_Heart_v1_L3.obj")
-	h, err := os.Open("../../misc/static/models/square.obj")
+	//h, err := os.Open("../../misc/static/models/square.obj")
+	h, err := os.Open("../../misc/static/models/cube.obj")
 	if err != nil {
 		t.Fatalf("opening object file: %v", err)
 	}

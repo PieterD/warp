@@ -39,6 +39,7 @@ type glConstants struct {
 	BindVertexArray         func(args ...driver.Value) driver.Value
 	Uniform1i               func(args ...driver.Value) driver.Value
 	Uniform1f               func(args ...driver.Value) driver.Value
+	Uniform3f               func(args ...driver.Value) driver.Value
 	UniformMatrix4fv        func(args ...driver.Value) driver.Value
 	VertexAttribPointer     func(args ...driver.Value) driver.Value
 	EnableVertexAttribArray func(args ...driver.Value) driver.Value

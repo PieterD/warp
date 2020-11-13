@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-gl/mathgl/mgl32"
 	"image"
 	_ "image/png"
 	"math"
@@ -13,7 +14,6 @@ import (
 	"github.com/PieterD/warp/pkg/dom/gl"
 	"github.com/PieterD/warp/pkg/driver/wasmjs"
 	"github.com/PieterD/warp/pkg/mdl"
-	"github.com/go-gl/mathgl/mgl32"
 )
 
 func main() {
@@ -50,7 +50,8 @@ func run(ctx context.Context) error {
 		canvas.SetInnerSize(w, h)
 		glx.Viewport(0, 0, w, h)
 
-		_, rot := math.Modf(millis / 2000.0)
+		//_, rot := math.Modf(millis / 2000.0)
+		_, rot := math.Modf(millis / 10000.0)
 		if err := render(rot); err != nil {
 			return fmt.Errorf("calling render: %w", err)
 		}
@@ -109,23 +110,44 @@ precision highp float; // mediump
 
 attribute vec3 Coordinates;
 attribute vec2 TexCoord;
-uniform mat4 MVP;
+attribute vec3 Normal;
+uniform mat4 Model;
+uniform mat4 View;
+uniform mat4 Projection;
 varying vec2 texCoord;
+varying vec3 normal;
+varying vec3 fragPos;
 
 void main(void) {
 	texCoord = TexCoord;
-	gl_Position = MVP * vec4(Coordinates, 1.0);
+    normal = Normal;   
+    fragPos = vec3(Model * vec4(Coordinates, 1.0));
+    gl_Position = Projection * View * vec4(fragPos, 1.0);
 }
 `,
 		FragmentCode: `#version 100
 precision highp float; // mediump
 
 varying vec2 texCoord;
+varying vec3 normal;
+varying vec3 fragPos;
 uniform sampler2D Texture;
+uniform vec3 LightPos;
 
 void main(void) {
+	vec3 lightPos = vec3(5.0, 5.0, 5.0);
+	float ambientStrength = 0.1;
+	vec3 lightColor = vec3(1.0, 0.0, 0.0);
+	vec3 ambient = ambientStrength * lightColor;
+
+	vec3 norm = normalize(normal);
+	vec3 lightDir = normalize(LightPos - fragPos);
+	float diff = max(dot(norm, lightDir), 0.0);
+	vec3 diffuse = diff * lightColor;
+
 	vec4 texColor = texture2D(Texture, texCoord);
-	gl_FragColor = mix(vec4(1.0,0.0,0.0,1.0), texColor, 0.5);
+	vec4 objectColor = vec4(1.0, 0.5, 0.3, 1.0);
+	gl_FragColor = vec4(ambient + diffuse, 1.0) * objectColor;
 }
 `,
 	}
@@ -134,9 +156,17 @@ void main(void) {
 	if err != nil {
 		return nil, fmt.Errorf("compiling shader: %w", err)
 	}
-	uniformMVP := program.Uniform("MVP")
-	if uniformMVP == nil {
-		return nil, fmt.Errorf("MVP uniform not found")
+	uniformModel := program.Uniform("Model")
+	if uniformModel == nil {
+		return nil, fmt.Errorf("model uniform not found")
+	}
+	uniformView := program.Uniform("View")
+	if uniformView == nil {
+		return nil, fmt.Errorf("view uniform not found")
+	}
+	uniformProjection := program.Uniform("Projection")
+	if uniformProjection == nil {
+		return nil, fmt.Errorf("projection uniform not found")
 	}
 	uniformSampler := program.Uniform("Texture")
 	if uniformSampler == nil {
@@ -149,6 +179,11 @@ void main(void) {
 	}
 
 	texAttr, err := program.Attribute("TexCoord")
+	if err != nil {
+		return nil, fmt.Errorf("fetching TexCoord attribute: %w", err)
+	}
+
+	normalAttr, err := program.Attribute("Normal")
 	if err != nil {
 		return nil, fmt.Errorf("fetching TexCoord attribute: %w", err)
 	}
@@ -181,6 +216,14 @@ void main(void) {
 				ByteStride: stride,
 			},
 		},
+		gl.VertexArrayAttribute{
+			Buffer: heartVertexBuffer,
+			Attr:   normalAttr,
+			Layout: gl.VertexArrayAttributeLayout{
+				ByteOffset: (heartModel.VertexItems + heartModel.TextureItems) * 4,
+				ByteStride: stride,
+			},
+		},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
@@ -191,32 +234,31 @@ void main(void) {
 
 	return func(rot float64) error {
 		glx.Clear()
+		program.Update(func(us *gl.UniformSetter) {
+			angle := 2 * math.Pi * rot
+			deg2rad := float32(math.Pi) / 180.0
+			fov := 70 * deg2rad
+			modelMatrix := mgl32.Ident4().
+				Mul4(mgl32.HomogRotate3DY(float32(angle))).
+				Mul4(mgl32.HomogRotate3DX(float32(0.6)))
+			cameraLocation := mgl32.Vec3{0, 0, -5}
+			cameraTarget := mgl32.Vec3{0, 0, 0}
+			up := mgl32.Vec3{0, 1, 0}
+			viewMatrix := mgl32.Ident4().
+				Mul4(mgl32.LookAtV(
+					cameraLocation,
+					cameraTarget,
+					up,
+				))
+			projectionMatrix := mgl32.Ident4().
+				Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
+			us.Mat4(uniformModel, modelMatrix)
+			us.Mat4(uniformView, viewMatrix)
+			us.Mat4(uniformProjection, projectionMatrix)
+			us.Int(uniformSampler, 0)
+		})
 		err := glx.Draw(gl.DrawConfig{
 			Use: program,
-			Uniforms: func(us *gl.UniformSetter) {
-				angle := 2 * math.Pi * rot
-				deg2rad := float32(math.Pi) / 180.0
-				fov := 70 * deg2rad
-				modelMatrix := mgl32.Ident4().
-					Mul4(mgl32.HomogRotate3DY(float32(angle)))
-				cameraLocation := mgl32.Vec3{0, 0, -5}
-				cameraTarget := mgl32.Vec3{0, 0, 0}
-				up := mgl32.Vec3{0, 1, 0}
-				viewMatrix := mgl32.Ident4().
-					Mul4(mgl32.LookAtV(
-						cameraLocation,
-						cameraTarget,
-						up,
-					))
-				projectionMatrix := mgl32.Ident4().
-					Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
-				mvp := mgl32.Ident4().
-					Mul4(projectionMatrix).
-					Mul4(viewMatrix).
-					Mul4(modelMatrix)
-				us.Mat4(uniformMVP, mvp)
-				us.Int(uniformSampler, 0)
-			},
 			VAO:          vao,
 			ElementArray: heartElementBuffer,
 			DrawMode:     gl.Triangles,

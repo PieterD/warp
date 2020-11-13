@@ -7,6 +7,11 @@
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/static/models/cube.obj" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/models/cube.obj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/draw.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/draw.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/program.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/mdl/obj_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/mdl/obj_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +67,7 @@
       <recent name="C:\dev\warp\misc" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl">
+  <component name="RunManager" selected="Go Test.obj_test.go">
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -115,8 +120,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl" />
         <item itemvalue="Go Test.obj_test.go" />
+        <item itemvalue="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl" />
       </list>
     </recent_temporary>
   </component>
@@ -129,7 +134,7 @@
       <option name="presentableId" value="Default" />
       <updated>1605008524544</updated>
       <workItem from="1605008525608" duration="750000" />
-      <workItem from="1605009290033" duration="8866000" />
+      <workItem from="1605009290033" duration="14413000" />
     </task>
     <servers />
   </component>
@@ -153,37 +158,45 @@
     </state>
     <state x="669" y="355" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1792.1120@0.0.1792.1120" timestamp="1605279952662" />
     <state x="717" y="342" key="#com.intellij.fileTypes.FileTypeChooser/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604980385150" />
-    <state width="1877" height="363" key="GridCell.Tab.0.bottom" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.0.bottom" timestamp="1605287427172">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.0.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427172" />
     <state width="1877" height="363" key="GridCell.Tab.0.bottom/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1877" height="363" key="GridCell.Tab.0.center" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.0.center" timestamp="1605287427171">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.0.center/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427171" />
     <state width="1877" height="363" key="GridCell.Tab.0.center/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1877" height="363" key="GridCell.Tab.0.left" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.0.left" timestamp="1605287427171">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.0.left/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427171" />
     <state width="1877" height="363" key="GridCell.Tab.0.left/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1877" height="363" key="GridCell.Tab.0.right" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.0.right" timestamp="1605287427172">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.0.right/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427172" />
     <state width="1877" height="363" key="GridCell.Tab.0.right/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1877" height="363" key="GridCell.Tab.1.bottom" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.1.bottom" timestamp="1605287427174">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.1.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427174" />
     <state width="1877" height="363" key="GridCell.Tab.1.bottom/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1877" height="363" key="GridCell.Tab.1.center" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.1.center" timestamp="1605287427173">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.1.center/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427173" />
     <state width="1877" height="363" key="GridCell.Tab.1.center/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1877" height="363" key="GridCell.Tab.1.left" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.1.left" timestamp="1605287427172">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.1.left/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427172" />
     <state width="1877" height="363" key="GridCell.Tab.1.left/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1877" height="363" key="GridCell.Tab.1.right" timestamp="1604983638207">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="383" key="GridCell.Tab.1.right" timestamp="1605287427173">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="383" key="GridCell.Tab.1.right/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427173" />
     <state width="1877" height="363" key="GridCell.Tab.1.right/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
     <state x="430" y="192" key="SettingsEditor" timestamp="1605010665973">
       <screen x="0" y="0" width="1792" height="1120" />
@@ -212,8 +225,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/mdl/obj_test.go</url>
-          <line>23</line>
-          <option name="timeStamp" value="15" />
+          <line>24</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

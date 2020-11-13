@@ -141,6 +141,13 @@ func (p *Program) Uniform(name string) *Uniform {
 	}
 }
 
+func (p *Program) Update(f func(us *UniformSetter)) {
+	glx := p.glx
+	glx.constants.UseProgram(p.glObject)
+	defer glx.constants.UseProgram(glx.factory.Null())
+	f(&UniformSetter{glx: p.glx})
+}
+
 type UniformSetter struct {
 	glx *Context
 }
@@ -153,6 +160,15 @@ func (us *UniformSetter) Int(u *Uniform, v int) {
 func (us *UniformSetter) Float32(u *Uniform, v float32) {
 	glx := us.glx
 	glx.constants.Uniform1f(u.location, glx.factory.Number(float64(v)))
+}
+
+func (us *UniformSetter) Vec3(u *Uniform, v mgl32.Vec3) {
+	glx := us.glx
+	glx.constants.Uniform3f(u.location,
+		glx.factory.Number(float64(v[0])),
+		glx.factory.Number(float64(v[1])),
+		glx.factory.Number(float64(v[2])),
+	)
 }
 
 func (us *UniformSetter) Mat4(u *Uniform, m mgl32.Mat4) {

@@ -8,7 +8,6 @@ import (
 
 type DrawConfig struct {
 	Use          *Program
-	Uniforms     func(us *UniformSetter) // Optional
 	VAO          *VertexArray
 	ElementArray *Buffer // Optional
 	DrawMode     DrawMode
@@ -51,9 +50,6 @@ func doDraw(glx *Context, cfg DrawConfig) error {
 
 	glx.constants.UseProgram(cfg.Use.glObject)
 	defer glx.constants.UseProgram(glx.factory.Null())
-	if cfg.Uniforms != nil {
-		cfg.Uniforms(&UniformSetter{glx: glx})
-	}
 	glx.constants.BindVertexArray(cfg.VAO.glObject)
 	defer glx.constants.BindVertexArray(glx.factory.Null())
 	if cfg.ElementArray == nil {
