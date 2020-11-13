@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/static/models/cube.obj" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/models/cube.obj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/draw.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/draw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/program.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/mdl/obj_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/mdl/obj_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +130,7 @@
       <option name="presentableId" value="Default" />
       <updated>1605008524544</updated>
       <workItem from="1605008525608" duration="750000" />
-      <workItem from="1605009290033" duration="14413000" />
+      <workItem from="1605009290033" duration="16388000" />
     </task>
     <servers />
   </component>

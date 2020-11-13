@@ -105,34 +105,36 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 	}
 
 	programConfig := gl.ProgramConfig{
-		VertexCode: `#version 100
+		VertexCode: `#version 300 es
 precision highp float; // mediump
 
-attribute vec3 Coordinates;
-attribute vec2 TexCoord;
-attribute vec3 Normal;
+in vec3 Coordinates;
+in vec2 TexCoord;
+in vec3 Normal;
 uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 Projection;
-varying vec2 texCoord;
-varying vec3 normal;
-varying vec3 fragPos;
+out vec2 texCoord;
+out vec3 normal;
+out vec3 fragPos;
 
 void main(void) {
 	texCoord = TexCoord;
-    normal = Normal;   
+	normal = Normal;
+    //normal = mat3(transpose(inverse(Model))) * Normal;
     fragPos = vec3(Model * vec4(Coordinates, 1.0));
     gl_Position = Projection * View * vec4(fragPos, 1.0);
 }
 `,
-		FragmentCode: `#version 100
+		FragmentCode: `#version 300 es
 precision highp float; // mediump
 
-varying vec2 texCoord;
-varying vec3 normal;
-varying vec3 fragPos;
+in vec2 texCoord;
+in vec3 normal;
+in vec3 fragPos;
 uniform sampler2D Texture;
 uniform vec3 LightPos;
+out vec4 FragColor;
 
 void main(void) {
 	vec3 lightPos = vec3(5.0, 5.0, 5.0);
@@ -145,9 +147,9 @@ void main(void) {
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * lightColor;
 
-	vec4 texColor = texture2D(Texture, texCoord);
+	vec4 texColor = texture(Texture, texCoord);
 	vec4 objectColor = vec4(1.0, 0.5, 0.3, 1.0);
-	gl_FragColor = vec4(ambient + diffuse, 1.0) * objectColor;
+	FragColor = vec4(ambient + diffuse, 1.0) * objectColor;
 }
 `,
 	}
@@ -239,9 +241,8 @@ void main(void) {
 			deg2rad := float32(math.Pi) / 180.0
 			fov := 70 * deg2rad
 			modelMatrix := mgl32.Ident4().
-				Mul4(mgl32.HomogRotate3DY(float32(angle))).
-				Mul4(mgl32.HomogRotate3DX(float32(0.6)))
-			cameraLocation := mgl32.Vec3{0, 0, -5}
+				Mul4(mgl32.HomogRotate3DY(float32(angle)))
+			cameraLocation := mgl32.Vec3{0, 0, 5}
 			cameraTarget := mgl32.Vec3{0, 0, 0}
 			up := mgl32.Vec3{0, 1, 0}
 			viewMatrix := mgl32.Ident4().
@@ -273,6 +274,7 @@ void main(void) {
 		if err != nil {
 			return fmt.Errorf("drawing: %w", err)
 		}
+
 		return nil
 	}, nil
 }
