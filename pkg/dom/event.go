@@ -15,6 +15,30 @@ func (e *Event) Type() string {
 	return typ
 }
 
+type MouseEvent struct {
+	OffsetX int
+	OffsetY int
+}
+
+func (e *Event) AsMouse() (MouseEvent, bool) {
+	o := e.obj
+	var me MouseEvent
+
+	offsetX, ok := o.Get("offsetX").IsNumber()
+	if !ok {
+		return MouseEvent{}, false
+	}
+	me.OffsetX = int(offsetX)
+
+	offsetY, ok := o.Get("offsetY").IsNumber()
+	if !ok {
+		return MouseEvent{}, false
+	}
+	me.OffsetY = int(offsetY)
+
+	return me, true
+}
+
 type KeyboardEvent struct {
 	Key        string
 	Code       string

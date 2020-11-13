@@ -29,7 +29,64 @@ func run(ctx context.Context) error {
 	factory := wasmjs.Open()
 	global := dom.Open(factory)
 	doc := global.Window().Document()
-	canvasElem := doc.CreateElem("canvas", nil)
+	rotating := struct{
+		now bool
+		start mgl32.Vec3
+		current mgl32.Vec3
+	}{}
+	currentQuat := mgl32.QuatIdent()
+	canvasElem := doc.CreateElem("canvas", func(canvasElem *dom.Elem) {
+		canvasElem.EventHandler("mousemove", func(this *dom.Elem, event *dom.Event) {
+			me, ok := event.AsMouse()
+			if !ok {
+				panic(fmt.Errorf("expected mouse event"))
+			}
+			x := me.OffsetX
+			y := me.OffsetY
+			w, h := dom.AsCanvas(canvasElem).OuterSize()
+			v := mgl32.Vec3{
+				float32(x) / float32(w) - 0.5,
+				float32(y) / float32(h) - 0.5,
+				1.0,
+			}.Normalize()
+			rotating.now = true
+			rotating.current = v
+		})
+		canvasElem.EventHandler("mousedown", func(this *dom.Elem, event *dom.Event) {
+			me, ok := event.AsMouse()
+			if !ok {
+				panic(fmt.Errorf("expected mouse event"))
+			}
+			x := me.OffsetX
+			y := me.OffsetY
+			w, h := dom.AsCanvas(canvasElem).OuterSize()
+			v := mgl32.Vec3{
+				float32(x) / float32(w) - 0.5,
+				float32(y) / float32(h) - 0.5,
+				1.0,
+			}.Normalize()
+			rotating.now = true
+			rotating.start = v
+			rotating.current = v
+		})
+		canvasElem.EventHandler("mouseup", func(this *dom.Elem, event *dom.Event) {
+			me, ok := event.AsMouse()
+			if !ok {
+				panic(fmt.Errorf("expected mouse event"))
+			}
+			x := me.OffsetX
+			y := me.OffsetY
+			w, h := dom.AsCanvas(canvasElem).OuterSize()
+			v := mgl32.Vec3{
+				float32(x) / float32(w) - 0.5,
+				float32(y) / float32(h) - 0.5,
+				1.0,
+			}.Normalize()
+			rotating.now = false
+			rotating.current = v
+			currentQuat = mgl32.QuatBetweenVectors(rotating.start, rotating.current).Mul(currentQuat)
+		})
+	})
 	doc.Body().AppendChildren(
 		canvasElem,
 	)
@@ -243,6 +300,7 @@ void main(void) {
 			modelMatrix := mgl32.Ident4().
 				Mul4(mgl32.HomogRotate3DY(float32(angle)))
 			cameraLocation := mgl32.Vec3{0, 0, 5}
+
 			cameraTarget := mgl32.Vec3{0, 0, 0}
 			up := mgl32.Vec3{0, 1, 0}
 			viewMatrix := mgl32.Ident4().
