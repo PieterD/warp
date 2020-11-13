@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/PieterD/warp/pkg/dom/glutil"
 	"github.com/go-gl/mathgl/mgl32"
 	"image"
 	_ "image/png"
@@ -31,9 +32,7 @@ type rendererState struct {
 	startCamera       mgl32.Quat
 	currentVec        mgl32.Vec3
 
-	currentCamera  mgl32.Quat
-	cameraDistance float32
-	cameraTarget   mgl32.Vec3
+	camera *glutil.Camera
 }
 
 func run(ctx context.Context) error {
@@ -41,8 +40,7 @@ func run(ctx context.Context) error {
 	global := dom.Open(factory)
 	doc := global.Window().Document()
 	rs := &rendererState{
-		currentCamera:  mgl32.QuatIdent(),
-		cameraDistance: 5.0,
+		camera: glutil.NewCamera(5.0),
 	}
 	mouseVec := func(canvasElem *dom.Elem, event *dom.Event) mgl32.Vec3 {
 		me, ok := event.AsMouse()
@@ -64,21 +62,21 @@ func run(ctx context.Context) error {
 			v := mouseVec(canvasElem, event)
 			rs.currentlyRotating = true
 			rs.startVec = v
-			rs.startCamera = rs.currentCamera
+			rs.startCamera = rs.camera.Rotation
 			rs.currentVec = v
 		})
 		canvasElem.EventHandler("mousemove", func(this *dom.Elem, event *dom.Event) {
 			v := mouseVec(canvasElem, event)
 			if rs.currentlyRotating {
 				rs.currentVec = v
-				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
+				rs.camera.Rotation = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 			}
 		})
 		canvasElem.EventHandler("mouseup", func(this *dom.Elem, event *dom.Event) {
 			v := mouseVec(canvasElem, event)
 			if rs.currentlyRotating {
 				rs.currentVec = v
-				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
+				rs.camera.Rotation = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 				rs.currentlyRotating = false
 			}
 		})
@@ -86,7 +84,7 @@ func run(ctx context.Context) error {
 			v := mouseVec(canvasElem, event)
 			if rs.currentlyRotating {
 				rs.currentVec = v
-				rs.currentCamera = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
+				rs.camera.Rotation = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 				rs.currentlyRotating = false
 			}
 		})
@@ -181,8 +179,7 @@ out vec3 fragPos;
 
 void main(void) {
 	texCoord = TexCoord;
-	normal = Normal;
-    //normal = mat3(transpose(inverse(Model))) * Normal;
+    normal = mat3(transpose(inverse(Model))) * Normal;
     fragPos = vec3(Model * vec4(Coordinates, 1.0));
     gl_Position = Projection * View * vec4(fragPos, 1.0);
 }
@@ -194,17 +191,16 @@ in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
 uniform sampler2D Texture;
-uniform vec3 LightPos;
+uniform vec3 LightLocation;
 out vec4 FragColor;
 
 void main(void) {
-	vec3 lightPos = vec3(5.0, 5.0, 5.0);
 	float ambientStrength = 0.1;
 	vec3 lightColor = vec3(1.0, 0.0, 0.0);
 	vec3 ambient = ambientStrength * lightColor;
 
 	vec3 norm = normalize(normal);
-	vec3 lightDir = normalize(LightPos - fragPos);
+	vec3 lightDir = normalize(LightLocation - fragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * lightColor;
 
@@ -230,6 +226,10 @@ void main(void) {
 	uniformProjection := program.Uniform("Projection")
 	if uniformProjection == nil {
 		return nil, fmt.Errorf("projection uniform not found")
+	}
+	uniformLightLocation := program.Uniform("LightLocation")
+	if uniformLightLocation == nil {
+		return nil, fmt.Errorf("light location uniform not found")
 	}
 	uniformSampler := program.Uniform("Texture")
 	if uniformSampler == nil {
@@ -298,21 +298,20 @@ void main(void) {
 	return func(rot float64) error {
 		glx.Clear()
 		program.Update(func(us *gl.UniformSetter) {
+			lightAngle := float32(rot * 2 * math.Pi)
+			lightLocation := mgl32.Vec3{0, 5, 5}
+			lightLocation = mgl32.Rotate3DY(lightAngle).Mul3x1(lightLocation)
+
 			deg2rad := float32(math.Pi) / 180.0
 			fov := 70 * deg2rad
 			modelMatrix := mgl32.Ident4()
-			cameraMatrix := mgl32.Ident4().
-				Mul4(mgl32.Translate3D(0, 0, -rs.cameraDistance)).
-				Mul4(rs.currentCamera.Mat4()).
-				Mul4(mgl32.Translate3D(rs.cameraTarget[0], rs.cameraTarget[1], rs.cameraTarget[2]))
-			viewMatrix := mgl32.Ident4().
-				Mul4(cameraMatrix)
-			projectionMatrix := mgl32.Ident4().
-				Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
+			viewMatrix := rs.camera.ViewMatrix()
+			projectionMatrix := mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0)
 			us.Mat4(uniformModel, modelMatrix)
 			us.Mat4(uniformView, viewMatrix)
 			us.Mat4(uniformProjection, projectionMatrix)
 			us.Int(uniformSampler, 0)
+			us.Vec3(uniformLightLocation, lightLocation)
 		})
 		err := glx.Draw(gl.DrawConfig{
 			Use:          program,
