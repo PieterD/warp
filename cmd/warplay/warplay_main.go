@@ -78,6 +78,7 @@ func run(ctx context.Context) error {
 				rs.currentVec = v
 				rs.camera.Rotation = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 				rs.currentlyRotating = false
+				fmt.Printf("%v\n", rs.camera.Location())
 			}
 		})
 		canvasElem.EventHandler("mouseout", func(this *dom.Elem, event *dom.Event) {
@@ -110,7 +111,7 @@ func run(ctx context.Context) error {
 		glx.Viewport(0, 0, w, h)
 
 		//_, rot := math.Modf(millis / 2000.0)
-		_, rot := math.Modf(millis / 10000.0)
+		_, rot := math.Modf(millis / 4000.0)
 		if err := render(rot); err != nil {
 			return fmt.Errorf("calling render: %w", err)
 		}
@@ -192,21 +193,30 @@ in vec3 normal;
 in vec3 fragPos;
 uniform sampler2D Texture;
 uniform vec3 LightLocation;
+uniform vec3 CameraLocation;
 out vec4 FragColor;
 
 void main(void) {
-	float ambientStrength = 0.1;
 	vec3 lightColor = vec3(1.0, 0.0, 0.0);
+
+	float ambientStrength = 0.1;
 	vec3 ambient = ambientStrength * lightColor;
 
+	float diffuseStrength = 0.5;
 	vec3 norm = normalize(normal);
 	vec3 lightDir = normalize(LightLocation - fragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * lightColor;
+	vec3 diffuse = diffuseStrength * diff * lightColor;
+
+    float specularStrength = 0.5;
+    vec3 viewDir = normalize(CameraLocation - fragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    vec3 specular = specularStrength * spec * lightColor;
 
 	vec4 texColor = texture(Texture, texCoord);
 	vec4 objectColor = vec4(1.0, 0.5, 0.3, 1.0);
-	FragColor = vec4(ambient + diffuse, 1.0) * objectColor;
+	FragColor = vec4(ambient + diffuse + specular, 1.0) * objectColor;
 }
 `,
 	}
@@ -230,6 +240,10 @@ void main(void) {
 	uniformLightLocation := program.Uniform("LightLocation")
 	if uniformLightLocation == nil {
 		return nil, fmt.Errorf("light location uniform not found")
+	}
+	uniformCameraLocation := program.Uniform("CameraLocation")
+	if uniformCameraLocation == nil {
+		return nil, fmt.Errorf("camera location uniform not found")
 	}
 	uniformSampler := program.Uniform("Texture")
 	if uniformSampler == nil {
@@ -296,11 +310,12 @@ void main(void) {
 	glx.BindTextureUnits(texture)
 
 	return func(rot float64) error {
+		lightAngle := float32(rot * 2 * math.Pi)
+		lightLocation := mgl32.Vec3{0, 0, 3}
+		lightLocation = mgl32.Rotate3DY(lightAngle).Mul3x1(lightLocation)
+
 		glx.Clear()
 		program.Update(func(us *gl.UniformSetter) {
-			lightAngle := float32(rot * 2 * math.Pi)
-			lightLocation := mgl32.Vec3{0, 5, 5}
-			lightLocation = mgl32.Rotate3DY(lightAngle).Mul3x1(lightLocation)
 
 			deg2rad := float32(math.Pi) / 180.0
 			fov := 70 * deg2rad
@@ -312,8 +327,32 @@ void main(void) {
 			us.Mat4(uniformProjection, projectionMatrix)
 			us.Int(uniformSampler, 0)
 			us.Vec3(uniformLightLocation, lightLocation)
+			us.Vec3(uniformCameraLocation, rs.camera.Location())
 		})
 		err := glx.Draw(gl.DrawConfig{
+			Use:          program,
+			VAO:          vao,
+			ElementArray: heartElementBuffer,
+			DrawMode:     gl.Triangles,
+			Vertices: gl.VertexRange{
+				FirstOffset: 0,
+				VertexCount: verticesToRender,
+			},
+			Options: gl.DrawOptions{
+				DepthTest: true,
+			},
+		})
+		if err != nil {
+			return fmt.Errorf("drawing: %w", err)
+		}
+
+		program.Update(func(us *gl.UniformSetter) {
+			modelMatrix := mgl32.Ident4().
+				Mul4(mgl32.Translate3D(lightLocation[0], lightLocation[1], lightLocation[2]).
+				Mul4(mgl32.Scale3D(0.2, 0.2, 0.2)))
+			us.Mat4(uniformModel, modelMatrix)
+		})
+		err = glx.Draw(gl.DrawConfig{
 			Use:          program,
 			VAO:          vao,
 			ElementArray: heartElementBuffer,
