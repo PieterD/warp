@@ -196,11 +196,15 @@ void main(void) {
 			Uniforms: func(us *gl.UniformSetter) {
 				angle := 2 * math.Pi * rot
 				deg2rad := float32(math.Pi) / 180.0
-				fov := 70*deg2rad
+				fov := 70 * deg2rad
 				modelMatrix := mgl32.Ident4().
 					Mul4(mgl32.HomogRotate3DY(float32(angle)))
 				viewMatrix := mgl32.Ident4().
-					Mul4(mgl32.Translate3D(0.0, 0.0, -5.0))
+					Mul4(mgl32.LookAtV(
+						mgl32.Vec3{0, 0, -5},
+						mgl32.Vec3{0, 0, 0},
+						mgl32.Vec3{0, 1, 0},
+					))
 				projectionMatrix := mgl32.Ident4().
 					Mul4(mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0))
 				mvp := mgl32.Ident4().
