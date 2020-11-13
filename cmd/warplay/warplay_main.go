@@ -216,8 +216,7 @@ void main(void) {
     vec3 specular = specularStrength * spec * lightColor;
 
 	vec4 texColor = texture(Texture, texCoord);
-	vec4 objectColor = vec4(1.0, 0.5, 0.3, 1.0);
-	FragColor = vec4(ambient + diffuse + specular, 1.0) * objectColor;
+	FragColor = vec4(ambient + diffuse + specular, 1.0) * texColor;
 }
 `}
 
