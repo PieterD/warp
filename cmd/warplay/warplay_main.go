@@ -98,7 +98,7 @@ func buildRenderer(glx *gl.Context) (renderFunc func(rot float64) error, err err
 		return nil, fmt.Errorf("getting texture: %w", err)
 	}
 	//heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
-	heartModel, err := loadModel("/models/square.obj")
+	heartModel, err := loadModel("/models/cube.obj")
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
 	}
