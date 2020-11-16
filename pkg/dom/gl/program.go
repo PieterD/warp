@@ -2,6 +2,7 @@ package gl
 
 import (
 	"fmt"
+	"github.com/PieterD/warp/pkg/dom/glutil"
 
 	"github.com/go-gl/mathgl/mgl32"
 
@@ -9,21 +10,49 @@ import (
 )
 
 type ProgramConfig struct {
-	VertexCode   string
-	FragmentCode string
+	HighPrecision bool
+	Uniform       interface{}
+	VertexCode    string
+	FragmentCode  string
 }
 
 type Program struct {
-	glx      *Context
-	glObject driver.Value
+	glx           *Context
+	glObject      driver.Value
+	rawUniforms   interface{}
+	uniBuffer     *Buffer
+	uniBlockIndex driver.Value
 }
 
+var headerHighPrecision = `#version 300 es
+precision highp float;
+`
+
+var headerMediumPrecision = `#version 300 es
+precision mediump float;
+`
+
 func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
-	vertShaderObject, err := compileShader(glx, glx.constants.VERTEX_SHADER, cfg.VertexCode)
+	hdr := headerMediumPrecision
+	if cfg.HighPrecision {
+		hdr = headerHighPrecision
+	}
+	rawUniform := cfg.Uniform
+	var uniBuffer *Buffer
+	if rawUniform != nil {
+		uniformDef, err := glutil.Std140Uniform(rawUniform)
+		if err != nil {
+			return nil, fmt.Errorf("creating uniform definition: %w", err)
+		}
+		hdr += uniformDef
+		uniBuffer = glx.Buffer()
+	}
+
+	vertShaderObject, err := compileShader(glx, glx.constants.VERTEX_SHADER, hdr+cfg.VertexCode)
 	if err != nil {
 		return nil, fmt.Errorf("compiling vertex shader: %w", err)
 	}
-	fragShaderObject, err := compileShader(glx, glx.constants.FRAGMENT_SHADER, cfg.FragmentCode)
+	fragShaderObject, err := compileShader(glx, glx.constants.FRAGMENT_SHADER, hdr+cfg.FragmentCode)
 	if err != nil {
 		return nil, fmt.Errorf("compiling fragment shader: %w", err)
 	}
@@ -42,13 +71,54 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		}
 		return nil, fmt.Errorf("program linking error: %s", info)
 	}
-	return &Program{
-		glx:      glx,
-		glObject: programObject,
-	}, nil
+	uniBlockIndex := glx.constants.GetUniformBlockIndex(
+		programObject,
+		glx.factory.String("Uniform"),
+	)
+	p := &Program{
+		glx:           glx,
+		glObject:      programObject,
+		rawUniforms:   rawUniform,
+		uniBuffer:     uniBuffer,
+		uniBlockIndex: uniBlockIndex,
+	}
+	if uniBuffer != nil {
+		if err := p.UpdateUniforms(); err != nil {
+			return nil, fmt.Errorf("updating uniforms: %w", err)
+		}
+		bufferBaseIndex := 0
+		glx.constants.BindBufferBase(
+			glx.constants.UNIFORM_BUFFER,
+			glx.factory.Number(float64(bufferBaseIndex)),
+			uniBuffer.glObject,
+		)
+		glx.constants.UniformBlockBinding(
+			programObject,
+			uniBlockIndex,
+			glx.factory.Number(float64(bufferBaseIndex)),
+		)
+		glx.constants.BindBuffer(glx.constants.UNIFORM_BUFFER, glx.factory.Null())
+	}
+	return p, nil
+}
+
+func (p *Program) UpdateUniforms() error {
+	glx := p.glx
+	data, err := glutil.Std140Data(p.rawUniforms)
+	if err != nil {
+		return fmt.Errorf("converting uniform to std140 data: %w", err)
+	}
+	jsBuffer := glx.factory.Buffer(len(data))
+	jsBuffer.Put(data)
+	jsBytes := jsBuffer.AsUint8Array()
+	glx.constants.BindBuffer(glx.constants.UNIFORM_BUFFER, p.uniBuffer.glObject)
+	glx.constants.BufferData(glx.constants.UNIFORM_BUFFER, jsBytes, glx.constants.STATIC_DRAW)
+	glx.constants.BindBuffer(glx.constants.UNIFORM_BUFFER, glx.factory.Null())
+	return nil
 }
 
 func compileShader(glx *Context, shaderType driver.Value, code string) (driver.Value, error) {
+	fmt.Printf("compileShader: %s\n", code)
 	shaderObject := glx.constants.CreateShader(shaderType)
 	glx.constants.ShaderSource(shaderObject, glx.factory.String(code))
 	glx.constants.CompileShader(shaderObject)

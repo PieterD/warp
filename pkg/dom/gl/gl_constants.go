@@ -16,8 +16,6 @@ type glConstants struct {
 	FRAGMENT_SHADER         driver.Value
 	COMPILE_STATUS          driver.Value
 	LINK_STATUS             driver.Value
-	ARRAY_BUFFER            driver.Value
-	ELEMENT_ARRAY_BUFFER    driver.Value
 	STATIC_DRAW             driver.Value
 	DEPTH_TEST              driver.Value
 	CreateShader            func(args ...driver.Value) driver.Value
@@ -33,6 +31,8 @@ type glConstants struct {
 	UseProgram              func(args ...driver.Value) driver.Value
 	GetAttribLocation       func(args ...driver.Value) driver.Value
 	GetUniformLocation      func(args ...driver.Value) driver.Value
+	GetUniformBlockIndex    func(args ...driver.Value) driver.Value
+	UniformBlockBinding     func(args ...driver.Value) driver.Value
 	GetActiveAttrib         func(args ...driver.Value) driver.Value
 	GetActiveUniform        func(args ...driver.Value) driver.Value
 	CreateVertexArray       func(args ...driver.Value) driver.Value
@@ -95,9 +95,13 @@ type glConstants struct {
 
 	/* Buffer stuff */
 
-	CreateBuffer func(args ...driver.Value) driver.Value
-	BindBuffer   func(args ...driver.Value) driver.Value
-	BufferData   func(args ...driver.Value) driver.Value
+	ARRAY_BUFFER         driver.Value
+	ELEMENT_ARRAY_BUFFER driver.Value
+	UNIFORM_BUFFER       driver.Value
+	CreateBuffer         func(args ...driver.Value) driver.Value
+	BindBuffer           func(args ...driver.Value) driver.Value
+	BufferData           func(args ...driver.Value) driver.Value
+	BindBufferBase       func(args ...driver.Value) driver.Value
 
 	/* Texture stuff */
 

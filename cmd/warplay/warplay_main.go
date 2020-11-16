@@ -164,37 +164,37 @@ func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot floa
 		return nil, fmt.Errorf("getting model: %w", err)
 	}
 
+	uniforms := &struct {
+		Model          mgl32.Mat4
+		View           mgl32.Mat4
+		Projection     mgl32.Mat4
+		LightLocation  mgl32.Vec3
+		CameraLocation mgl32.Vec3
+	}{}
 	programConfig := gl.ProgramConfig{
-		VertexCode: `#version 300 es
-precision highp float; // mediump
-
+		HighPrecision: true,
+		Uniform:       uniforms,
+		VertexCode: `
 in vec3 Coordinates;
 in vec2 TexCoord;
 in vec3 Normal;
-uniform mat4 Model;
-uniform mat4 View;
-uniform mat4 Projection;
 out vec2 texCoord;
 out vec3 normal;
 out vec3 fragPos;
 
 void main(void) {
 	texCoord = TexCoord;
-    normal = mat3(transpose(inverse(Model))) * Normal;
-    fragPos = vec3(Model * vec4(Coordinates, 1.0));
-    gl_Position = Projection * View * vec4(fragPos, 1.0);
+    normal = mat3(transpose(inverse(Uniforms.Model))) * Normal;
+    fragPos = vec3(Uniforms.Model * vec4(Coordinates, 1.0));
+    gl_Position = Uniforms.Projection * Uniforms.View * vec4(fragPos, 1.0);
 }
 `,
-		FragmentCode: `#version 300 es
-precision highp float; // mediump
-
+		FragmentCode: `
 in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
-uniform sampler2D Texture;
-uniform vec3 LightLocation;
-uniform vec3 CameraLocation;
 out vec4 FragColor;
+uniform sampler2D Texture;
 
 void main(void) {
 	vec3 lightColor = vec3(1.0, 0.0, 0.0);
@@ -206,11 +206,11 @@ void main(void) {
 	vec3 ambient = ambientStrength * lightColor;
 
 	vec3 norm = normalize(normal);
-	vec3 lightDir = normalize(LightLocation - fragPos);
+	vec3 lightDir = normalize(Uniforms.LightLocation - fragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diffuseStrength * diff * lightColor;
 
-    vec3 viewDir = normalize(CameraLocation - fragPos);
+    vec3 viewDir = normalize(Uniforms.CameraLocation - fragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
     vec3 specular = specularStrength * spec * lightColor;
@@ -223,26 +223,6 @@ void main(void) {
 	program, err := glx.Program(programConfig)
 	if err != nil {
 		return nil, fmt.Errorf("compiling shader: %w", err)
-	}
-	uniformModel := program.Uniform("Model")
-	if uniformModel == nil {
-		return nil, fmt.Errorf("model uniform not found")
-	}
-	uniformView := program.Uniform("View")
-	if uniformView == nil {
-		return nil, fmt.Errorf("view uniform not found")
-	}
-	uniformProjection := program.Uniform("Projection")
-	if uniformProjection == nil {
-		return nil, fmt.Errorf("projection uniform not found")
-	}
-	uniformLightLocation := program.Uniform("LightLocation")
-	if uniformLightLocation == nil {
-		return nil, fmt.Errorf("light location uniform not found")
-	}
-	uniformCameraLocation := program.Uniform("CameraLocation")
-	if uniformCameraLocation == nil {
-		return nil, fmt.Errorf("camera location uniform not found")
 	}
 	uniformSampler := program.Uniform("Texture")
 	if uniformSampler == nil {
@@ -308,28 +288,30 @@ void main(void) {
 	texture := glx.Texture(gl.Texture2DConfig{}, textureImage)
 	glx.BindTextureUnits(texture)
 
+	program.Update(func(us *gl.UniformSetter) {
+		us.Int(uniformSampler, 0)
+	})
+
 	return func(rot float64) error {
+		glx.Clear()
+
 		lightAngle := float32(rot * 2 * math.Pi)
 		lightLocation := mgl32.Vec3{0, 0, 20}
 		lightLocation = mgl32.Rotate3DY(lightAngle).Mul3x1(lightLocation)
 
-		glx.Clear()
-		program.Update(func(us *gl.UniformSetter) {
+		deg2rad := float32(math.Pi) / 180.0
+		fov := 70 * deg2rad
+		uniforms.Model = mgl32.Ident4().
+			Mul4(mgl32.Translate3D(0, -10, 0)).
+			Mul4(mgl32.HomogRotate3DX(-math.Pi / 2.0))
+		uniforms.View = rs.camera.ViewMatrix()
+		uniforms.Projection = mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0)
+		uniforms.LightLocation = lightLocation
+		uniforms.CameraLocation = rs.camera.Location()
+		if err := program.UpdateUniforms(); err != nil {
+			return fmt.Errorf("updaring uniforms: %w", err)
+		}
 
-			deg2rad := float32(math.Pi) / 180.0
-			fov := 70 * deg2rad
-			modelMatrix := mgl32.Ident4().
-				Mul4(mgl32.Translate3D(0, -10, 0)).
-				Mul4(mgl32.HomogRotate3DX(-math.Pi/2.0))
-			viewMatrix := rs.camera.ViewMatrix()
-			projectionMatrix := mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0)
-			us.Mat4(uniformModel, modelMatrix)
-			us.Mat4(uniformView, viewMatrix)
-			us.Mat4(uniformProjection, projectionMatrix)
-			us.Int(uniformSampler, 0)
-			us.Vec3(uniformLightLocation, lightLocation)
-			us.Vec3(uniformCameraLocation, rs.camera.Location())
-		})
 		err := glx.Draw(gl.DrawConfig{
 			Use:          program,
 			VAO:          vao,
@@ -347,12 +329,12 @@ void main(void) {
 			return fmt.Errorf("drawing: %w", err)
 		}
 
-		program.Update(func(us *gl.UniformSetter) {
-			modelMatrix := mgl32.Ident4().
-				Mul4(mgl32.Translate3D(lightLocation[0], lightLocation[1], lightLocation[2]).
-					Mul4(mgl32.Scale3D(0.2, 0.2, 0.2)))
-			us.Mat4(uniformModel, modelMatrix)
-		})
+		uniforms.Model = mgl32.Ident4().
+			Mul4(mgl32.Translate3D(lightLocation[0], lightLocation[1], lightLocation[2])).
+			Mul4(mgl32.Scale3D(0.2, 0.2, 0.2))
+		if err := program.UpdateUniforms(); err != nil {
+			return fmt.Errorf("updaring uniforms: %w", err)
+		}
 		err = glx.Draw(gl.DrawConfig{
 			Use:          program,
 			VAO:          vao,
