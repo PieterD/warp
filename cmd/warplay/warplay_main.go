@@ -78,7 +78,6 @@ func run(ctx context.Context) error {
 				rs.currentVec = v
 				rs.camera.Rotation = mgl32.QuatBetweenVectors(rs.startVec, rs.currentVec).Mul(rs.startCamera)
 				rs.currentlyRotating = false
-				fmt.Printf("%v\n", rs.camera.Location())
 			}
 		})
 		canvasElem.EventHandler("mouseout", func(this *dom.Elem, event *dom.Event) {
@@ -299,6 +298,20 @@ void main(void) {
 		lightLocation := mgl32.Vec3{0, 0, 20}
 		lightLocation = mgl32.Rotate3DY(lightAngle).Mul3x1(lightLocation)
 
+		drawConfig := gl.DrawConfig{
+			Use:          program,
+			VAO:          vao,
+			ElementArray: heartElementBuffer,
+			DrawMode:     gl.Triangles,
+			Vertices: gl.VertexRange{
+				FirstOffset: 0,
+				VertexCount: verticesToRender,
+			},
+			Options: gl.DrawOptions{
+				DepthTest: true,
+			},
+		}
+
 		deg2rad := float32(math.Pi) / 180.0
 		fov := 70 * deg2rad
 		uniforms.Model = mgl32.Ident4().
@@ -311,20 +324,7 @@ void main(void) {
 		if err := program.UpdateUniforms(); err != nil {
 			return fmt.Errorf("updaring uniforms: %w", err)
 		}
-
-		err := glx.Draw(gl.DrawConfig{
-			Use:          program,
-			VAO:          vao,
-			ElementArray: heartElementBuffer,
-			DrawMode:     gl.Triangles,
-			Vertices: gl.VertexRange{
-				FirstOffset: 0,
-				VertexCount: verticesToRender,
-			},
-			Options: gl.DrawOptions{
-				DepthTest: true,
-			},
-		})
+		err := glx.Draw(drawConfig)
 		if err != nil {
 			return fmt.Errorf("drawing: %w", err)
 		}
@@ -335,19 +335,7 @@ void main(void) {
 		if err := program.UpdateUniforms(); err != nil {
 			return fmt.Errorf("updaring uniforms: %w", err)
 		}
-		err = glx.Draw(gl.DrawConfig{
-			Use:          program,
-			VAO:          vao,
-			ElementArray: heartElementBuffer,
-			DrawMode:     gl.Triangles,
-			Vertices: gl.VertexRange{
-				FirstOffset: 0,
-				VertexCount: verticesToRender,
-			},
-			Options: gl.DrawOptions{
-				DepthTest: true,
-			},
-		})
+		err = glx.Draw(drawConfig)
 		if err != nil {
 			return fmt.Errorf("drawing: %w", err)
 		}

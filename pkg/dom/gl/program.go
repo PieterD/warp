@@ -44,7 +44,7 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		if err != nil {
 			return nil, fmt.Errorf("creating uniform definition: %w", err)
 		}
-		hdr += uniformDef
+		hdr += uniformDef + "\n"
 		uniBuffer = glx.Buffer()
 	}
 

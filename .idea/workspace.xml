@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/pkg/dom/glutil/std140.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/dom/glutil/std140_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/buffer.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/buffer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/gl_constants.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/program.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -139,7 +135,7 @@
       <option name="presentableId" value="Default" />
       <updated>1605008524544</updated>
       <workItem from="1605008525608" duration="750000" />
-      <workItem from="1605009290033" duration="51882000" />
+      <workItem from="1605009290033" duration="53375000" />
     </task>
     <servers />
   </component>
