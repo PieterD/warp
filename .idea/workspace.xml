@@ -7,7 +7,6 @@
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/dom/gl/program.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/dom/gl/program.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,7 +134,7 @@
       <option name="presentableId" value="Default" />
       <updated>1605008524544</updated>
       <workItem from="1605008525608" duration="750000" />
-      <workItem from="1605009290033" duration="53375000" />
+      <workItem from="1605009290033" duration="54684000" />
     </task>
     <servers />
   </component>
@@ -208,10 +207,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="777" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604238710365" />
-    <state x="623" y="283" width="574" height="554" key="find.popup" timestamp="1605564328601">
+    <state x="623" y="283" width="574" height="554" key="find.popup" timestamp="1605568788751">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state x="623" y="283" width="574" height="554" key="find.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1605564328601" />
+    <state x="623" y="283" width="574" height="554" key="find.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1605568788751" />
     <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983881162" />
     <state x="803" y="301" key="refactoring.ChangeSignatureDialog" timestamp="1604167516638">
       <screen x="0" y="0" width="1920" height="1080" />
