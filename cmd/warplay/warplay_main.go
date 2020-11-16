@@ -40,7 +40,7 @@ func run(ctx context.Context) error {
 	global := dom.Open(factory)
 	doc := global.Window().Document()
 	rs := &rendererState{
-		camera: glutil.NewCamera(5.0),
+		camera: glutil.NewCamera(25.0),
 	}
 	mouseVec := func(canvasElem *dom.Elem, event *dom.Event) mgl32.Vec3 {
 		me, ok := event.AsMouse()
@@ -158,8 +158,8 @@ func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot floa
 	if err != nil {
 		return nil, fmt.Errorf("getting texture: %w", err)
 	}
-	//heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
-	heartModel, err := loadModel("/models/cube.obj")
+	heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
+	//heartModel, err := loadModel("/models/cube.obj")
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
 	}
@@ -310,7 +310,7 @@ void main(void) {
 
 	return func(rot float64) error {
 		lightAngle := float32(rot * 2 * math.Pi)
-		lightLocation := mgl32.Vec3{0, 0, 3}
+		lightLocation := mgl32.Vec3{0, 0, 20}
 		lightLocation = mgl32.Rotate3DY(lightAngle).Mul3x1(lightLocation)
 
 		glx.Clear()
@@ -318,7 +318,9 @@ void main(void) {
 
 			deg2rad := float32(math.Pi) / 180.0
 			fov := 70 * deg2rad
-			modelMatrix := mgl32.Ident4()
+			modelMatrix := mgl32.Ident4().
+				Mul4(mgl32.Translate3D(0, -10, 0)).
+				Mul4(mgl32.HomogRotate3DX(-math.Pi/2.0))
 			viewMatrix := rs.camera.ViewMatrix()
 			projectionMatrix := mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0)
 			us.Mat4(uniformModel, modelMatrix)
