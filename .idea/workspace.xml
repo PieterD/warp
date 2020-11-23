@@ -24,6 +24,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/misc/static/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +38,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="$USER_HOME$/go1.13.1" />
+  <component name="GOROOT" path="C:\dev\go1.15.2" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -180,15 +181,17 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="696" y="508" key="#GOROOT" timestamp="1605009048476">
-      <screen x="0" y="0" width="1792" height="1120" />
+    <state x="746" y="490" key="#GOROOT" timestamp="1606124132436">
+      <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="696" y="508" key="#GOROOT/0.0.1792.1120@0.0.1792.1120" timestamp="1605009048476" />
+    <state x="746" y="490" key="#GOROOT/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1606124132436" />
     <state x="669" y="355" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1605279952662">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
@@ -248,20 +251,20 @@
     </state>
     <state x="725" y="471" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1792.1120@0.0.1792.1120" timestamp="1605884918406" />
     <state x="777" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604238710365" />
-    <state x="623" y="283" width="574" height="554" key="find.popup" timestamp="1605876603826">
-      <screen x="0" y="0" width="1792" height="1120" />
+    <state x="667" y="273" width="585" height="534" key="find.popup" timestamp="1606131260360">
+      <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="623" y="283" width="574" height="554" key="find.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1605876603826" />
-    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983881162" />
+    <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1606131260360" />
     <state x="803" y="301" key="refactoring.ChangeSignatureDialog" timestamp="1604167516638">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="803" y="301" key="refactoring.ChangeSignatureDialog/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604167516638" />
-    <state x="581" y="244" width="670" height="704" key="search.everywhere.popup" timestamp="1605883071663">
-      <screen x="0" y="0" width="1792" height="1120" />
+    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1606131976474">
+      <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="581" y="244" width="670" height="704" key="search.everywhere.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1605883071663" />
-    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604779949940" />
+    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1606131976474" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
