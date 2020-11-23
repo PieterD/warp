@@ -3,10 +3,27 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="9e5fc114-9f5f-4b1f-8766-ac8ceddf774f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/warplay/warplay_main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,14 +79,16 @@
       <recent name="C:\dev\warp\misc" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.std140_test.go">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.types_test.go">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -105,10 +124,14 @@
       <filePath value="$PROJECT_DIR$/pkg/dom/glutil/std140_test.go" />
       <method v="2" />
     </configuration>
-    <configuration name="build-docker" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
-      <makefile filename="$PROJECT_DIR$/Makefile" target="build-docker" workingDirectory="" arguments="">
-        <envs />
-      </makefile>
+    <configuration name="types_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="warp" />
+      <working_directory value="$PROJECT_DIR$/pkg/dom/glutil" />
+      <framework value="gotest" />
+      <kind value="FILE" />
+      <package value="github.com/PieterD/warp" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/pkg/dom/glutil/types_test.go" />
       <method v="2" />
     </configuration>
     <configuration name="clean" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
@@ -119,6 +142,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.types_test.go" />
         <item itemvalue="Go Test.std140_test.go" />
         <item itemvalue="Go Test.obj_test.go" />
         <item itemvalue="Go Test.TestFromObj in github.com/PieterD/warp/pkg/mdl" />
@@ -134,7 +158,8 @@
       <option name="presentableId" value="Default" />
       <updated>1605008524544</updated>
       <workItem from="1605008525608" duration="750000" />
-      <workItem from="1605009290033" duration="54684000" />
+      <workItem from="1605009290033" duration="55844000" />
+      <workItem from="1605875179422" duration="11773000" />
     </task>
     <servers />
   </component>
@@ -144,6 +169,17 @@
   <component name="UnknownFeatures">
     <option featureType="com.intellij.configurationType" implementationName="MAKEFILE_TARGET_RUN_CONFIGURATION" />
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.obj" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -158,67 +194,73 @@
     </state>
     <state x="669" y="355" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1792.1120@0.0.1792.1120" timestamp="1605279952662" />
     <state x="717" y="342" key="#com.intellij.fileTypes.FileTypeChooser/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604980385150" />
-    <state width="1750" height="241" key="GridCell.Tab.0.bottom" timestamp="1605560961846">
+    <state x="584" y="303" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1605875142211">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="241" key="GridCell.Tab.0.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1605560961846" />
+    <state x="584" y="303" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1792.1120@0.0.1792.1120" timestamp="1605875142211" />
+    <state width="1750" height="383" key="GridCell.Tab.0.bottom" timestamp="1605969771421">
+      <screen x="0" y="0" width="1792" height="1120" />
+    </state>
+    <state width="1750" height="383" key="GridCell.Tab.0.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771421" />
     <state width="1877" height="363" key="GridCell.Tab.0.bottom/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1750" height="241" key="GridCell.Tab.0.center" timestamp="1605560961845">
+    <state width="1750" height="383" key="GridCell.Tab.0.center" timestamp="1605969771420">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="241" key="GridCell.Tab.0.center/0.0.1792.1120@0.0.1792.1120" timestamp="1605560961845" />
+    <state width="1750" height="383" key="GridCell.Tab.0.center/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771420" />
     <state width="1877" height="363" key="GridCell.Tab.0.center/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1750" height="241" key="GridCell.Tab.0.left" timestamp="1605560961845">
+    <state width="1750" height="383" key="GridCell.Tab.0.left" timestamp="1605969771420">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="241" key="GridCell.Tab.0.left/0.0.1792.1120@0.0.1792.1120" timestamp="1605560961845" />
+    <state width="1750" height="383" key="GridCell.Tab.0.left/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771420" />
     <state width="1877" height="363" key="GridCell.Tab.0.left/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1750" height="241" key="GridCell.Tab.0.right" timestamp="1605560961846">
+    <state width="1750" height="383" key="GridCell.Tab.0.right" timestamp="1605969771420">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="241" key="GridCell.Tab.0.right/0.0.1792.1120@0.0.1792.1120" timestamp="1605560961846" />
+    <state width="1750" height="383" key="GridCell.Tab.0.right/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771420" />
     <state width="1877" height="363" key="GridCell.Tab.0.right/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1750" height="383" key="GridCell.Tab.1.bottom" timestamp="1605287427174">
+    <state width="1750" height="383" key="GridCell.Tab.1.bottom" timestamp="1605969771421">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="383" key="GridCell.Tab.1.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427174" />
+    <state width="1750" height="383" key="GridCell.Tab.1.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771421" />
     <state width="1877" height="363" key="GridCell.Tab.1.bottom/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1750" height="383" key="GridCell.Tab.1.center" timestamp="1605287427173">
+    <state width="1750" height="383" key="GridCell.Tab.1.center" timestamp="1605969771421">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="383" key="GridCell.Tab.1.center/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427173" />
+    <state width="1750" height="383" key="GridCell.Tab.1.center/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771421" />
     <state width="1877" height="363" key="GridCell.Tab.1.center/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1750" height="383" key="GridCell.Tab.1.left" timestamp="1605287427172">
+    <state width="1750" height="383" key="GridCell.Tab.1.left" timestamp="1605969771421">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="383" key="GridCell.Tab.1.left/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427172" />
+    <state width="1750" height="383" key="GridCell.Tab.1.left/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771421" />
     <state width="1877" height="363" key="GridCell.Tab.1.left/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
-    <state width="1750" height="383" key="GridCell.Tab.1.right" timestamp="1605287427173">
+    <state width="1750" height="383" key="GridCell.Tab.1.right" timestamp="1605969771421">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="383" key="GridCell.Tab.1.right/0.0.1792.1120@0.0.1792.1120" timestamp="1605287427173" />
+    <state width="1750" height="383" key="GridCell.Tab.1.right/0.0.1792.1120@0.0.1792.1120" timestamp="1605969771421" />
     <state width="1877" height="363" key="GridCell.Tab.1.right/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983638207" />
     <state x="430" y="192" key="SettingsEditor" timestamp="1605010665973">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
     <state x="430" y="192" key="SettingsEditor/0.0.1792.1120@0.0.1792.1120" timestamp="1605010665973" />
     <state x="461" y="185" key="SettingsEditor/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1603999842026" />
-    <state x="777" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604238710365">
-      <screen x="0" y="0" width="1920" height="1080" />
-    </state>
-    <state x="777" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604238710365" />
-    <state x="623" y="283" width="574" height="554" key="find.popup" timestamp="1605568788751">
+    <state x="725" y="471" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605884918406">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state x="623" y="283" width="574" height="554" key="find.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1605568788751" />
+    <state x="725" y="471" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1792.1120@0.0.1792.1120" timestamp="1605884918406" />
+    <state x="777" y="454" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604238710365" />
+    <state x="623" y="283" width="574" height="554" key="find.popup" timestamp="1605876603826">
+      <screen x="0" y="0" width="1792" height="1120" />
+    </state>
+    <state x="623" y="283" width="574" height="554" key="find.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1605876603826" />
     <state x="667" y="273" width="585" height="534" key="find.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604983881162" />
     <state x="803" y="301" key="refactoring.ChangeSignatureDialog" timestamp="1604167516638">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="803" y="301" key="refactoring.ChangeSignatureDialog/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604167516638" />
-    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1604779949940">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state x="581" y="244" width="670" height="704" key="search.everywhere.popup" timestamp="1605883071663">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state x="581" y="244" width="670" height="704" key="search.everywhere.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1605883071663" />
     <state x="623" y="235" width="672" height="678" key="search.everywhere.popup/1920.-2.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1604779949940" />
   </component>
   <component name="XDebuggerManager">
@@ -228,6 +270,16 @@
           <url>file://$PROJECT_DIR$/pkg/mdl/obj_test.go</url>
           <line>24</line>
           <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/dom/glutil/types_test.go</url>
+          <line>30</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/dom/glutil/types.go</url>
+          <line>93</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
