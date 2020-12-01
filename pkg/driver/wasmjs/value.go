@@ -178,7 +178,7 @@ func (j jsBuffer) AsUint8Array() driver.Object {
 func (j jsBuffer) AsUint16Array() driver.Object {
 	con := j.factory.Global().Get("Uint16Array").IsFunction()
 	if con == nil {
-		panic(fmt.Errorf("Uint8Array was not a function"))
+		panic(fmt.Errorf("Uint16Array was not a function"))
 	}
 	return con.New(j.obj.Get("buffer"))
 }
@@ -186,7 +186,7 @@ func (j jsBuffer) AsUint16Array() driver.Object {
 func (j jsBuffer) AsFloat32Array() driver.Object {
 	con := j.factory.Global().Get("Float32Array").IsFunction()
 	if con == nil {
-		panic(fmt.Errorf("Uint8Array was not a function"))
+		panic(fmt.Errorf("Float32Array was not a function"))
 	}
 	return con.New(j.obj.Get("buffer"))
 }

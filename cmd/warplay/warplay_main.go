@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/PieterD/warp/pkg/dom/glutil"
-	"github.com/go-gl/mathgl/mgl32"
 	_ "image/png"
 	"math"
 	"os"
+
+	"github.com/PieterD/warp/pkg/dom/glutil"
+	"github.com/go-gl/mathgl/mgl32"
 
 	"github.com/PieterD/warp/pkg/dom"
 	"github.com/PieterD/warp/pkg/driver/wasmjs"
@@ -93,7 +94,14 @@ func run(ctx context.Context) error {
 	glx := canvas.GetContextWebgl()
 	render, err := buildRenderer(glx, rs)
 	if err != nil {
-		panic(fmt.Errorf("building renderer: %w", err))
+		doc.Body().ClearChildren()
+		doc.Body().AppendChildren(
+			doc.CreateElem("label", func(labelElem *dom.Elem) {
+				labelElem.SetText(fmt.Sprintf("error building renderer: %v", err))
+			}),
+		)
+
+		return nil
 	}
 	global.Window().Animate(ctx, func(ctx context.Context, millis float64) error {
 		select {

@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/PieterD/warp/pkg/dom/gl"
 	"github.com/go-gl/mathgl/mgl32"
-	"math"
 )
 
 func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot float64) error, err error) {
@@ -27,7 +28,12 @@ func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot floa
 	}{}
 	programConfig := gl.ProgramConfig{
 		HighPrecision: true,
-		Uniform:       uniforms,
+		Uniforms:      uniforms,
+		Attributes: map[string]gl.Type{
+			"Coordinates": gl.Vec3,
+			"TexCoord":    gl.Vec2,
+			"Normal":      gl.Vec3,
+		},
 		VertexCode: `
 in vec3 Coordinates;
 in vec2 TexCoord;
@@ -85,7 +91,7 @@ void main(void) {
 
 	coordAttr, err := program.Attribute("Coordinates")
 	if err != nil {
-		return nil, fmt.Errorf("fetching coordinate attribute: %w", err)
+		return nil, fmt.Errorf("fetching Coordinate attribute: %w", err)
 	}
 
 	texAttr, err := program.Attribute("TexCoord")
@@ -95,7 +101,7 @@ void main(void) {
 
 	normalAttr, err := program.Attribute("Normal")
 	if err != nil {
-		return nil, fmt.Errorf("fetching TexCoord attribute: %w", err)
+		return nil, fmt.Errorf("fetching Normal attribute: %w", err)
 	}
 
 	heartVertices, heartIndices, err := heartModel.Interleaved()

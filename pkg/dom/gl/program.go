@@ -2,6 +2,7 @@ package gl
 
 import (
 	"fmt"
+
 	"github.com/PieterD/warp/pkg/dom/glutil"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -11,7 +12,8 @@ import (
 
 type ProgramConfig struct {
 	HighPrecision bool
-	Uniform       interface{}
+	Uniforms      interface{}
+	Attributes    map[string]Type
 	VertexCode    string
 	FragmentCode  string
 }
@@ -37,7 +39,7 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 	if cfg.HighPrecision {
 		hdr = headerHighPrecision
 	}
-	rawUniform := cfg.Uniform
+	rawUniform := cfg.Uniforms
 	var uniBuffer *Buffer
 	if rawUniform != nil {
 		uniformDef, err := glutil.Std140Uniform(rawUniform)
