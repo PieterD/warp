@@ -12,41 +12,42 @@ import (
 type glConstants struct {
 	/* Unsorted. */
 
-	VERTEX_SHADER           driver.Value
-	FRAGMENT_SHADER         driver.Value
-	COMPILE_STATUS          driver.Value
-	LINK_STATUS             driver.Value
-	STATIC_DRAW             driver.Value
-	DEPTH_TEST              driver.Value
-	CreateShader            func(args ...driver.Value) driver.Value
-	ShaderSource            func(args ...driver.Value) driver.Value
-	CompileShader           func(args ...driver.Value) driver.Value
-	GetShaderParameter      func(args ...driver.Value) driver.Value
-	GetShaderInfoLog        func(args ...driver.Value) driver.Value
-	CreateProgram           func(args ...driver.Value) driver.Value
-	AttachShader            func(args ...driver.Value) driver.Value
-	LinkProgram             func(args ...driver.Value) driver.Value
-	GetProgramParameter     func(args ...driver.Value) driver.Value
-	GetProgramInfoLog       func(args ...driver.Value) driver.Value
-	UseProgram              func(args ...driver.Value) driver.Value
-	GetAttribLocation       func(args ...driver.Value) driver.Value
-	GetUniformLocation      func(args ...driver.Value) driver.Value
-	GetUniformBlockIndex    func(args ...driver.Value) driver.Value
-	UniformBlockBinding     func(args ...driver.Value) driver.Value
-	GetActiveAttrib         func(args ...driver.Value) driver.Value
-	GetActiveUniform        func(args ...driver.Value) driver.Value
-	CreateVertexArray       func(args ...driver.Value) driver.Value
-	BindVertexArray         func(args ...driver.Value) driver.Value
-	Uniform1i               func(args ...driver.Value) driver.Value
-	Uniform1f               func(args ...driver.Value) driver.Value
-	Uniform3f               func(args ...driver.Value) driver.Value
-	UniformMatrix4fv        func(args ...driver.Value) driver.Value
-	VertexAttribPointer     func(args ...driver.Value) driver.Value
-	EnableVertexAttribArray func(args ...driver.Value) driver.Value
-	ClearColor              func(args ...driver.Value) driver.Value
-	Enable                  func(args ...driver.Value) driver.Value
-	Disable                 func(args ...driver.Value) driver.Value
-	Viewport                func(args ...driver.Value) driver.Value
+	VERTEX_SHADER            driver.Value
+	FRAGMENT_SHADER          driver.Value
+	COMPILE_STATUS           driver.Value
+	LINK_STATUS              driver.Value
+	STATIC_DRAW              driver.Value
+	DEPTH_TEST               driver.Value
+	CreateShader             func(args ...driver.Value) driver.Value
+	ShaderSource             func(args ...driver.Value) driver.Value
+	CompileShader            func(args ...driver.Value) driver.Value
+	GetShaderParameter       func(args ...driver.Value) driver.Value
+	GetShaderInfoLog         func(args ...driver.Value) driver.Value
+	CreateProgram            func(args ...driver.Value) driver.Value
+	AttachShader             func(args ...driver.Value) driver.Value
+	LinkProgram              func(args ...driver.Value) driver.Value
+	GetProgramParameter      func(args ...driver.Value) driver.Value
+	GetProgramInfoLog        func(args ...driver.Value) driver.Value
+	UseProgram               func(args ...driver.Value) driver.Value
+	GetAttribLocation        func(args ...driver.Value) driver.Value
+	GetUniformLocation       func(args ...driver.Value) driver.Value
+	GetUniformBlockIndex     func(args ...driver.Value) driver.Value
+	UniformBlockBinding      func(args ...driver.Value) driver.Value
+	GetActiveAttrib          func(args ...driver.Value) driver.Value
+	GetActiveUniform         func(args ...driver.Value) driver.Value
+	CreateVertexArray        func(args ...driver.Value) driver.Value
+	BindVertexArray          func(args ...driver.Value) driver.Value
+	Uniform1i                func(args ...driver.Value) driver.Value
+	Uniform1f                func(args ...driver.Value) driver.Value
+	Uniform3f                func(args ...driver.Value) driver.Value
+	UniformMatrix4fv         func(args ...driver.Value) driver.Value
+	VertexAttribPointer      func(args ...driver.Value) driver.Value
+	EnableVertexAttribArray  func(args ...driver.Value) driver.Value
+	DisableVertexAttribArray func(args ...driver.Value) driver.Value
+	ClearColor               func(args ...driver.Value) driver.Value
+	Enable                   func(args ...driver.Value) driver.Value
+	Disable                  func(args ...driver.Value) driver.Value
+	Viewport                 func(args ...driver.Value) driver.Value
 
 	/* Depth. */
 

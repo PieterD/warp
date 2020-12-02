@@ -1,6 +1,6 @@
 # TODO
 
-- reflect and generate attributes
+- generate attributes from program config
 - generate texture units
 - generate #define WARP_GL_ENABLED 1
 

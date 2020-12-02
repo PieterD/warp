@@ -9,14 +9,53 @@ import (
 )
 
 func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot float64) error, err error) {
-	textureImage, err := loadTexture("/texture.png")
-	if err != nil {
-		return nil, fmt.Errorf("getting texture: %w", err)
-	}
 	heartModel, err := loadModel("/models/12190_Heart_v1_L3.obj")
 	//heartModel, err := loadModel("/models/cube.obj")
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
+	}
+	heartVertices, heartIndices, err := heartModel.Interleaved()
+	if err != nil {
+		return nil, fmt.Errorf("generating interleaved arrays: %w", err)
+	}
+	verticesToRender := len(heartIndices)
+	heartVertexBuffer := glx.Buffer()
+	heartVertexBuffer.VertexData(heartVertices)
+	heartElementBuffer := glx.Buffer()
+	heartElementBuffer.IndexData(heartIndices)
+
+	stride := (heartModel.VertexItems + heartModel.TextureItems + heartModel.VertexItems) * 4
+	vao, err := glx.VertexArray(
+		gl.VertexArrayAttribute{
+			Name:   "Coordinates",
+			Type:   gl.Vec3,
+			Buffer: heartVertexBuffer,
+			Layout: gl.VertexArrayAttributeLayout{
+				ByteOffset: 0,
+				ByteStride: stride,
+			},
+		},
+		gl.VertexArrayAttribute{
+			Name:   "TexCoord",
+			Type:   gl.Vec2,
+			Buffer: heartVertexBuffer,
+			Layout: gl.VertexArrayAttributeLayout{
+				ByteOffset: 4 * heartModel.VertexItems,
+				ByteStride: stride,
+			},
+		},
+		gl.VertexArrayAttribute{
+			Name:   "Normal",
+			Type:   gl.Vec3,
+			Buffer: heartVertexBuffer,
+			Layout: gl.VertexArrayAttributeLayout{
+				ByteOffset: (heartModel.VertexItems + heartModel.TextureItems) * 4,
+				ByteStride: stride,
+			},
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
 
 	uniforms := &struct {
@@ -35,9 +74,9 @@ func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot floa
 			"Normal":      gl.Vec3,
 		},
 		VertexCode: `
-in vec3 Coordinates;
-in vec2 TexCoord;
-in vec3 Normal;
+layout(location = 0) in vec3 Coordinates;
+layout(location = 1) in vec2 TexCoord;
+layout(location = 2) in vec3 Normal;
 out vec2 texCoord;
 out vec3 normal;
 out vec3 fragPos;
@@ -89,65 +128,12 @@ void main(void) {
 		return nil, fmt.Errorf("sampler uniform not found")
 	}
 
-	coordAttr, err := program.Attribute("Coordinates")
+	textureImage, err := loadTexture("/texture.png")
 	if err != nil {
-		return nil, fmt.Errorf("fetching Coordinate attribute: %w", err)
+		return nil, fmt.Errorf("getting texture: %w", err)
 	}
-
-	texAttr, err := program.Attribute("TexCoord")
-	if err != nil {
-		return nil, fmt.Errorf("fetching TexCoord attribute: %w", err)
-	}
-
-	normalAttr, err := program.Attribute("Normal")
-	if err != nil {
-		return nil, fmt.Errorf("fetching Normal attribute: %w", err)
-	}
-
-	heartVertices, heartIndices, err := heartModel.Interleaved()
-	if err != nil {
-		return nil, fmt.Errorf("generating interleaved arrays: %w", err)
-	}
-	verticesToRender := len(heartIndices)
-	heartVertexBuffer := glx.Buffer()
-	heartVertexBuffer.VertexData(heartVertices)
-	heartElementBuffer := glx.Buffer()
-	heartElementBuffer.IndexData(heartIndices)
-
-	stride := (heartModel.VertexItems + heartModel.TextureItems + heartModel.VertexItems) * 4
-	vao, err := glx.VertexArray(
-		gl.VertexArrayAttribute{
-			Buffer: heartVertexBuffer,
-			Attr:   coordAttr,
-			Layout: gl.VertexArrayAttributeLayout{
-				ByteOffset: 0,
-				ByteStride: stride,
-			},
-		},
-		gl.VertexArrayAttribute{
-			Buffer: heartVertexBuffer,
-			Attr:   texAttr,
-			Layout: gl.VertexArrayAttributeLayout{
-				ByteOffset: 4 * heartModel.VertexItems,
-				ByteStride: stride,
-			},
-		},
-		gl.VertexArrayAttribute{
-			Buffer: heartVertexBuffer,
-			Attr:   normalAttr,
-			Layout: gl.VertexArrayAttributeLayout{
-				ByteOffset: (heartModel.VertexItems + heartModel.TextureItems) * 4,
-				ByteStride: stride,
-			},
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("creating vertex array object: %w", err)
-	}
-
 	texture := glx.Texture(gl.Texture2DConfig{}, textureImage)
 	glx.BindTextureUnits(texture)
-
 	program.Update(func(us *gl.UniformSetter) {
 		us.Int(uniformSampler, 0)
 	})

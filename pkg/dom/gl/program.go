@@ -139,61 +139,6 @@ func compileShader(glx *Context, shaderType driver.Value, code string) (driver.V
 	return shaderObject, nil
 }
 
-type Attribute struct {
-	p     *Program
-	name  string
-	index int
-	typ   Type
-	siz   float64
-}
-
-func (p *Program) Attribute(name string) (*Attribute, error) {
-	glx := p.glx
-	glIndex := glx.constants.GetAttribLocation(p.glObject, glx.factory.String(name))
-	fIndex, ok := glIndex.IsNumber()
-	if !ok {
-		return nil, fmt.Errorf("returned attribute index is somehow not a number: %T", glIndex)
-	}
-	if fIndex == -1 {
-		return nil, fmt.Errorf("attribute does not exist")
-	}
-	attribInfoValue := glx.constants.GetActiveAttrib(p.glObject, glIndex)
-	if attribInfoValue.IsNull() {
-		return nil, fmt.Errorf("no attribute info found")
-	}
-	attribInfo := attribInfoValue.IsObject()
-	if attribInfo.IsNull() {
-		return nil, fmt.Errorf("attribute info is not an object: %T", attribInfo)
-	}
-	attribName, ok := attribInfo.Get("name").IsString()
-	if !ok {
-		return nil, fmt.Errorf("expected attribute name")
-	}
-	if attribName != name {
-		return nil, fmt.Errorf("attribute info name does not match request name: %s", attribName)
-	}
-	attribType, err := glx.typeConverter.FromJs(attribInfo.Get("type"))
-	if err != nil {
-		return nil, fmt.Errorf("fetching attr info type: %w", err)
-	}
-	attribSize, ok := attribInfo.Get("size").IsNumber()
-	if !ok {
-		return nil, fmt.Errorf("expected attribute size")
-	}
-
-	return &Attribute{
-		p:     p,
-		name:  name,
-		index: int(fIndex),
-		typ:   attribType,
-		siz:   attribSize,
-	}, nil
-}
-
-func (a *Attribute) Type() (typ Type, size int) {
-	return a.typ, int(a.siz)
-}
-
 type Uniform struct {
 	p        *Program
 	name     string
