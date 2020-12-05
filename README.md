@@ -1,8 +1,9 @@
 # TODO
 
-- Textures
-- Matrices
-- Elements
+- generate attributes from program config
+- generate program attribute config from VAO enabled attributes
+- generate texture units
+- generate #define WARP_GL_ENABLED 1
 
 # Notes
 

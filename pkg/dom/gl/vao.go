@@ -2,6 +2,7 @@ package gl
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/PieterD/warp/pkg/driver"
 )
@@ -94,4 +95,27 @@ func (vao *VertexArray) Enable(attrNames ...string) error {
 		va.enabled = shouldBeEnabled
 	}
 	return nil
+}
+
+func (vao *VertexArray) Attributes() (attrs []AttributeDescription) {
+	//indexCounts := make(map[int]struct{})
+	for _, attr := range vao.attrs {
+		if !attr.enabled {
+			continue
+		}
+		//TODO: move this to Verify
+		//if _, ok := indexCounts[attr.index]; ok {
+		//	return nil, fmt.Errorf("index %d set by multiple attributes", attr.index)
+		//}
+		//indexCounts[attr.index] = struct{}{}
+		attrs = append(attrs, AttributeDescription{
+			Name:  attr.name,
+			Type:  attr.typ,
+			Index: attr.index,
+		})
+	}
+	sort.Slice(attrs, func(i, j int) bool {
+		return attrs[i].Index < attrs[j].Index
+	})
+	return attrs
 }

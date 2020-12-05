@@ -68,15 +68,8 @@ func buildRenderer(glx *gl.Context, rs *rendererState) (renderFunc func(rot floa
 	programConfig := gl.ProgramConfig{
 		HighPrecision: true,
 		Uniforms:      uniforms,
-		Attributes: map[string]gl.Type{
-			"Coordinates": gl.Vec3,
-			"TexCoord":    gl.Vec2,
-			"Normal":      gl.Vec3,
-		},
+		Attributes:    vao.Attributes(),
 		VertexCode: `
-layout(location = 0) in vec3 Coordinates;
-layout(location = 1) in vec2 TexCoord;
-layout(location = 2) in vec3 Normal;
 out vec2 texCoord;
 out vec3 normal;
 out vec3 fragPos;

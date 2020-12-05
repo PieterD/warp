@@ -13,9 +13,16 @@ import (
 type ProgramConfig struct {
 	HighPrecision bool
 	Uniforms      interface{}
-	Attributes    map[string]Type
+	Attributes    []AttributeDescription
 	VertexCode    string
 	FragmentCode  string
+}
+
+type AttributeDescription struct {
+	Name string
+	Type Type
+	//TODO: autogenerate (and fill in) if all Index values are 0
+	Index int
 }
 
 type Program struct {
@@ -50,7 +57,12 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		uniBuffer = glx.Buffer()
 	}
 
-	vertShaderObject, err := compileShader(glx, glx.constants.VERTEX_SHADER, hdr+cfg.VertexCode)
+	vertHdr := "\n"
+	for _, attr := range cfg.Attributes {
+		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.Index, attr.Type.glString(), attr.Name)
+	}
+
+	vertShaderObject, err := compileShader(glx, glx.constants.VERTEX_SHADER, hdr+vertHdr+cfg.VertexCode)
 	if err != nil {
 		return nil, fmt.Errorf("compiling vertex shader: %w", err)
 	}

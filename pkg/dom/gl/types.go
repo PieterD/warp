@@ -2,6 +2,7 @@ package gl
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/PieterD/warp/pkg/driver"
 )
@@ -24,6 +25,30 @@ const (
 	Int
 	UnsignedInt
 )
+
+func (t Type) glString() string {
+	switch t {
+	case Vec2, Vec3, Vec4, Mat2, Mat3, Mat4:
+		return strings.ToLower(t.String())
+	default:
+		panic(fmt.Errorf("unimplemented %s.glString", t.String()))
+	}
+}
+
+func (t Type) asAttribute() (bufferType Type, itemsPerVertex int, err error) {
+	switch t {
+	case Float:
+		return Float, 1, nil
+	case Vec2:
+		return Float, 2, nil
+	case Vec3:
+		return Float, 3, nil
+	case Vec4:
+		return Float, 4, nil
+	default:
+		return 0, 0, fmt.Errorf("unable to decompose: %s", t)
+	}
+}
 
 /*
 GL_FLOAT_MAT2x3
@@ -98,19 +123,4 @@ func (tc *typeConverter) ToJs(typ Type) driver.Value {
 		panic(fmt.Errorf("invalid type: %d", typ))
 	}
 	return v
-}
-
-func (t Type) asAttribute() (bufferType Type, itemsPerVertex int, err error) {
-	switch t {
-	case Float:
-		return Float, 1, nil
-	case Vec2:
-		return Float, 2, nil
-	case Vec3:
-		return Float, 3, nil
-	case Vec4:
-		return Float, 4, nil
-	default:
-		return 0, 0, fmt.Errorf("unable to decompose: %s", t)
-	}
 }
