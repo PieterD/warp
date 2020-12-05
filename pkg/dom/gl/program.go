@@ -33,16 +33,18 @@ type Program struct {
 	uniBlockIndex driver.Value
 }
 
-var headerHighPrecision = `#version 300 es
-precision highp float;
+var baseHeader = `#version 300 es
+#define WARP_GL_ENABLED 1
 `
 
-var headerMediumPrecision = `#version 300 es
-precision mediump float;
+var headerHighPrecision = baseHeader + `precision highp float;
+`
+
+var headerMediumPrecision = baseHeader + `precision mediump float;
 `
 
 func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
-	hdr := headerMediumPrecision
+	hdr := headerHighPrecision
 	if cfg.HighPrecision {
 		hdr = headerHighPrecision
 	}
@@ -53,11 +55,11 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		if err != nil {
 			return nil, fmt.Errorf("creating uniform definition: %w", err)
 		}
-		hdr += uniformDef + "\n"
+		hdr += uniformDef
 		uniBuffer = glx.Buffer()
 	}
 
-	vertHdr := "\n"
+	vertHdr := ""
 	for _, attr := range cfg.Attributes {
 		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.Index, attr.Type.glString(), attr.Name)
 	}

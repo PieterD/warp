@@ -1,9 +1,11 @@
 # TODO
 
-- generate attributes from program config
-- generate program attribute config from VAO enabled attributes
 - generate texture units
-- generate #define WARP_GL_ENABLED 1
+- glVertexAttrib* to set fixed value for disabled attributes
+- figure out Multi-Draw extensions and default fallback
+- transform feedback: glTransformFeedbackVaryings
+- framebuffers
+- multiple render targets
 
 # Notes
 
