@@ -6,6 +6,7 @@
 - transform feedback: glTransformFeedbackVaryings
 - framebuffers
 - multiple render targets
+- separate driver.Buffer's AsUint16Array and AsFloat32Array, and expand.
 
 # Notes
 

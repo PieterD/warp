@@ -2,7 +2,6 @@ package dom
 
 import (
 	"github.com/PieterD/warp/pkg/driver"
-	"github.com/PieterD/warp/pkg/driver/driverutil"
 )
 
 type Document struct {
@@ -23,7 +22,7 @@ func (doc *Document) Body() *Elem {
 }
 
 func (doc *Document) CreateElem(tag string, constructor func(newElem *Elem)) *Elem {
-	fCreateElement := driverutil.Bind(doc.obj, "createElement")
+	fCreateElement := driver.Bind(doc.obj, "createElement")
 	elementValue := fCreateElement(doc.factory.String(tag))
 	elementObject := elementValue.IsObject()
 	if elementObject == nil {

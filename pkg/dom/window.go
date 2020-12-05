@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/PieterD/warp/pkg/driver"
-	"github.com/PieterD/warp/pkg/driver/driverutil"
 )
 
 type Window struct {
@@ -26,7 +25,7 @@ func (w *Window) Document() *Document {
 }
 
 func (w *Window) Animate(ctx context.Context, f func(ctx context.Context, millis float64) error) {
-	fRequestAnimationFrame := driverutil.Bind(w.obj, "requestAnimationFrame")
+	fRequestAnimationFrame := driver.Bind(w.obj, "requestAnimationFrame")
 	var cb driver.Function
 	cb = w.factory.Function(func(this driver.Object, args ...driver.Value) driver.Value {
 		if len(args) != 1 {

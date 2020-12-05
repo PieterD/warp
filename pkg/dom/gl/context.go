@@ -5,7 +5,6 @@ import (
 	"image"
 
 	"github.com/PieterD/warp/pkg/driver"
-	"github.com/PieterD/warp/pkg/driver/driverutil"
 )
 
 type Context struct {
@@ -21,7 +20,7 @@ type Canvas interface {
 
 func NewContext(canvas Canvas) *Context {
 	factory, canvasObject := canvas.Driver()
-	fGetContext := driverutil.Bind(canvasObject, "getContext")
+	fGetContext := driver.Bind(canvasObject, "getContext")
 	ctxObject := fGetContext(factory.String("webgl2")).IsObject()
 	if ctxObject == nil {
 		return nil

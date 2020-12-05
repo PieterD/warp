@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/PieterD/warp/pkg/driver"
-	"github.com/PieterD/warp/pkg/driver/driverutil"
 )
 
 type glConstants struct {
@@ -143,7 +142,7 @@ func newGlConstants(obj driver.Object, trace bool) (c glConstants) {
 		case typeDriverFunc:
 			functionName := strings.ToLower(field.Name[:1]) + field.Name[1:]
 			fmt.Printf("loading function: %s\n", functionName)
-			function := driverutil.Bind(obj, functionName)
+			function := driver.Bind(obj, functionName)
 			if function == nil {
 				panic(fmt.Errorf("function %s is apparently not a function", functionName))
 			}
