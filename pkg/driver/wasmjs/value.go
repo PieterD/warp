@@ -12,22 +12,38 @@ type jsUndefined struct {
 	v js.Value
 }
 
-func (jsUndefined) IsUndefined() bool {
+func (j jsUndefined) jsValue() js.Value {
+	return j.v
+}
+
+func (j jsUndefined) IsUndefined() bool {
 	return true
 }
+
+var _ vValue = jsUndefined{}
 
 type jsNull struct {
 	jsEmpty
 	v js.Value
 }
 
-func (jsNull) IsNull() bool {
+func (j jsNull) jsValue() js.Value {
+	return j.v
+}
+
+func (j jsNull) IsNull() bool {
 	return true
 }
+
+var _ vValue = jsNull{}
 
 type jsBoolean struct {
 	jsEmpty
 	v js.Value
+}
+
+func (j jsBoolean) jsValue() js.Value {
+	return j.v
 }
 
 func (j jsBoolean) IsBoolean() (bool, bool) {
@@ -39,9 +55,15 @@ func (j jsBoolean) IsBoolean() (bool, bool) {
 	}
 }
 
+var _ vValue = jsBoolean{}
+
 type jsNumber struct {
 	jsEmpty
 	v js.Value
+}
+
+func (j jsNumber) jsValue() js.Value {
+	return j.v
 }
 
 func (j jsNumber) IsNumber() (float64, bool) {
@@ -53,9 +75,15 @@ func (j jsNumber) IsNumber() (float64, bool) {
 	}
 }
 
+var _ vValue = jsNumber{}
+
 type jsString struct {
 	jsEmpty
 	v js.Value
+}
+
+func (j jsString) jsValue() js.Value {
+	return j.v
 }
 
 func (j jsString) IsString() (string, bool) {
@@ -67,9 +95,15 @@ func (j jsString) IsString() (string, bool) {
 	}
 }
 
+var _ vValue = jsString{}
+
 type jsObject struct {
 	jsEmpty
 	v js.Value
+}
+
+func (j jsObject) jsValue() js.Value {
+	return j.v
 }
 
 func (j jsObject) IsObject() driver.Object {
@@ -80,6 +114,8 @@ func (j jsObject) IsObject() driver.Object {
 		return nil
 	}
 }
+
+var _ vValue = jsObject{}
 
 func (j jsObject) Get(key string) driver.Value {
 	return js2value(j.v.Get(key))
@@ -94,6 +130,10 @@ type jsFunction struct {
 	v js.Value
 }
 
+func (j jsFunction) jsValue() js.Value {
+	return j.v
+}
+
 func (j jsFunction) IsFunction() driver.Function {
 	switch jsType := j.v.Type(); jsType {
 	case js.TypeFunction:
@@ -102,6 +142,8 @@ func (j jsFunction) IsFunction() driver.Function {
 		return nil
 	}
 }
+
+var _ vValue = jsFunction{}
 
 func (j jsFunction) New(args ...driver.Value) driver.Object {
 	var jsArgs []interface{}
@@ -134,6 +176,10 @@ type jsBuffer struct {
 	obj     driver.Object
 }
 
+func (j jsBuffer) jsValue() js.Value {
+	return j.v
+}
+
 func newBuffer(factory jsFactory, size int) jsBuffer {
 	fUint8Array := factory.Global().Get("Uint8Array").IsFunction()
 	if fUint8Array == nil {
@@ -150,6 +196,8 @@ func newBuffer(factory jsFactory, size int) jsBuffer {
 		obj:     obj,
 	}
 }
+
+var _ vValue = jsBuffer{}
 
 func (j jsBuffer) Size() int {
 	length, ok := j.obj.Get("length").IsNumber()

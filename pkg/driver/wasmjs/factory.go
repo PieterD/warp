@@ -1,12 +1,33 @@
 package wasmjs
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"github.com/PieterD/warp/pkg/driver"
 )
 
+type vValue interface {
+	jsValue() js.Value
+	driver.Value
+}
+
 type jsFactory struct{}
+
+func (j jsFactory) Array(values ...driver.Value) driver.Object {
+	var jsValues []interface{}
+	for _, value := range values {
+		vv, ok := value.(vValue)
+		if !ok {
+			panic(fmt.Errorf("non-wasmjs value: %T %v", value, value))
+		}
+		jsValues = append(jsValues, vv.jsValue())
+	}
+	jsArrayObject := js.Global().Get("Array").New(jsValues...)
+	return jsObject{
+		v: jsArrayObject,
+	}
+}
 
 func (j jsFactory) Boolean(t bool) driver.Value {
 	return jsBoolean{

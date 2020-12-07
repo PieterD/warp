@@ -14,6 +14,7 @@ type ProgramConfig struct {
 	HighPrecision bool
 	Uniforms      interface{}
 	Attributes    []AttributeDescription
+	Feedback      []AttributeDescription
 	VertexCode    string
 	FragmentCode  string
 }
@@ -44,7 +45,7 @@ var headerMediumPrecision = baseHeader + `precision mediump float;
 `
 
 func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
-	hdr := headerHighPrecision
+	hdr := headerMediumPrecision
 	if cfg.HighPrecision {
 		hdr = headerHighPrecision
 	}
@@ -63,6 +64,9 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 	for _, attr := range cfg.Attributes {
 		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.Index, attr.Type.glString(), attr.Name)
 	}
+	for _, attr := range cfg.Feedback {
+		vertHdr += fmt.Sprintf("out %s %s;\n", attr.Type.glString(), attr.Name)
+	}
 
 	vertShaderObject, err := compileShader(glx, glx.constants.VERTEX_SHADER, hdr+vertHdr+cfg.VertexCode)
 	if err != nil {
@@ -75,6 +79,14 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 	programObject := glx.constants.CreateProgram()
 	glx.constants.AttachShader(programObject, vertShaderObject)
 	glx.constants.AttachShader(programObject, fragShaderObject)
+	if len(cfg.Feedback) > 0 {
+		var arrayValues []driver.Value
+		for _, attr := range cfg.Feedback {
+			arrayValues = append(arrayValues, glx.factory.String(attr.Name))
+		}
+		feedbackNames := glx.factory.Array(arrayValues...)
+		glx.constants.TransformFeedbackVaryings(programObject, feedbackNames, glx.constants.SEPARATE_ATTRIBS)
+	}
 	glx.constants.LinkProgram(programObject)
 	linkStatus, ok := glx.constants.GetProgramParameter(programObject, glx.constants.LINK_STATUS).IsBoolean()
 	if !ok {

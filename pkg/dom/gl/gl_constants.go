@@ -73,6 +73,8 @@ type glConstants struct {
 
 	/* Drawing. */
 
+	POINTS       driver.Value
+	LINES        driver.Value
 	TRIANGLES    driver.Value
 	DrawArrays   func(args ...driver.Value) driver.Value
 	DrawElements func(args ...driver.Value) driver.Value
@@ -102,6 +104,18 @@ type glConstants struct {
 	BindBuffer           func(args ...driver.Value) driver.Value
 	BufferData           func(args ...driver.Value) driver.Value
 	BindBufferBase       func(args ...driver.Value) driver.Value
+	BindBufferRange      func(args ...driver.Value) driver.Value
+
+	/* Transform feedback */
+
+	TRANSFORM_FEEDBACK        driver.Value
+	INTERLEAVED_ATTRIBS       driver.Value
+	SEPARATE_ATTRIBS          driver.Value
+	CreateTransformFeedback   func(args ...driver.Value) driver.Value
+	BindTransformFeedback     func(args ...driver.Value) driver.Value
+	TransformFeedbackVaryings func(args ...driver.Value) driver.Value
+	BeginTransformFeedback    func(args ...driver.Value) driver.Value
+	EndTransformFeedback      func(args ...driver.Value) driver.Value
 
 	/* Texture stuff */
 

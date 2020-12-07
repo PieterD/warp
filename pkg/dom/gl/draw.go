@@ -10,7 +10,7 @@ type DrawConfig struct {
 	Use          *Program
 	VAO          *VertexArray
 	ElementArray *Buffer // Optional
-	DrawMode     DrawMode
+	DrawMode     PrimitiveDrawMode
 	Vertices     VertexRange
 	Options      DrawOptions
 }
@@ -26,10 +26,12 @@ type VertexRange struct {
 	VertexCount int
 }
 
-type DrawMode int
+type PrimitiveDrawMode int
 
 const (
-	Triangles DrawMode = iota
+	Points PrimitiveDrawMode = iota
+	Lines
+	Triangles
 )
 
 func doDraw(glx *Context, cfg DrawConfig) error {

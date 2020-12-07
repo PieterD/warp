@@ -37,5 +37,6 @@ type (
 		String(s string) Value
 		Function(f func(this Object, args ...Value) Value) Function
 		Buffer(size int) Buffer
+		Array(values ...Value) Object
 	}
 )
