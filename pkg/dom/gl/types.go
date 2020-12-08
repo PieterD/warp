@@ -88,7 +88,7 @@ func newTypeConverter(constants glConstants) *typeConverter {
 	}
 	reverse := make(map[int]Type)
 	for typ, v := range jsConstants {
-		fNum, ok := v.IsNumber()
+		fNum, ok := v.ToFloat64()
 		if !ok {
 			panic(fmt.Errorf("js constant for %s not a Number: %T", typ, v))
 		}
@@ -105,7 +105,7 @@ func newTypeConverter(constants glConstants) *typeConverter {
 }
 
 func (tc *typeConverter) FromJs(value driver.Value) (Type, error) {
-	fValue, ok := value.IsNumber()
+	fValue, ok := value.ToFloat64()
 	if !ok {
 		return 0, fmt.Errorf("expected number value: %T", value)
 	}

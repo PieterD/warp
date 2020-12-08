@@ -2,8 +2,8 @@ package driver
 
 func Bind(o Object, methodName string) func(args ...Value) Value {
 	got := o.Get(methodName)
-	function := got.IsFunction()
-	if function == nil {
+	function, ok := got.ToFunction()
+	if !ok {
 		return nil
 	}
 	return func(args ...Value) Value {
@@ -12,7 +12,7 @@ func Bind(o Object, methodName string) func(args ...Value) Value {
 }
 
 func IndexableToSlice(factory Factory, o Object) []Value {
-	numChildren, ok := o.Get("length").IsNumber()
+	numChildren, ok := o.Get("length").ToFloat64()
 	if !ok {
 		return nil
 	}

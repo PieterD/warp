@@ -92,6 +92,7 @@ func run(ctx context.Context) error {
 
 	canvas := dom.AsCanvas(canvasElem)
 	glx := canvas.GetContextWebgl()
+
 	heartProgram, err := NewHeartProgram(glx, "/models/12190_Heart_v1_L3.obj", "/texture.png")
 	if err != nil {
 		doc.Body().ClearChildren()

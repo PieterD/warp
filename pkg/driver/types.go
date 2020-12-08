@@ -2,15 +2,14 @@ package driver
 
 type (
 	Value interface {
-		IsUndefined() (ok bool) // stay
-		IsNull() (ok bool) // stay
+		IsUndefined() (ok bool)
+		IsNull() (ok bool)
 		
-		// these will become ToBoolean, etc
-		IsBoolean() (value, ok bool)
-		IsNumber() (value float64, ok bool) // ToFloat64
-		IsString() (value string, ok bool)
-		IsObject() (optionalValue Object) // add ok bool
-		IsFunction() (optionalValue Function) // add ok bool
+		ToBoolean() (value, ok bool)
+		ToFloat64() (value float64, ok bool)
+		ToString() (value string, ok bool)
+		ToObject() (optionalValue Object, ok bool)
+		ToFunction() (optionalValue Function, ok bool)
 	}
 	Object interface {
 		Value

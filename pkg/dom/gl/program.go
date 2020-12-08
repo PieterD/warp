@@ -88,12 +88,12 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		glx.constants.TransformFeedbackVaryings(programObject, feedbackNames, glx.constants.SEPARATE_ATTRIBS)
 	}
 	glx.constants.LinkProgram(programObject)
-	linkStatus, ok := glx.constants.GetProgramParameter(programObject, glx.constants.LINK_STATUS).IsBoolean()
+	linkStatus, ok := glx.constants.GetProgramParameter(programObject, glx.constants.LINK_STATUS).ToBoolean()
 	if !ok {
 		return nil, fmt.Errorf("LINK_STATUS program parameter did not return boolean")
 	}
 	if !linkStatus {
-		info, ok := glx.constants.GetProgramInfoLog(programObject).IsString()
+		info, ok := glx.constants.GetProgramInfoLog(programObject).ToString()
 		if !ok {
 			return nil, fmt.Errorf("programInfoLog did not return string")
 		}
@@ -151,12 +151,12 @@ func compileShader(glx *Context, shaderType driver.Value, code string) (driver.V
 	glx.constants.ShaderSource(shaderObject, glx.factory.String(code))
 	glx.constants.CompileShader(shaderObject)
 	csValue := glx.constants.GetShaderParameter(shaderObject, glx.constants.COMPILE_STATUS)
-	compileStatus, ok := csValue.IsBoolean()
+	compileStatus, ok := csValue.ToBoolean()
 	if !ok {
 		return nil, fmt.Errorf("COMPILE_STATUS shader parameteer did not return boolean: %T", csValue)
 	}
 	if !compileStatus {
-		info, ok := glx.constants.GetShaderInfoLog(shaderObject).IsString()
+		info, ok := glx.constants.GetShaderInfoLog(shaderObject).ToString()
 		if !ok {
 			return nil, fmt.Errorf("shaderInfoLog did not return string")
 		}

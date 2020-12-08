@@ -24,11 +24,11 @@ func (c *Canvas) GetContextWebgl() *gl.Context {
 }
 
 func (c *Canvas) InnerSize() (width, height int) {
-	fWidth, ok := c.elem.obj.Get("width").IsNumber()
+	fWidth, ok := c.elem.obj.Get("width").ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("canvas width is not a number"))
 	}
-	fHeight, ok := c.elem.obj.Get("height").IsNumber()
+	fHeight, ok := c.elem.obj.Get("height").ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("canvas height is not a number"))
 	}
@@ -41,11 +41,11 @@ func (c *Canvas) SetInnerSize(width, height int) {
 }
 
 func (c *Canvas) OuterSize() (width, height int) {
-	fWidth, ok := c.elem.obj.Get("clientWidth").IsNumber()
+	fWidth, ok := c.elem.obj.Get("clientWidth").ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("canvas clientWidth is not a number"))
 	}
-	fHeight, ok := c.elem.obj.Get("clientHeight").IsNumber()
+	fHeight, ok := c.elem.obj.Get("clientHeight").ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("canvas clientHeight is not a number"))
 	}

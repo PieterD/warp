@@ -14,8 +14,8 @@ type Window struct {
 
 func (w *Window) Document() *Document {
 	dValue := w.obj.Get("document")
-	dObj := dValue.IsObject()
-	if dObj == nil {
+	dObj, ok := dValue.ToObject()
+	if !ok {
 		return nil
 	}
 	return &Document{
@@ -31,7 +31,7 @@ func (w *Window) Animate(ctx context.Context, f func(ctx context.Context, millis
 		if len(args) != 1 {
 			panic(fmt.Errorf("expecteed 1 argument, got: %d", len(args)))
 		}
-		millis, ok := args[0].IsNumber()
+		millis, ok := args[0].ToFloat64()
 		if !ok {
 			panic(fmt.Errorf("expected first argument to be a number: %T", args[0]))
 		}

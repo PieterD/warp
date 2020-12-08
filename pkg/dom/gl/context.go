@@ -21,8 +21,8 @@ type Canvas interface {
 func NewContext(canvas Canvas) *Context {
 	factory, canvasObject := canvas.Driver()
 	fGetContext := driver.Bind(canvasObject, "getContext")
-	ctxObject := fGetContext(factory.String("webgl2")).IsObject()
-	if ctxObject == nil {
+	ctxObject, ok := fGetContext(factory.String("webgl2")).ToObject()
+	if !ok {
 		return nil
 	}
 
@@ -71,7 +71,7 @@ func (glx *Context) BindTextureUnits(textures ...*Texture2D) {
 	if len(textures) >= maxUnits {
 		panic(fmt.Errorf("only %d texture units allowed, got: %d", maxUnits, len(textures)))
 	}
-	fTexture0, ok := glx.constants.TEXTURE0.IsNumber()
+	fTexture0, ok := glx.constants.TEXTURE0.ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("expected TEXTURE0 to be a number: %T", glx.constants.TEXTURE0))
 	}

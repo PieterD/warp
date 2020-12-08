@@ -11,8 +11,8 @@ type Document struct {
 
 func (doc *Document) Body() *Elem {
 	dValue := doc.obj.Get("body")
-	dObj := dValue.IsObject()
-	if dObj == nil {
+	dObj, ok := dValue.ToObject()
+	if !ok {
 		return nil
 	}
 	return &Elem{
@@ -24,8 +24,8 @@ func (doc *Document) Body() *Elem {
 func (doc *Document) CreateElem(tag string, constructor func(newElem *Elem)) *Elem {
 	fCreateElement := driver.Bind(doc.obj, "createElement")
 	elementValue := fCreateElement(doc.factory.String(tag))
-	elementObject := elementValue.IsObject()
-	if elementObject == nil {
+	elementObject, ok := elementValue.ToObject()
+	if !ok {
 		return nil
 	}
 	elem := &Elem{

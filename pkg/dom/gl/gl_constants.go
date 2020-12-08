@@ -150,7 +150,7 @@ func newGlConstants(obj driver.Object, trace bool) (c glConstants) {
 		value := obj.Get(field.Name)
 		switch fieldValue.Type() {
 		case typeDriverValue:
-			v, _ := value.IsNumber()
+			v, _ := value.ToFloat64()
 			fmt.Printf("loading constant: %s = %d\n", field.Name, int(v))
 			fieldValue.Set(reflect.ValueOf(value))
 		case typeDriverFunc:
@@ -180,15 +180,15 @@ func wrapTrace(functionName string, f func(args ...driver.Value) driver.Value) f
 				fmt.Printf("null")
 			} else if arg.IsUndefined() {
 				fmt.Printf("undefined")
-			} else if v, ok := arg.IsBoolean(); ok {
+			} else if v, ok := arg.ToBoolean(); ok {
 				fmt.Printf("%t", v)
-			} else if v, ok := arg.IsNumber(); ok {
+			} else if v, ok := arg.ToFloat64(); ok {
 				fmt.Printf("%f", v)
-			} else if v, ok := arg.IsString(); ok {
+			} else if v, ok := arg.ToString(); ok {
 				fmt.Printf("%q", v)
-			} else if v := arg.IsObject(); v != nil {
+			} else if _, ok := arg.ToObject(); ok {
 				fmt.Printf("object")
-			} else if v := arg.IsFunction(); v != nil {
+			} else if _, ok := arg.ToFunction(); ok {
 				fmt.Printf("function")
 			} else {
 				fmt.Printf("UNKNOWN")

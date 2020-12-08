@@ -18,7 +18,7 @@ func (e *Elem) Driver() (factory driver.Factory, obj driver.Object) {
 }
 
 func (e *Elem) Tag() string {
-	v, ok := e.obj.Get("tagName").IsString()
+	v, ok := e.obj.Get("tagName").ToString()
 	if !ok {
 		return "!UNKNOWN-TAG-TYPE!"
 	}
@@ -30,7 +30,7 @@ func (e *Elem) SetText(text string) {
 }
 
 func (e *Elem) Classes() []string {
-	allClasses, ok := e.obj.Get("className").IsString()
+	allClasses, ok := e.obj.Get("className").ToString()
 	if !ok {
 		return nil
 	}
@@ -58,13 +58,13 @@ func (e *Elem) ClearClasses() {
 }
 
 func (e *Elem) Children() (children []*Elem) {
-	childrenObject := e.obj.Get("children").IsObject()
-	if childrenObject == nil {
+	childrenObject, ok := e.obj.Get("children").ToObject()
+	if !ok {
 		return
 	}
 	for _, childValue := range driver.IndexableToSlice(e.factory, childrenObject) {
-		childObject := childValue.IsObject()
-		if childObject == nil {
+		childObject, ok := childValue.ToObject()
+		if !ok {
 			return
 		}
 		children = append(children, &Elem{
@@ -85,8 +85,8 @@ func (e *Elem) AppendChildren(children ...*Elem) {
 func (e *Elem) ClearChildren() {
 	fRemoveChild := driver.Bind(e.obj, "removeChild")
 	for {
-		firstChildObject := e.obj.Get("firstChild").IsObject()
-		if firstChildObject == nil {
+		firstChildObject, ok := e.obj.Get("firstChild").ToObject()
+		if !ok {
 			break
 		}
 		fRemoveChild(firstChildObject)
@@ -99,8 +99,8 @@ func (e *Elem) EventHandler(eventName string, f func(this *Elem, event *Event)) 
 		if len(args) != 1 {
 			panic(fmt.Errorf("expected 1 argument, got: %d", len(args)))
 		}
-		eventObject := args[0].IsObject()
-		if eventObject == nil {
+		eventObject, ok := args[0].ToObject()
+		if !ok {
 			panic(fmt.Errorf("first argument is not an object: %T", args[0]))
 		}
 		evt := &Event{

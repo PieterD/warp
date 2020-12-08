@@ -46,7 +46,7 @@ func (j jsBoolean) jsValue() js.Value {
 	return j.v
 }
 
-func (j jsBoolean) IsBoolean() (bool, bool) {
+func (j jsBoolean) ToBoolean() (bool, bool) {
 	switch jsType := j.v.Type(); jsType {
 	case js.TypeBoolean:
 		return j.v.Bool(), true
@@ -66,7 +66,7 @@ func (j jsNumber) jsValue() js.Value {
 	return j.v
 }
 
-func (j jsNumber) IsNumber() (float64, bool) {
+func (j jsNumber) ToFloat64() (float64, bool) {
 	switch jsType := j.v.Type(); jsType {
 	case js.TypeNumber:
 		return j.v.Float(), true
@@ -86,7 +86,7 @@ func (j jsString) jsValue() js.Value {
 	return j.v
 }
 
-func (j jsString) IsString() (string, bool) {
+func (j jsString) ToString() (string, bool) {
 	switch jsType := j.v.Type(); jsType {
 	case js.TypeString:
 		return j.v.String(), true
@@ -106,12 +106,12 @@ func (j jsObject) jsValue() js.Value {
 	return j.v
 }
 
-func (j jsObject) IsObject() driver.Object {
+func (j jsObject) ToObject() (driver.Object, bool) {
 	switch jsType := j.v.Type(); jsType {
 	case js.TypeObject:
-		return j
+		return j, true
 	default:
-		return nil
+		return nil, false
 	}
 }
 
@@ -134,12 +134,12 @@ func (j jsFunction) jsValue() js.Value {
 	return j.v
 }
 
-func (j jsFunction) IsFunction() driver.Function {
+func (j jsFunction) ToFunction() (driver.Function, bool) {
 	switch jsType := j.v.Type(); jsType {
 	case js.TypeFunction:
-		return j
+		return j, true
 	default:
-		return nil
+		return nil, false
 	}
 }
 
@@ -181,8 +181,8 @@ func (j jsBuffer) jsValue() js.Value {
 }
 
 func newBuffer(factory jsFactory, size int) jsBuffer {
-	fUint8Array := factory.Global().Get("Uint8Array").IsFunction()
-	if fUint8Array == nil {
+	fUint8Array, ok := factory.Global().Get("Uint8Array").ToFunction()
+	if !ok {
 		panic(fmt.Errorf("Uint8Array constructor is missing"))
 	}
 	obj := fUint8Array.New(factory.Number(float64(size)))
@@ -200,7 +200,7 @@ func newBuffer(factory jsFactory, size int) jsBuffer {
 var _ vValue = jsBuffer{}
 
 func (j jsBuffer) Size() int {
-	length, ok := j.obj.Get("length").IsNumber()
+	length, ok := j.obj.Get("length").ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("buffer length was not a number"))
 	}
@@ -216,24 +216,24 @@ func (j jsBuffer) Get(data []byte) int {
 }
 
 func (j jsBuffer) AsUint8Array() driver.Object {
-	con := j.factory.Global().Get("Uint8Array").IsFunction()
-	if con == nil {
+	con, ok := j.factory.Global().Get("Uint8Array").ToFunction()
+	if !ok {
 		panic(fmt.Errorf("Uint8Array was not a function"))
 	}
 	return con.New(j.obj.Get("buffer"))
 }
 
 func (j jsBuffer) AsUint16Array() driver.Object {
-	con := j.factory.Global().Get("Uint16Array").IsFunction()
-	if con == nil {
+	con, ok := j.factory.Global().Get("Uint16Array").ToFunction()
+	if !ok {
 		panic(fmt.Errorf("Uint16Array was not a function"))
 	}
 	return con.New(j.obj.Get("buffer"))
 }
 
 func (j jsBuffer) AsFloat32Array() driver.Object {
-	con := j.factory.Global().Get("Float32Array").IsFunction()
-	if con == nil {
+	con, ok := j.factory.Global().Get("Float32Array").ToFunction()
+	if !ok {
 		panic(fmt.Errorf("Float32Array was not a function"))
 	}
 	return con.New(j.obj.Get("buffer"))
@@ -241,7 +241,7 @@ func (j jsBuffer) AsFloat32Array() driver.Object {
 
 type jsEmpty struct{}
 
-func (j jsEmpty) IsBoolean() (value, ok bool) {
+func (j jsEmpty) ToBoolean() (value, ok bool) {
 	return false, false
 }
 
@@ -253,20 +253,20 @@ func (j jsEmpty) IsNull() (ok bool) {
 	return false
 }
 
-func (j jsEmpty) IsNumber() (value float64, ok bool) {
+func (j jsEmpty) ToFloat64() (value float64, ok bool) {
 	return 0, false
 }
 
-func (j jsEmpty) IsString() (value string, ok bool) {
+func (j jsEmpty) ToString() (value string, ok bool) {
 	return "", false
 }
 
-func (j jsEmpty) IsObject() (value driver.Object) {
-	return nil
+func (j jsEmpty) ToObject() (optionalValue driver.Object, ok bool) {
+	return nil, ok
 }
 
-func (j jsEmpty) IsFunction() (value driver.Function) {
-	return nil
+func (j jsEmpty) ToFunction() (optionalValue driver.Function, ok bool) {
+	return nil, ok
 }
 
 var _ driver.Value = jsEmpty{}

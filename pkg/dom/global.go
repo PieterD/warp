@@ -16,8 +16,8 @@ func Open(factory driver.Factory) *Global {
 
 func (g *Global) Window() *Window {
 	dValue := g.obj.Get("window")
-	dObj := dValue.IsObject()
-	if dObj == nil {
+	dObj, ok := dValue.ToObject()
+	if !ok {
 		return nil
 	}
 	return &Window{
