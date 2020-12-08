@@ -112,11 +112,9 @@ func run(ctx context.Context) error {
 		w, h := canvas.OuterSize()
 		canvas.SetInnerSize(w, h)
 		glx.Viewport(0, 0, w, h)
-
-		//_, rot := math.Modf(millis / 2000.0)
-		_, rot := math.Modf(millis / 4000.0)
-
 		glx.Clear()
+
+		_, rot := math.Modf(millis / 4000.0)
 		if err := heartProgram.Draw(rs, rot); err != nil {
 			return fmt.Errorf("drawing heart program: %w", err)
 		}
