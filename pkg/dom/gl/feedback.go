@@ -4,6 +4,7 @@ import "github.com/PieterD/warp/pkg/driver"
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGLTransformFeedback
 
+//TODO: buffer binding.
 type Feedback struct {
 	glx      *Context
 	glObject driver.Value
@@ -47,3 +48,4 @@ func (f *Feedback) end() {
 	glx := f.glx
 	glx.constants.EndTransformFeedback()
 }
+

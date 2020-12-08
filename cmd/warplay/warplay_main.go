@@ -92,15 +92,14 @@ func run(ctx context.Context) error {
 
 	canvas := dom.AsCanvas(canvasElem)
 	glx := canvas.GetContextWebgl()
-	render, err := buildRenderer(glx, rs)
+	heartProgram, err := NewHeartProgram(glx, "/models/12190_Heart_v1_L3.obj", "/texture.png")
 	if err != nil {
 		doc.Body().ClearChildren()
 		doc.Body().AppendChildren(
 			doc.CreateElem("label", func(labelElem *dom.Elem) {
-				labelElem.SetText(fmt.Sprintf("error building renderer: %v", err))
+				labelElem.SetText(fmt.Sprintf("error building heart program: %v", err))
 			}),
 		)
-
 		return nil
 	}
 	global.Window().Animate(ctx, func(ctx context.Context, millis float64) error {
@@ -115,8 +114,10 @@ func run(ctx context.Context) error {
 
 		//_, rot := math.Modf(millis / 2000.0)
 		_, rot := math.Modf(millis / 4000.0)
-		if err := render(rot); err != nil {
-			return fmt.Errorf("calling render: %w", err)
+
+		glx.Clear()
+		if err := heartProgram.Draw(rs, rot); err != nil {
+			return fmt.Errorf("drawing heart program: %w", err)
 		}
 		return nil
 	})
