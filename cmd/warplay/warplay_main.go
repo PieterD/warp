@@ -115,7 +115,7 @@ func run(ctx context.Context) error {
 		glx.Clear()
 
 		_, rot := math.Modf(millis / 4000.0)
-		if err := heartProgram.Draw(rs, rot); err != nil {
+		if err := heartProgram.Draw(rs.camera, rot); err != nil {
 			return fmt.Errorf("drawing heart program: %w", err)
 		}
 		return nil

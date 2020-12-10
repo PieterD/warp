@@ -157,11 +157,11 @@ func (j jsFunction) New(args ...driver.Value) driver.Object {
 }
 
 func (j jsFunction) Call(this driver.Object, args ...driver.Value) driver.Value {
-	ourThis, ok := this.(jsObject)
+	vThis, ok := this.(vValue)
 	if !ok {
 		panic(fmt.Errorf("unknown this type: %T", this))
 	}
-	jsArgs := []interface{}{ourThis.v}
+	jsArgs := []interface{}{vThis.jsValue()}
 	for _, arg := range args {
 		jsArgs = append(jsArgs, value2js(arg))
 	}
@@ -186,13 +186,13 @@ func newBuffer(factory jsFactory, size int) jsBuffer {
 		panic(fmt.Errorf("Uint8Array constructor is missing"))
 	}
 	obj := fUint8Array.New(factory.Number(float64(size)))
-	ours, ok := obj.(jsObject)
+	vObj, ok := obj.(vValue)
 	if !ok {
 		panic(fmt.Errorf("buffer object was somehow not an object"))
 	}
 	return jsBuffer{
 		factory: factory,
-		v:       ours.v,
+		v:       vObj.jsValue(),
 		obj:     obj,
 	}
 }

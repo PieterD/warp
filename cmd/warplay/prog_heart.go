@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/PieterD/warp/pkg/dom/glutil"
+
 	"github.com/PieterD/warp/pkg/dom/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -147,7 +149,7 @@ void main(void) {
 	return p, nil
 }
 
-func (p *HeartProgram) Draw(rs *rendererState, rot float64) error {
+func (p *HeartProgram) Draw(camera *glutil.Camera, rot float64) error {
 	deg2rad := float32(math.Pi) / 180.0
 	fov := 70 * deg2rad
 	lightAngle := float32(rot * 2 * math.Pi)
@@ -171,10 +173,10 @@ func (p *HeartProgram) Draw(rs *rendererState, rot float64) error {
 	p.Uniforms.Model = mgl32.Ident4().
 		Mul4(mgl32.Translate3D(0, -10, 0)).
 		Mul4(mgl32.HomogRotate3DX(-math.Pi / 2.0))
-	p.Uniforms.View = rs.camera.ViewMatrix()
+	p.Uniforms.View = camera.ViewMatrix()
 	p.Uniforms.Projection = mgl32.Perspective(fov, 4.0/3.0, 0.1, 100.0)
 	p.Uniforms.LightLocation = lightLocation
-	p.Uniforms.CameraLocation = rs.camera.Location()
+	p.Uniforms.CameraLocation = camera.Location()
 	if err := p.program.UpdateUniforms(); err != nil {
 		return fmt.Errorf("updaring uniforms: %w", err)
 	}

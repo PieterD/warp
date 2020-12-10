@@ -43,24 +43,12 @@ func js2value(jsValue js.Value) (v driver.Value) {
 }
 
 func value2js(dv driver.Value) (jsValue js.Value) {
-	switch j := dv.(type) {
-	case nil:
+	if dv == nil {
 		return js.Null()
-	case jsUndefined:
-		return j.v
-	case jsNull:
-		return j.v
-	case jsBoolean:
-		return j.v
-	case jsNumber:
-		return j.v
-	case jsString:
-		return j.v
-	case jsObject:
-		return j.v
-	case jsFunction:
-		return j.v
-	default:
-		panic(fmt.Errorf("unknown driver value type: %T", dv))
 	}
+	vdv, ok := dv.(vValue)
+	if !ok {
+		panic(fmt.Errorf("value was not our type: %T", dv))
+	}
+	return vdv.jsValue()
 }
