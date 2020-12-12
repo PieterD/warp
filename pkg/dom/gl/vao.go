@@ -6,14 +6,6 @@ import (
 	"github.com/PieterD/warp/pkg/driver"
 )
 
-type VertexArrayAttributeConfig struct {
-	Name       string
-	Type       Type
-	Buffer     *Buffer
-	ByteOffset int
-	ByteStride int
-}
-
 type VertexArray struct {
 	glx      *Context
 	glObject driver.Value
@@ -27,16 +19,27 @@ type vertexAttr struct {
 	index   int
 }
 
-func newVertexArray(glx *Context, attrs ...VertexArrayAttributeConfig) (*VertexArray, error) {
+func newVertexArray(glx *Context, adc ActiveCoupling, buffers map[string]*Buffer) (*VertexArray, error) {
+	// Verify that all enabled attributes really exist.
+	for attrName := range adc.Enabled {
+		if _, ok := adc.DC.attrByName[attrName]; !ok {
+			return nil, fmt.Errorf("unknown enabled attribute %s in active coupling", attrName)
+		}
+	}
+
 	glVAO := glx.constants.CreateVertexArray()
 	glx.constants.BindVertexArray(glVAO)
 	defer glx.constants.BindVertexArray(glx.factory.Null())
 
 	attrMap := make(map[string]*vertexAttr)
-	for attrIndex, attr := range attrs {
-		fmt.Printf("VAO ATTR: %s %s %d %d\n", attr.Name, attr.Type, attr.ByteOffset, attr.ByteStride)
+	for attrIndex, attr := range adc.DC.attributes {
+		//fmt.Printf("VAO ATTR: %s %s %d %d %s\n", attr.name, attr.typ, attr.offset, attr.stride, attr.buffer)
+		buffer, ok := buffers[attr.buffer]
+		if !ok {
+			return nil, fmt.Errorf("missing buffer with name %s", attr.buffer)
+		}
 		glAttrIndex := glx.factory.Number(float64(attrIndex))
-		attrType := attr.Type
+		attrType := attr.typ
 		bufferType, bufferItemsPerVertex, err := attrType.asAttribute()
 		if err != nil {
 			return nil, fmt.Errorf("converting attribute type %s to attribute: %w", attrType, err)
@@ -44,9 +47,9 @@ func newVertexArray(glx *Context, attrs ...VertexArrayAttributeConfig) (*VertexA
 		glBufferType := glx.typeConverter.ToJs(bufferType)
 		glItemsPerVertex := glx.factory.Number(float64(bufferItemsPerVertex))
 		glNormalized := glx.factory.Boolean(false)
-		glByteStride := glx.factory.Number(float64(attr.ByteStride))
-		glByteOffset := glx.factory.Number(float64(attr.ByteOffset))
-		glx.constants.BindBuffer(glx.constants.ARRAY_BUFFER, attr.Buffer.glObject)
+		glByteStride := glx.factory.Number(float64(attr.stride))
+		glByteOffset := glx.factory.Number(float64(attr.offset))
+		glx.constants.BindBuffer(glx.constants.ARRAY_BUFFER, buffer.glObject)
 		glx.constants.VertexAttribPointer(
 			glAttrIndex,
 			glItemsPerVertex,
@@ -56,10 +59,10 @@ func newVertexArray(glx *Context, attrs ...VertexArrayAttributeConfig) (*VertexA
 			glByteOffset,
 		)
 		glx.constants.EnableVertexAttribArray(glAttrIndex)
-		attrMap[attr.Name] = &vertexAttr{
+		attrMap[attr.name] = &vertexAttr{
 			enabled: true,
-			name:    attr.Name,
-			typ:     attr.Type,
+			name:    attr.name,
+			typ:     attr.typ,
 			index:   attrIndex,
 		}
 	}

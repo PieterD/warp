@@ -3,7 +3,6 @@ package gl
 import (
 	"fmt"
 	"io"
-	"sort"
 )
 
 type (
@@ -14,6 +13,10 @@ type (
 		attrByName    map[string]int
 		attrByIndex   map[int]int
 		attrsByBuffer map[string][]int
+	}
+	ActiveCoupling struct {
+		DC      *DataCoupling
+		Enabled map[string]struct{}
 	}
 	vertexAttribute struct {
 		name    string
@@ -74,12 +77,13 @@ func NewDataCoupling(config DataCouplingConfig) (*DataCoupling, error) {
 			return nil, fmt.Errorf("attribute name appears multiple times: %s", vertexConfig.Name)
 		}
 		dc.attributes[i] = vertexAttribute{
-			name:   vertexConfig.Name,
-			typ:    vertexConfig.Type,
-			buffer: vertexConfig.Buffer,
-			index:  index,
-			offset: 0,
-			stride: 0,
+			name:    vertexConfig.Name,
+			typ:     vertexConfig.Type,
+			buffer:  vertexConfig.Buffer,
+			padding: vertexConfig.Padding,
+			index:   index,
+			offset:  0,
+			stride:  0,
 		}
 		dc.attrByName[vertexConfig.Name] = i
 		dc.attrByIndex[index] = i
@@ -103,59 +107,15 @@ func NewDataCoupling(config DataCouplingConfig) (*DataCoupling, error) {
 	return dc, nil
 }
 
-func (dc *DataCoupling) ProgramConfig(attributeNamesIncluded []string) ([]ProgramAttributeConfig, error) {
-	if len(attributeNamesIncluded) == 0 {
-		return nil, fmt.Errorf("no attribute names included")
+func (dc *DataCoupling) Active(enabledAttrNames ...string) ActiveCoupling {
+	enabled := make(map[string]struct{})
+	for _, attrName := range enabledAttrNames {
+		enabled[attrName] = struct{}{}
 	}
-	var paConfigs []ProgramAttributeConfig
-	for i, attrName := range attributeNamesIncluded {
-		if attrName == "" {
-			return nil, fmt.Errorf("cannot include empty attribute name at index %d", i)
-		}
-		idx, ok := dc.attrByName[attrName]
-		if !ok {
-			return nil, fmt.Errorf("unknown attribute name: %s", attrName)
-		}
-		attr := &dc.attributes[idx]
-		paConfigs = append(paConfigs, ProgramAttributeConfig{
-			Name:  attr.name,
-			Type:  attr.typ,
-			Index: attr.index,
-		})
+	return ActiveCoupling{
+		DC:      dc,
+		Enabled: enabled,
 	}
-	sort.Slice(paConfigs, func(i, j int) bool {
-		return paConfigs[i].Index < paConfigs[j].Index
-	})
-	return paConfigs, nil
-}
-
-func (dc *DataCoupling) VertexArrayConfig(attributeNamesIncluded []string, buffers map[string]*Buffer) ([]VertexArrayAttributeConfig, error) {
-	if len(attributeNamesIncluded) == 0 {
-		return nil, fmt.Errorf("no attribute names included")
-	}
-	var vaoConfigs []VertexArrayAttributeConfig
-	for i, attrName := range attributeNamesIncluded {
-		if attrName == "" {
-			return nil, fmt.Errorf("cannot include empty attribute name at index %d", i)
-		}
-		idx, ok := dc.attrByName[attrName]
-		if !ok {
-			return nil, fmt.Errorf("unknown attribute name %s", attrName)
-		}
-		attr := &dc.attributes[idx]
-		buffer := buffers[attr.buffer]
-		if buffer == nil {
-			return nil, fmt.Errorf("missing Buffer with name %s", attr.buffer)
-		}
-		vaoConfigs = append(vaoConfigs, VertexArrayAttributeConfig{
-			Name:       attr.name,
-			Type:       attr.typ,
-			Buffer:     buffer,
-			ByteOffset: attr.offset,
-			ByteStride: attr.stride,
-		})
-	}
-	return vaoConfigs, nil
 }
 
 // DataCouplingConfigFromStruct will return a DataCouplingConfig corresponding to

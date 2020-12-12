@@ -2,6 +2,7 @@ package gl
 
 import (
 	"fmt"
+
 	"github.com/PieterD/warp/pkg/dom/glunsafe"
 
 	"github.com/PieterD/warp/pkg/dom/glutil"
@@ -14,16 +15,10 @@ import (
 type ProgramConfig struct {
 	HighPrecision bool
 	Uniforms      interface{}
-	Attributes    []ProgramAttributeConfig
-	Feedback      []ProgramAttributeConfig
-	VertexCode    string
-	FragmentCode  string
-}
-
-type ProgramAttributeConfig struct {
-	Name  string
-	Type  Type
-	Index int
+	Attributes    ActiveCoupling
+	//Feedback      ActiveCoupling
+	VertexCode   string
+	FragmentCode string
 }
 
 type Program struct {
@@ -60,13 +55,23 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		uniBuffer = glx.Buffer()
 	}
 
+	// Verify that all enabled attributes really exist.
+	for attrName := range cfg.Attributes.Enabled {
+		if _, ok := cfg.Attributes.DC.attrByName[attrName]; !ok {
+			return nil, fmt.Errorf("unknown enabled attribute %s in active coupling", attrName)
+		}
+	}
 	vertHdr := ""
-	for _, attr := range cfg.Attributes {
-		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.Index, attr.Type.glString(), attr.Name)
+	for _, attr := range cfg.Attributes.DC.attributes {
+		if _, ok := cfg.Attributes.Enabled[attr.name]; !ok {
+			continue
+		}
+		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.index, attr.typ.glString(), attr.name)
 	}
-	for _, attr := range cfg.Feedback {
-		vertHdr += fmt.Sprintf("out %s %s;\n", attr.Type.glString(), attr.Name)
-	}
+
+	//for _, attr := range cfg.Feedback {
+	//	vertHdr += fmt.Sprintf("out %s %s;\n", attr.Type.glString(), attr.Name)
+	//}
 
 	vertShaderObject, err := compileShader(glx, glx.constants.VERTEX_SHADER, hdr+vertHdr+cfg.VertexCode)
 	if err != nil {
@@ -79,14 +84,14 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 	programObject := glx.constants.CreateProgram()
 	glx.constants.AttachShader(programObject, vertShaderObject)
 	glx.constants.AttachShader(programObject, fragShaderObject)
-	if len(cfg.Feedback) > 0 {
-		var arrayValues []driver.Value
-		for _, attr := range cfg.Feedback {
-			arrayValues = append(arrayValues, glx.factory.String(attr.Name))
-		}
-		feedbackNames := glx.factory.Array(arrayValues...)
-		glx.constants.TransformFeedbackVaryings(programObject, feedbackNames, glx.constants.SEPARATE_ATTRIBS)
-	}
+	//if len(cfg.Feedback) > 0 {
+	//	var arrayValues []driver.Value
+	//	for _, attr := range cfg.Feedback {
+	//		arrayValues = append(arrayValues, glx.factory.String(attr.Name))
+	//	}
+	//	feedbackNames := glx.factory.Array(arrayValues...)
+	//	glx.constants.TransformFeedbackVaryings(programObject, feedbackNames, glx.constants.SEPARATE_ATTRIBS)
+	//}
 	glx.constants.LinkProgram(programObject)
 	linkStatus, ok := glx.constants.GetProgramParameter(programObject, glx.constants.LINK_STATUS).ToBoolean()
 	if !ok {

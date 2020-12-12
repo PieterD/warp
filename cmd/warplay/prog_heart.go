@@ -28,7 +28,6 @@ type HeartProgram struct {
 }
 
 func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*HeartProgram, error) {
-	allAttributeNames := []string{"Coordinates", "TexCoord", "Normal"}
 	dc, err := gl.NewDataCoupling(gl.DataCouplingConfig{
 		Vertices: []gl.VertexConfig{
 			{
@@ -41,7 +40,7 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 				Name:    "TexCoord",
 				Type:    gl.Vec2,
 				Buffer:  "vertex",
-				Padding: 0,
+				Padding: 4,
 			},
 			{
 				Name:    "Normal",
@@ -54,6 +53,7 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 	if err != nil {
 		return nil, fmt.Errorf("creating data coupling: %w", err)
 	}
+	adc := dc.Active("Coordinates", "TexCoord", "Normal")
 	model, err := loadModel(modelPath)
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
@@ -75,25 +75,17 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 	p.elementBuffer = glx.Buffer()
 	p.elementBuffer.IndexData(heartIndices)
 
-	vertexArrayConfig, err := dc.VertexArrayConfig(
-		allAttributeNames,
-		map[string]*gl.Buffer{
-			"vertex": p.vertexBuffer,
-		},
-	)
-	p.vao, err = glx.VertexArray(vertexArrayConfig...)
+	p.vao, err = glx.VertexArray(adc, map[string]*gl.Buffer{
+		"vertex": p.vertexBuffer,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
 
-	programAttrConfig, err := dc.ProgramConfig(allAttributeNames)
-	if err != nil {
-		return nil, fmt.Errorf("creating program attribute config: %w", err)
-	}
 	programConfig := gl.ProgramConfig{
 		HighPrecision: true,
 		Uniforms:      &p.Uniforms,
-		Attributes:    programAttrConfig,
+		Attributes:    adc,
 		VertexCode: `
 out vec2 texCoord;
 out vec3 normal;
