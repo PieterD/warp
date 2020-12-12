@@ -1,6 +1,9 @@
 package gl
 
-import "github.com/PieterD/warp/pkg/driver"
+import (
+	"github.com/PieterD/warp/pkg/dom/glunsafe"
+	"github.com/PieterD/warp/pkg/driver"
+)
 
 type Buffer struct {
 	glx         *Context
@@ -17,7 +20,7 @@ func newBuffer(glx *Context) *Buffer {
 }
 
 func (b *Buffer) VertexData(data []float32) {
-	byteData := fastFloat32ToByte(data)
+	byteData := glunsafe.FastFloat32ToByte(data)
 	jsBuffer := b.glx.factory.Buffer(len(byteData))
 	jsBuffer.Put(byteData)
 	vertexArray := jsBuffer.AsFloat32Array()
@@ -29,7 +32,7 @@ func (b *Buffer) VertexData(data []float32) {
 }
 
 func (b *Buffer) IndexData(data []uint16) {
-	byteData := fastUint16ToByte(data)
+	byteData := glunsafe.FastUint16ToByte(data)
 	jsBuffer := b.glx.factory.Buffer(len(byteData))
 	jsBuffer.Put(byteData)
 	indexArray := jsBuffer.AsUint16Array()

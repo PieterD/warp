@@ -2,6 +2,7 @@ package gl
 
 import (
 	"fmt"
+	"github.com/PieterD/warp/pkg/dom/glunsafe"
 
 	"github.com/PieterD/warp/pkg/dom/glutil"
 
@@ -13,16 +14,15 @@ import (
 type ProgramConfig struct {
 	HighPrecision bool
 	Uniforms      interface{}
-	Attributes    []AttributeDescription
-	Feedback      []AttributeDescription
+	Attributes    []ProgramAttributeConfig
+	Feedback      []ProgramAttributeConfig
 	VertexCode    string
 	FragmentCode  string
 }
 
-type AttributeDescription struct {
-	Name string
-	Type Type
-	//TODO: autogenerate (and fill in) if all Index values are 0
+type ProgramAttributeConfig struct {
+	Name  string
+	Type  Type
 	Index int
 }
 
@@ -217,6 +217,6 @@ func (us *UniformSetter) Vec3(u *Uniform, v mgl32.Vec3) {
 func (us *UniformSetter) Mat4(u *Uniform, m mgl32.Mat4) {
 	glx := us.glx
 	buf := glx.factory.Buffer(4 * 4 * 4)
-	buf.Put(fastFloat32ToByte(m[:]))
+	buf.Put(glunsafe.FastFloat32ToByte(m[:]))
 	glx.constants.UniformMatrix4fv(u.location, glx.factory.Boolean(false), buf.AsFloat32Array())
 }

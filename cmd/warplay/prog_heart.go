@@ -28,6 +28,32 @@ type HeartProgram struct {
 }
 
 func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*HeartProgram, error) {
+	allAttributeNames := []string{"Coordinates", "TexCoord", "Normal"}
+	dc, err := gl.NewDataCoupling(gl.DataCouplingConfig{
+		Vertices: []gl.VertexConfig{
+			{
+				Name:    "Coordinates",
+				Type:    gl.Vec3,
+				Buffer:  "vertex",
+				Padding: 0,
+			},
+			{
+				Name:    "TexCoord",
+				Type:    gl.Vec2,
+				Buffer:  "vertex",
+				Padding: 0,
+			},
+			{
+				Name:    "Normal",
+				Type:    gl.Vec3,
+				Buffer:  "vertex",
+				Padding: 0,
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("creating data coupling: %w", err)
+	}
 	model, err := loadModel(modelPath)
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
@@ -49,44 +75,25 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 	p.elementBuffer = glx.Buffer()
 	p.elementBuffer.IndexData(heartIndices)
 
-	stride := (model.VertexItems + model.TextureItems + model.VertexItems) * 4
-	p.vao, err = glx.VertexArray(
-		gl.VertexArrayAttribute{
-			Name:   "Coordinates",
-			Type:   gl.Vec3,
-			Buffer: p.vertexBuffer,
-			Layout: gl.VertexArrayAttributeLayout{
-				ByteOffset: 0,
-				ByteStride: stride,
-			},
-		},
-		gl.VertexArrayAttribute{
-			Name:   "TexCoord",
-			Type:   gl.Vec2,
-			Buffer: p.vertexBuffer,
-			Layout: gl.VertexArrayAttributeLayout{
-				ByteOffset: 4 * model.VertexItems,
-				ByteStride: stride,
-			},
-		},
-		gl.VertexArrayAttribute{
-			Name:   "Normal",
-			Type:   gl.Vec3,
-			Buffer: p.vertexBuffer,
-			Layout: gl.VertexArrayAttributeLayout{
-				ByteOffset: (model.VertexItems + model.TextureItems) * 4,
-				ByteStride: stride,
-			},
+	vertexArrayConfig, err := dc.VertexArrayConfig(
+		allAttributeNames,
+		map[string]*gl.Buffer{
+			"vertex": p.vertexBuffer,
 		},
 	)
+	p.vao, err = glx.VertexArray(vertexArrayConfig...)
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
 
+	programAttrConfig, err := dc.ProgramConfig(allAttributeNames)
+	if err != nil {
+		return nil, fmt.Errorf("creating program attribute config: %w", err)
+	}
 	programConfig := gl.ProgramConfig{
 		HighPrecision: true,
 		Uniforms:      &p.Uniforms,
-		Attributes:    p.vao.Attributes(),
+		Attributes:    programAttrConfig,
 		VertexCode: `
 out vec2 texCoord;
 out vec3 normal;

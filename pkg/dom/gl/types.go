@@ -26,6 +26,31 @@ const (
 	UnsignedInt
 )
 
+func (t Type) glSize() int {
+	switch t {
+	case Byte, UnsignedByte:
+		return 1
+	case Short, UnsignedShort:
+		return 2
+	case Int, UnsignedInt, Float:
+		return 4
+	case Vec2:
+		return 2 * 4
+	case Vec3:
+		return 3 * 4
+	case Vec4:
+		return 4 * 4
+	case Mat2:
+		return 2 * 2 * 4
+	case Mat3:
+		return 3 * 3 * 4
+	case Mat4:
+		return 4 * 4 * 4
+	default:
+		panic(fmt.Errorf("invalid Type: %v", t))
+	}
+}
+
 func (t Type) glString() string {
 	switch t {
 	case Vec2, Vec3, Vec4, Mat2, Mat3, Mat4:

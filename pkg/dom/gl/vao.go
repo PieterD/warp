@@ -2,19 +2,14 @@ package gl
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/PieterD/warp/pkg/driver"
 )
 
-type VertexArrayAttribute struct {
-	Name   string
-	Type   Type
-	Buffer *Buffer
-	Layout VertexArrayAttributeLayout
-}
-
-type VertexArrayAttributeLayout struct {
+type VertexArrayAttributeConfig struct {
+	Name       string
+	Type       Type
+	Buffer     *Buffer
 	ByteOffset int
 	ByteStride int
 }
@@ -32,13 +27,14 @@ type vertexAttr struct {
 	index   int
 }
 
-func newVertexArray(glx *Context, attrs ...VertexArrayAttribute) (*VertexArray, error) {
+func newVertexArray(glx *Context, attrs ...VertexArrayAttributeConfig) (*VertexArray, error) {
 	glVAO := glx.constants.CreateVertexArray()
 	glx.constants.BindVertexArray(glVAO)
 	defer glx.constants.BindVertexArray(glx.factory.Null())
 
 	attrMap := make(map[string]*vertexAttr)
 	for attrIndex, attr := range attrs {
+		fmt.Printf("VAO ATTR: %s %s %d %d\n", attr.Name, attr.Type, attr.ByteOffset, attr.ByteStride)
 		glAttrIndex := glx.factory.Number(float64(attrIndex))
 		attrType := attr.Type
 		bufferType, bufferItemsPerVertex, err := attrType.asAttribute()
@@ -48,8 +44,8 @@ func newVertexArray(glx *Context, attrs ...VertexArrayAttribute) (*VertexArray, 
 		glBufferType := glx.typeConverter.ToJs(bufferType)
 		glItemsPerVertex := glx.factory.Number(float64(bufferItemsPerVertex))
 		glNormalized := glx.factory.Boolean(false)
-		glByteStride := glx.factory.Number(float64(attr.Layout.ByteStride))
-		glByteOffset := glx.factory.Number(float64(attr.Layout.ByteOffset))
+		glByteStride := glx.factory.Number(float64(attr.ByteStride))
+		glByteOffset := glx.factory.Number(float64(attr.ByteOffset))
 		glx.constants.BindBuffer(glx.constants.ARRAY_BUFFER, attr.Buffer.glObject)
 		glx.constants.VertexAttribPointer(
 			glAttrIndex,
@@ -95,27 +91,4 @@ func (vao *VertexArray) Enable(attrNames ...string) error {
 		va.enabled = shouldBeEnabled
 	}
 	return nil
-}
-
-func (vao *VertexArray) Attributes() (attrs []AttributeDescription) {
-	//indexCounts := make(map[int]struct{})
-	for _, attr := range vao.attrs {
-		if !attr.enabled {
-			continue
-		}
-		//TODO: move this to Verify
-		//if _, ok := indexCounts[attr.index]; ok {
-		//	return nil, fmt.Errorf("index %d set by multiple attributes", attr.index)
-		//}
-		//indexCounts[attr.index] = struct{}{}
-		attrs = append(attrs, AttributeDescription{
-			Name:  attr.name,
-			Type:  attr.typ,
-			Index: attr.index,
-		})
-	}
-	sort.Slice(attrs, func(i, j int) bool {
-		return attrs[i].Index < attrs[j].Index
-	})
-	return attrs
 }
