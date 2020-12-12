@@ -21,8 +21,8 @@ type vertexAttr struct {
 
 func newVertexArray(glx *Context, adc ActiveCoupling, buffers map[string]*Buffer) (*VertexArray, error) {
 	// Verify that all enabled attributes really exist.
-	for attrName := range adc.Enabled {
-		if _, ok := adc.DC.attrByName[attrName]; !ok {
+	for attrName := range adc.enabled {
+		if _, ok := adc.dc.attrByName[attrName]; !ok {
 			return nil, fmt.Errorf("unknown enabled attribute %s in active coupling", attrName)
 		}
 	}
@@ -32,7 +32,7 @@ func newVertexArray(glx *Context, adc ActiveCoupling, buffers map[string]*Buffer
 	defer glx.constants.BindVertexArray(glx.factory.Null())
 
 	attrMap := make(map[string]*vertexAttr)
-	for attrIndex, attr := range adc.DC.attributes {
+	for attrIndex, attr := range adc.dc.attributes {
 		//fmt.Printf("VAO ATTR: %s %s %d %d %s\n", attr.name, attr.typ, attr.offset, attr.stride, attr.buffer)
 		buffer, ok := buffers[attr.buffer]
 		if !ok {

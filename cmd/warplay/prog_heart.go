@@ -28,6 +28,27 @@ type HeartProgram struct {
 }
 
 func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*HeartProgram, error) {
+	model, err := loadModel(modelPath)
+	if err != nil {
+		return nil, fmt.Errorf("getting model: %w", err)
+	}
+	texture, err := loadTexture(texturePath)
+	if err != nil {
+		return nil, fmt.Errorf("getting texture: %w", err)
+	}
+	p := &HeartProgram{
+		glx: glx,
+	}
+	heartVertices, heartIndices, err := model.Interleaved()
+	if err != nil {
+		return nil, fmt.Errorf("generating interleaved arrays: %w", err)
+	}
+	p.verticesToRender = len(heartIndices)
+	p.vertexBuffer = glx.Buffer()
+	p.vertexBuffer.VertexData(heartVertices)
+	p.elementBuffer = glx.Buffer()
+	p.elementBuffer.IndexData(heartIndices)
+
 	dc, err := gl.NewDataCoupling(gl.DataCouplingConfig{
 		Vertices: []gl.VertexConfig{
 			{
@@ -54,26 +75,6 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 		return nil, fmt.Errorf("creating data coupling: %w", err)
 	}
 	adc := dc.Active("Coordinates", "TexCoord", "Normal")
-	model, err := loadModel(modelPath)
-	if err != nil {
-		return nil, fmt.Errorf("getting model: %w", err)
-	}
-	texture, err := loadTexture(texturePath)
-	if err != nil {
-		return nil, fmt.Errorf("getting texture: %w", err)
-	}
-	p := &HeartProgram{
-		glx: glx,
-	}
-	heartVertices, heartIndices, err := model.Interleaved()
-	if err != nil {
-		return nil, fmt.Errorf("generating interleaved arrays: %w", err)
-	}
-	p.verticesToRender = len(heartIndices)
-	p.vertexBuffer = glx.Buffer()
-	p.vertexBuffer.VertexData(heartVertices)
-	p.elementBuffer = glx.Buffer()
-	p.elementBuffer.IndexData(heartIndices)
 
 	p.vao, err = glx.VertexArray(adc, map[string]*gl.Buffer{
 		"vertex": p.vertexBuffer,

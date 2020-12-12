@@ -56,14 +56,14 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 	}
 
 	// Verify that all enabled attributes really exist.
-	for attrName := range cfg.Attributes.Enabled {
-		if _, ok := cfg.Attributes.DC.attrByName[attrName]; !ok {
+	for attrName := range cfg.Attributes.enabled {
+		if _, ok := cfg.Attributes.dc.attrByName[attrName]; !ok {
 			return nil, fmt.Errorf("unknown enabled attribute %s in active coupling", attrName)
 		}
 	}
 	vertHdr := ""
-	for _, attr := range cfg.Attributes.DC.attributes {
-		if _, ok := cfg.Attributes.Enabled[attr.name]; !ok {
+	for _, attr := range cfg.Attributes.dc.attributes {
+		if _, ok := cfg.Attributes.enabled[attr.name]; !ok {
 			continue
 		}
 		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.index, attr.typ.glString(), attr.name)

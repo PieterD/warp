@@ -15,8 +15,8 @@ type (
 		attrsByBuffer map[string][]int
 	}
 	ActiveCoupling struct {
-		DC      *DataCoupling
-		Enabled map[string]struct{}
+		dc      *DataCoupling
+		enabled map[string]struct{}
 	}
 	vertexAttribute struct {
 		name    string
@@ -113,8 +113,8 @@ func (dc *DataCoupling) Active(enabledAttrNames ...string) ActiveCoupling {
 		enabled[attrName] = struct{}{}
 	}
 	return ActiveCoupling{
-		DC:      dc,
-		Enabled: enabled,
+		dc:      dc,
+		enabled: enabled,
 	}
 }
 
