@@ -12,13 +12,25 @@ import (
 	"github.com/PieterD/warp/pkg/driver"
 )
 
+type SampleMode int
+
+const (
+	Sample2D SampleMode = iota
+)
+
 type ProgramConfig struct {
 	HighPrecision bool
 	Uniforms      interface{}
 	Attributes    ActiveCoupling
+	Textures      []ProgramSamplerConfig
 	//Feedback      ActiveCoupling
 	VertexCode   string
 	FragmentCode string
+}
+
+type ProgramSamplerConfig struct {
+	Name string
+	Mode SampleMode
 }
 
 type Program struct {
@@ -27,6 +39,12 @@ type Program struct {
 	rawUniforms   interface{}
 	uniBuffer     *Buffer
 	uniBlockIndex driver.Value
+	textures      []programTexture
+}
+
+type programTexture struct {
+	name string
+	mode SampleMode
 }
 
 var baseHeader = `#version 300 es
@@ -53,6 +71,16 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		}
 		hdr += uniformDef
 		uniBuffer = glx.Buffer()
+	}
+	for _, textureCfg := range cfg.Textures {
+		modeName := ""
+		switch textureCfg.Mode {
+		case Sample2D:
+			modeName = "sampler2D"
+		default:
+			return nil, fmt.Errorf("unknown texture sampler mode %v", textureCfg.Mode)
+		}
+		hdr += fmt.Sprintf("uniform %s %s;\n", modeName, textureCfg.Name)
 	}
 
 	// Verify that all enabled attributes really exist.
@@ -132,6 +160,17 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		)
 		glx.constants.BindBuffer(glx.constants.UNIFORM_BUFFER, glx.factory.Null())
 	}
+	for textureIndex, textureCfg := range cfg.Textures {
+		uniformSampler := p.Uniform(textureCfg.Name)
+		if uniformSampler == nil {
+			return nil, fmt.Errorf("sampler uniform not found")
+		}
+		UniformSetter{glx: glx}.Int(uniformSampler, textureIndex)
+		p.textures = append(p.textures, programTexture{
+			name: textureCfg.Name,
+			mode: textureCfg.Mode,
+		})
+	}
 	return p, nil
 }
 
@@ -189,28 +228,28 @@ func (p *Program) Uniform(name string) *Uniform {
 	}
 }
 
-func (p *Program) Update(f func(us *UniformSetter)) {
+func (p *Program) Update(f func(us UniformSetter)) {
 	glx := p.glx
 	glx.constants.UseProgram(p.glObject)
 	defer glx.constants.UseProgram(glx.factory.Null())
-	f(&UniformSetter{glx: p.glx})
+	f(UniformSetter{glx: p.glx})
 }
 
 type UniformSetter struct {
 	glx *Context
 }
 
-func (us *UniformSetter) Int(u *Uniform, v int) {
+func (us UniformSetter) Int(u *Uniform, v int) {
 	glx := us.glx
 	glx.constants.Uniform1i(u.location, glx.factory.Number(float64(v)))
 }
 
-func (us *UniformSetter) Float32(u *Uniform, v float32) {
+func (us UniformSetter) Float32(u *Uniform, v float32) {
 	glx := us.glx
 	glx.constants.Uniform1f(u.location, glx.factory.Number(float64(v)))
 }
 
-func (us *UniformSetter) Vec3(u *Uniform, v mgl32.Vec3) {
+func (us UniformSetter) Vec3(u *Uniform, v mgl32.Vec3) {
 	glx := us.glx
 	glx.constants.Uniform3f(u.location,
 		glx.factory.Number(float64(v[0])),
@@ -219,7 +258,7 @@ func (us *UniformSetter) Vec3(u *Uniform, v mgl32.Vec3) {
 	)
 }
 
-func (us *UniformSetter) Mat4(u *Uniform, m mgl32.Mat4) {
+func (us UniformSetter) Mat4(u *Uniform, m mgl32.Mat4) {
 	glx := us.glx
 	buf := glx.factory.Buffer(4 * 4 * 4)
 	buf.Put(glunsafe.FastFloat32ToByte(m[:]))

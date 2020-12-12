@@ -9,7 +9,8 @@ import (
 type DrawConfig struct {
 	Use          *Program
 	VAO          *VertexArray
-	ElementArray *Buffer // Optional
+	Textures     map[string]*Texture2D // Optional
+	ElementArray *Buffer               // Optional
 	DrawMode     PrimitiveDrawMode
 	Vertices     VertexRange
 	Options      DrawOptions
@@ -48,6 +49,14 @@ func doDraw(glx *Context, cfg DrawConfig) error {
 		defer glx.constants.Disable(glx.constants.DEPTH_TEST)
 		glx.constants.DepthMask(glx.factory.Boolean(!cfg.Options.DepthReadOnly))
 		glx.constants.DepthFunc(glx.constants.LESS)
+	}
+
+	for textureIndex, pTex := range cfg.Use.textures {
+		texture, ok := cfg.Textures[pTex.name]
+		if !ok {
+			return fmt.Errorf("missing texture unit %s", pTex.name)
+		}
+		glx.bindTextureUnit(textureIndex, texture)
 	}
 
 	glx.constants.UseProgram(cfg.Use.glObject)

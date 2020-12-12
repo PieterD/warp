@@ -66,30 +66,19 @@ func (glx *Context) Texture(cfg Texture2DConfig, img image.Image) *Texture2D {
 	return newTexture2D(glx, cfg, img)
 }
 
-func (glx *Context) BindTextureUnits(textures ...*Texture2D) {
+func (glx *Context) bindTextureUnit(unit int, texture *Texture2D) {
 	maxUnits := glx.Parameters().MaxCombinedTextureImageUnits()
-	if len(textures) >= maxUnits {
-		panic(fmt.Errorf("only %d texture units allowed, got: %d", maxUnits, len(textures)))
+	if unit >= maxUnits {
+		panic(fmt.Errorf("trying to bind to %d, but only %d texture units are allowed %d", unit, maxUnits))
 	}
 	fTexture0, ok := glx.constants.TEXTURE0.ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("expected TEXTURE0 to be a number: %T", glx.constants.TEXTURE0))
 	}
 	t0 := int(fTexture0)
-	for textureUnit := 0; textureUnit < maxUnits; textureUnit++ {
-		jsTextureUnit := glx.factory.Number(float64(t0 + textureUnit))
-		glx.constants.ActiveTexture(jsTextureUnit)
-		glObject := glx.factory.Null()
-		if textureUnit < len(textures) && textures[textureUnit] != nil {
-			glObject = textures[textureUnit].glObject
-		} else {
-			// Do we want to disable all non-selected units, or do we leave them alone?
-			// For now, leave them alone.
-			break
-		}
-		glx.constants.BindTexture(glx.constants.TEXTURE_2D, glObject)
-	}
-	glx.constants.ActiveTexture(glx.constants.TEXTURE0)
+	jsTextureUnit := glx.factory.Number(float64(t0 + unit))
+	glx.constants.ActiveTexture(jsTextureUnit)
+	glx.constants.BindTexture(glx.constants.TEXTURE_2D, texture.glObject)
 }
 
 func (glx *Context) Parameters() *ParameterSet {

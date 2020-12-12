@@ -87,6 +87,10 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 		HighPrecision: true,
 		Uniforms:      &p.Uniforms,
 		Attributes:    adc,
+		Textures: []gl.ProgramSamplerConfig{{
+			Name: "Texture",
+			Mode: gl.Sample2D,
+		}},
 		VertexCode: `
 out vec2 texCoord;
 out vec3 normal;
@@ -104,7 +108,6 @@ in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
 out vec4 FragColor;
-uniform sampler2D Texture;
 
 void main(void) {
 	vec3 lightColor = vec3(1.0, 0.0, 0.0);
@@ -135,16 +138,7 @@ void main(void) {
 		return nil, fmt.Errorf("compiling shader: %w", err)
 	}
 
-	//TODO: clean up texture sampler code.
-	uniformSampler := p.program.Uniform("Texture")
-	if uniformSampler == nil {
-		return nil, fmt.Errorf("sampler uniform not found")
-	}
 	p.texture = glx.Texture(gl.Texture2DConfig{}, texture)
-	glx.BindTextureUnits(p.texture)
-	p.program.Update(func(us *gl.UniformSetter) {
-		us.Int(uniformSampler, 0)
-	})
 
 	return p, nil
 }
@@ -159,6 +153,7 @@ func (p *HeartProgram) Draw(camera *glutil.Camera, rot float64) error {
 	drawConfig := gl.DrawConfig{
 		Use:          p.program,
 		VAO:          p.vao,
+		Textures:     map[string]*gl.Texture2D{"Texture": p.texture},
 		ElementArray: p.elementBuffer,
 		DrawMode:     gl.Triangles,
 		Vertices: gl.VertexRange{
