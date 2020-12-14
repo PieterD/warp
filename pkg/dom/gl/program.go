@@ -23,9 +23,9 @@ type ProgramConfig struct {
 	Uniforms      interface{}
 	Attributes    ActiveCoupling
 	Textures      []ProgramSamplerConfig
-	//Feedback      ActiveCoupling
-	VertexCode   string
-	FragmentCode string
+	Feedback      ActiveCoupling
+	VertexCode    string
+	FragmentCode  string
 }
 
 type ProgramSamplerConfig struct {
@@ -58,6 +58,8 @@ var headerMediumPrecision = baseHeader + `precision mediump float;
 `
 
 func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
+	programObject := glx.constants.CreateProgram()
+
 	hdr := headerMediumPrecision
 	if cfg.HighPrecision {
 		hdr = headerHighPrecision
@@ -97,9 +99,36 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.index, attr.typ.glString(), attr.name)
 	}
 
-	//for _, attr := range cfg.Feedback {
-	//	vertHdr += fmt.Sprintf("out %s %s;\n", attr.Type.glString(), attr.Name)
-	//}
+	if len(cfg.Feedback.enabled) > 0 {
+		interleaved := false
+		switch {
+		case len(cfg.Feedback.dc.attrsByBuffer) == 0:
+			return nil, fmt.Errorf("feedback buffer with enabled but without attrsByBuffer")
+		case len(cfg.Feedback.dc.attrsByBuffer) == 1:
+			interleaved = true
+		case len(cfg.Feedback.dc.attrsByBuffer) > 1:
+			interleaved = false
+			for bufferName, attrIndices := range cfg.Feedback.dc.attrsByBuffer {
+				if len(attrIndices) != 1 {
+					return nil, fmt.Errorf("multiple buffers, but buffer %s has more than one (%d) attributes", bufferName, len(attrIndices))
+				}
+			}
+		}
+		var arrayValues []driver.Value
+		for _, attr := range cfg.Feedback.dc.attributes {
+			if _, ok := cfg.Feedback.enabled[attr.name]; !ok {
+				continue
+			}
+			vertHdr += fmt.Sprintf("out %s %s;\n", attr.typ.glString(), attr.name)
+			arrayValues = append(arrayValues, glx.factory.String(attr.name))
+		}
+		feedbackNames := glx.factory.Array(arrayValues...)
+		glBufferMode := glx.constants.SEPARATE_ATTRIBS
+		if interleaved {
+			glBufferMode = glx.constants.INTERLEAVED_ATTRIBS
+		}
+		glx.constants.TransformFeedbackVaryings(programObject, feedbackNames, glBufferMode)
+	}
 
 	vertShaderObject, err := compileShader(glx, glx.constants.VERTEX_SHADER, hdr+vertHdr+cfg.VertexCode)
 	if err != nil {
@@ -109,17 +138,8 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 	if err != nil {
 		return nil, fmt.Errorf("compiling fragment shader: %w", err)
 	}
-	programObject := glx.constants.CreateProgram()
 	glx.constants.AttachShader(programObject, vertShaderObject)
 	glx.constants.AttachShader(programObject, fragShaderObject)
-	//if len(cfg.Feedback) > 0 {
-	//	var arrayValues []driver.Value
-	//	for _, attr := range cfg.Feedback {
-	//		arrayValues = append(arrayValues, glx.factory.String(attr.Name))
-	//	}
-	//	feedbackNames := glx.factory.Array(arrayValues...)
-	//	glx.constants.TransformFeedbackVaryings(programObject, feedbackNames, glx.constants.SEPARATE_ATTRIBS)
-	//}
 	glx.constants.LinkProgram(programObject)
 	linkStatus, ok := glx.constants.GetProgramParameter(programObject, glx.constants.LINK_STATUS).ToBoolean()
 	if !ok {
@@ -143,6 +163,8 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		uniBuffer:     uniBuffer,
 		uniBlockIndex: uniBlockIndex,
 	}
+	glx.constants.UseProgram(p.glObject)
+	defer glx.constants.UseProgram(glx.factory.Null())
 	if uniBuffer != nil {
 		if err := p.UpdateUniforms(); err != nil {
 			return nil, fmt.Errorf("updating uniforms: %w", err)
@@ -161,11 +183,13 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		glx.constants.BindBuffer(glx.constants.UNIFORM_BUFFER, glx.factory.Null())
 	}
 	for textureIndex, textureCfg := range cfg.Textures {
+
 		uniformSampler := p.Uniform(textureCfg.Name)
 		if uniformSampler == nil {
 			return nil, fmt.Errorf("sampler uniform not found")
 		}
-		UniformSetter{glx: glx}.Int(uniformSampler, textureIndex)
+		glx.constants.Uniform1i(uniformSampler.location, glx.factory.Number(float64(textureIndex)))
+		//UniformSetter{glx: glx}.Int(uniformSampler, textureIndex)
 		p.textures = append(p.textures, programTexture{
 			name: textureCfg.Name,
 			mode: textureCfg.Mode,

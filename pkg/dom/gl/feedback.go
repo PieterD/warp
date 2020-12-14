@@ -22,12 +22,16 @@ type FeedbackAttributeLayout struct {
 	ByteStride int
 }
 
-func newFeedback(glx *Context, attrs ...FeedbackAttribute) *Feedback {
+func newFeedback(glx *Context, coupling ActiveCoupling, vertices int) *Feedback {
 	feedbackObject := glx.constants.CreateTransformFeedback()
 	return &Feedback{
 		glx:      glx,
 		glObject: feedbackObject,
 	}
+}
+
+func (f *Feedback) Buffer(name string) (*Buffer, error) {
+	panic("not implemented")
 }
 
 func (f *Feedback) begin(m PrimitiveDrawMode) {
@@ -48,4 +52,3 @@ func (f *Feedback) end() {
 	glx := f.glx
 	glx.constants.EndTransformFeedback()
 }
-

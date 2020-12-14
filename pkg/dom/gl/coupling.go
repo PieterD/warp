@@ -28,7 +28,9 @@ type (
 		stride  int
 	}
 	DataCouplingConfig struct {
-		Vertices []VertexConfig
+		Vertices         []VertexConfig
+		WithElements     bool
+		ElementArrayType Type
 	}
 	VertexConfig struct {
 		Name    string
@@ -105,6 +107,14 @@ func NewDataCoupling(config DataCouplingConfig) (*DataCoupling, error) {
 		}
 	}
 	return dc, nil
+}
+
+func (dc *DataCoupling) Allocate(vertices int) (map[string]*Buffer, error) {
+	panic("not implemented")
+}
+
+func (dc *DataCoupling) Upload(offset int, data map[string][]byte) error {
+	panic("not implemented")
 }
 
 func (dc *DataCoupling) Active(enabledAttrNames ...string) ActiveCoupling {
