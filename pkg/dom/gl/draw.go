@@ -11,6 +11,7 @@ type DrawConfig struct {
 	VAO          *VertexArray
 	Textures     map[string]*Texture2D // Optional
 	ElementArray *Buffer               // Optional
+	Feedback     map[string]*Buffer    // Optional
 	DrawMode     PrimitiveDrawMode
 	Vertices     VertexRange
 	Options      DrawOptions

@@ -113,7 +113,7 @@ func (dc *DataCoupling) Allocate(vertices int) (map[string]*Buffer, error) {
 	panic("not implemented")
 }
 
-func (dc *DataCoupling) Upload(offset int, data map[string][]byte) error {
+func (dc *DataCoupling) Upload(byteOffset int, data map[string][]byte) error {
 	panic("not implemented")
 }
 
@@ -137,4 +137,19 @@ func DataCouplingConfigFromStruct(rawStruct interface{}) (DataCouplingConfig, er
 
 func (dc *DataCoupling) Translate(to *DataCoupling, source io.Reader) io.Reader {
 	panic("not implemented")
+}
+
+func (adc ActiveCoupling) BufferNames() (bufferNames []string) {
+	bufSet := make(map[string]struct{})
+	for _, attr := range adc.dc.attributes {
+		if _, ok := adc.enabled[attr.name]; !ok {
+			continue
+		}
+		if _, ok := bufSet[attr.buffer]; ok {
+			continue
+		}
+		bufSet[attr.buffer] = struct{}{}
+		bufferNames = append(bufferNames, attr.name)
+	}
+	return bufferNames
 }

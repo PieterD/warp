@@ -30,12 +30,13 @@ type ProgramSamplerConfig struct {
 }
 
 type Program struct {
-	glx           *Context
-	glObject      driver.Value
-	rawUniforms   interface{}
-	uniBuffer     *Buffer
-	uniBlockIndex driver.Value
-	textures      []programTexture
+	glx            *Context
+	glObject       driver.Value
+	rawUniforms    interface{}
+	uniBuffer      *Buffer
+	uniBlockIndex  driver.Value
+	textures       []programTexture
+	varyingBuffers []string // used to determine which index each buffer should be bound to
 }
 
 type programTexture struct {
@@ -95,7 +96,9 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		vertHdr += fmt.Sprintf("layout(location = %d) in %s %s;\n", attr.index, attr.typ.glString(), attr.name)
 	}
 
+	var varyingBufferNames []string
 	if len(cfg.Feedback.enabled) > 0 {
+		varyingBufferNames = cfg.Feedback.BufferNames()
 		interleaved := false
 		switch {
 		case len(cfg.Feedback.dc.attrsByBuffer) == 0:
@@ -153,11 +156,12 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		glx.factory.String("Uniform"),
 	)
 	p := &Program{
-		glx:           glx,
-		glObject:      programObject,
-		rawUniforms:   rawUniform,
-		uniBuffer:     uniBuffer,
-		uniBlockIndex: uniBlockIndex,
+		glx:            glx,
+		glObject:       programObject,
+		rawUniforms:    rawUniform,
+		uniBuffer:      uniBuffer,
+		uniBlockIndex:  uniBlockIndex,
+		varyingBuffers: varyingBufferNames,
 	}
 	glx.constants.UseProgram(p.glObject)
 	defer glx.constants.UseProgram(glx.factory.Null())
