@@ -6,26 +6,22 @@ import (
 	"github.com/PieterD/warp/pkg/driver"
 )
 
-// https://developer.mozilla.org/en-US/docs/Web/API/WebGLTransformFeedback
-
-//TODO: buffer binding.
-//TODO: hide this, only use internally in Draw.
-type Feedback struct {
+type feedback struct {
 	glx         *Context
 	glObject    driver.Value
 	bufferNames []string
 }
 
-func newFeedback(glx *Context, coupling ActiveCoupling) *Feedback {
+func newFeedback(glx *Context, coupling ActiveCoupling) *feedback {
 	feedbackObject := glx.constants.CreateTransformFeedback()
-	return &Feedback{
+	return &feedback{
 		glx:         glx,
 		glObject:    feedbackObject,
 		bufferNames: coupling.BufferNames(),
 	}
 }
 
-func (f *Feedback) begin(m PrimitiveDrawMode, buffers map[string]*Buffer) error {
+func (f *feedback) begin(m PrimitiveDrawMode, buffers map[string]*Buffer) error {
 	glx := f.glx
 	var jsMode driver.Value
 	switch m {
@@ -51,7 +47,7 @@ func (f *Feedback) begin(m PrimitiveDrawMode, buffers map[string]*Buffer) error 
 	return nil
 }
 
-func (f *Feedback) end() {
+func (f *feedback) end() {
 	glx := f.glx
 	glx.constants.EndTransformFeedback()
 	for index, _ := range f.bufferNames {

@@ -153,3 +153,7 @@ func (adc ActiveCoupling) BufferNames() (bufferNames []string) {
 	}
 	return bufferNames
 }
+
+func (adc ActiveCoupling) AttrNum() int {
+	return len(adc.enabled)
+}

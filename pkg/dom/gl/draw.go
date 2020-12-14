@@ -64,6 +64,12 @@ func doDraw(glx *Context, cfg DrawConfig) error {
 	defer glx.constants.UseProgram(glx.factory.Null())
 	glx.constants.BindVertexArray(cfg.VAO.glObject)
 	defer glx.constants.BindVertexArray(glx.factory.Null())
+	if cfg.Feedback != nil && cfg.Use.feedback != nil {
+		if err := cfg.Use.feedback.begin(cfg.DrawMode, cfg.Feedback); err != nil {
+			return fmt.Errorf("beginning feedback: %w", err)
+		}
+		defer cfg.Use.feedback.end()
+	}
 	if cfg.ElementArray == nil {
 		glx.constants.DrawArrays(
 			glDrawMode,
