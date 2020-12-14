@@ -3,11 +3,7 @@ package gl
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/pkg/dom/glunsafe"
-
 	"github.com/PieterD/warp/pkg/dom/glutil"
-
-	"github.com/go-gl/mathgl/mgl32"
 
 	"github.com/PieterD/warp/pkg/driver"
 )
@@ -183,8 +179,7 @@ func newProgram(glx *Context, cfg ProgramConfig) (*Program, error) {
 		glx.constants.BindBuffer(glx.constants.UNIFORM_BUFFER, glx.factory.Null())
 	}
 	for textureIndex, textureCfg := range cfg.Textures {
-
-		uniformSampler := p.Uniform(textureCfg.Name)
+		uniformSampler := p.uniform(textureCfg.Name)
 		if uniformSampler == nil {
 			return nil, fmt.Errorf("sampler uniform not found")
 		}
@@ -233,58 +228,47 @@ func compileShader(glx *Context, shaderType driver.Value, code string) (driver.V
 	return shaderObject, nil
 }
 
-type Uniform struct {
+type uniform struct {
 	p        *Program
 	name     string
 	location driver.Value
 }
 
-func (p *Program) Uniform(name string) *Uniform {
+func (p *Program) uniform(name string) *uniform {
 	glx := p.glx
 	location := glx.constants.GetUniformLocation(p.glObject, glx.factory.String(name))
 	if location.IsNull() {
 		return nil
 	}
-	return &Uniform{
+	return &uniform{
 		p:        p,
 		name:     name,
 		location: location,
 	}
 }
 
-func (p *Program) Update(f func(us UniformSetter)) {
-	glx := p.glx
-	glx.constants.UseProgram(p.glObject)
-	defer glx.constants.UseProgram(glx.factory.Null())
-	f(UniformSetter{glx: p.glx})
-}
-
-type UniformSetter struct {
-	glx *Context
-}
-
-func (us UniformSetter) Int(u *Uniform, v int) {
-	glx := us.glx
-	glx.constants.Uniform1i(u.location, glx.factory.Number(float64(v)))
-}
-
-func (us UniformSetter) Float32(u *Uniform, v float32) {
-	glx := us.glx
-	glx.constants.Uniform1f(u.location, glx.factory.Number(float64(v)))
-}
-
-func (us UniformSetter) Vec3(u *Uniform, v mgl32.Vec3) {
-	glx := us.glx
-	glx.constants.Uniform3f(u.location,
-		glx.factory.Number(float64(v[0])),
-		glx.factory.Number(float64(v[1])),
-		glx.factory.Number(float64(v[2])),
-	)
-}
-
-func (us UniformSetter) Mat4(u *Uniform, m mgl32.Mat4) {
-	glx := us.glx
-	buf := glx.factory.Buffer(4 * 4 * 4)
-	buf.Put(glunsafe.FastFloat32ToByte(m[:]))
-	glx.constants.UniformMatrix4fv(u.location, glx.factory.Boolean(false), buf.AsFloat32Array())
-}
+//func (us UniformSetter) Int(u *uniform, v int) {
+//	glx := us.glx
+//	glx.constants.Uniform1i(u.location, glx.factory.Number(float64(v)))
+//}
+//
+//func (us UniformSetter) Float32(u *uniform, v float32) {
+//	glx := us.glx
+//	glx.constants.Uniform1f(u.location, glx.factory.Number(float64(v)))
+//}
+//
+//func (us UniformSetter) Vec3(u *uniform, v mgl32.Vec3) {
+//	glx := us.glx
+//	glx.constants.Uniform3f(u.location,
+//		glx.factory.Number(float64(v[0])),
+//		glx.factory.Number(float64(v[1])),
+//		glx.factory.Number(float64(v[2])),
+//	)
+//}
+//
+//func (us UniformSetter) Mat4(u *uniform, m mgl32.Mat4) {
+//	glx := us.glx
+//	buf := glx.factory.Buffer(4 * 4 * 4)
+//	buf.Put(glunsafe.FastFloat32ToByte(m[:]))
+//	glx.constants.UniformMatrix4fv(u.location, glx.factory.Boolean(false), buf.AsFloat32Array())
+//}
