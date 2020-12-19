@@ -50,7 +50,7 @@ func (f *feedback) begin(m PrimitiveDrawMode, buffers map[string]*Buffer) error 
 func (f *feedback) end() {
 	glx := f.glx
 	glx.constants.EndTransformFeedback()
-	for index, _ := range f.bufferNames {
+	for index := range f.bufferNames {
 		glx.constants.BindBufferBase(
 			glx.constants.TRANSFORM_FEEDBACK,
 			glx.factory.Number(float64(index)),

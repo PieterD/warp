@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/PieterD/warp/pkg/dom/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -21,5 +22,30 @@ func NewParticleProgram(glx *gl.Context, particleLimit int) (*ParticleProgram, e
 	p := &ParticleProgram{
 		glx: glx,
 	}
+	inputBuffer := glx.Buffer()
+	inputBuffer.VertexData([]float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+	outputBuffer := glx.Buffer()
+	outputBuffer.VertexData([]float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+	dc, err := gl.NewDataCoupling(gl.DataCouplingConfig{
+		Vertices: []gl.VertexConfig{
+			{
+				Name:   "Input",
+				Type:   gl.Float,
+				Buffer: "input",
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("creating data coupling: %w", err)
+	}
+	adc := dc.Active("Input")
+	vao, err := glx.VertexArray(adc, map[string]*gl.Buffer{
+		"input": inputBuffer,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("creating vertex array object: %w", err)
+	}
+
+	_ = vao
 	return p, nil
 }
