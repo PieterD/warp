@@ -186,84 +186,25 @@ func (target RenderbufferTarget) Storage(cfg RenderbufferConfig) {
 	)
 }
 
-type FramebufferTarget struct {
-	glx *Context
-}
-
 func (targets Targets) FrameBuffer() FramebufferTarget {
 	return FramebufferTarget{
 		glx: targets.glx,
 	}
 }
 
-func (target FramebufferTarget) Bind(fbo FramebufferObject) {
-	glx := target.glx
-	glx.constants.BindFramebuffer(
-		glx.constants.FRAMEBUFFER,
-		fbo.value,
-	)
-}
-
-func (target FramebufferTarget) Unbind() {
-	glx := target.glx
-	glx.constants.BindFramebuffer(
-		glx.constants.FRAMEBUFFER,
-		glx.factory.Null(),
-	)
-}
-
-func (target FramebufferTarget) AttachRenderbuffer(attachmentType RenderbufferType, rbo RenderbufferObject) {
-	glx := target.glx
-	var glType driver.Value
-	switch attachmentType {
-	case ColorBuffer:
-		glType = glx.constants.COLOR_ATTACHMENT0
-	case DepthStencilBuffer:
-		glType = glx.constants.DEPTH_STENCIL_ATTACHMENT
-	default:
-		panic(fmt.Errorf("invalid renderbuffer type: %v", attachmentType))
+func (targets Targets) Texture2D() Texture2DTarget {
+	return Texture2DTarget{
+		glx: targets.glx,
 	}
-	glx.constants.FramebufferRenderbuffer(
-		glx.constants.FRAMEBUFFER,
-		glType,
-		glx.constants.RENDERBUFFER,
-		rbo.value,
-	)
 }
 
-func (target FramebufferTarget) IsComplete() bool {
-	glx := target.glx
-	fbsJs := glx.constants.CheckFramebufferStatus()
-	fbsFloat, ok := fbsJs.ToFloat64()
+func (targets Targets) ActiveTextureUnit(unit int) {
+	glx := targets.glx
+	fTexture0, ok := glx.constants.TEXTURE0.ToFloat64()
 	if !ok {
-		panic(fmt.Errorf("CheckFramebufferStatus return value was not a number: %T", fbsJs))
+		panic(fmt.Errorf("expected TEXTURE0 to be a number: %T", glx.constants.TEXTURE0))
 	}
-	completeFloat, ok := glx.constants.FRAMEBUFFER_COMPLETE.ToFloat64()
-	if !ok {
-		panic(fmt.Errorf("FRAMEBUFFER_COMPLETE was not a number: %T", glx.constants.FRAMEBUFFER_COMPLETE))
-	}
-	return fbsFloat == completeFloat
-}
-
-func (target FramebufferTarget) ReadPixels(x, y, w, h int) []byte {
-	glx := target.glx
-	pixelDataSize := w * h * 4
-	jsBuffer := glx.factory.Buffer(pixelDataSize)
-	jsArray := jsBuffer.AsUint8Array()
-	glx.constants.ReadPixels(
-		glx.factory.Number(float64(x)),
-		glx.factory.Number(float64(y)),
-		glx.factory.Number(float64(w)),
-		glx.factory.Number(float64(h)),
-		glx.constants.RGBA,
-		glx.constants.UNSIGNED_BYTE,
-		jsArray,
-		glx.factory.Number(0),
-	)
-	data := make([]byte, pixelDataSize)
-	num := jsBuffer.Get(data)
-	if num != pixelDataSize {
-		panic(fmt.Errorf("expected jsBuffer.Get to return %d, got %d", pixelDataSize, num))
-	}
-	return data
+	t0 := int(fTexture0)
+	jsTextureUnit := glx.factory.Number(float64(t0 + unit))
+	glx.constants.ActiveTexture(jsTextureUnit)
 }

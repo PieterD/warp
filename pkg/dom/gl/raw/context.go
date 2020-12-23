@@ -189,6 +189,12 @@ func (glx *Context) Targets() Targets {
 	}
 }
 
+func (glx *Context) Parameters() Parameters {
+	return Parameters{
+		glx: glx,
+	}
+}
+
 type BufferObject struct {
 	glx   *Context
 	value driver.Value
@@ -366,4 +372,17 @@ func (glx *Context) CreateFramebuffer() FramebufferObject {
 func (fbo FramebufferObject) Destroy() {
 	glx := fbo.glx
 	glx.constants.DeleteFramebuffer(fbo.value)
+}
+
+type TextureObject struct {
+	glx   *Context
+	value driver.Value
+}
+
+func (glx *Context) CreateTexture() TextureObject {
+	value := glx.constants.CreateTexture()
+	return TextureObject{
+		glx:   glx,
+		value: value,
+	}
 }

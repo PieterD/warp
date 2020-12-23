@@ -131,6 +131,10 @@ type glConstants struct {
 
 	/* Internal formats */
 
+	R32F             driver.Value
+	RG32F            driver.Value
+	RGB32F           driver.Value
+	RGBA32F          driver.Value
 	DEPTH24_STENCIL8 driver.Value
 	RGBA8            driver.Value
 
@@ -148,6 +152,7 @@ type glConstants struct {
 	TEXTURE0           driver.Value
 	ActiveTexture      func(args ...driver.Value) driver.Value
 	CreateTexture      func(args ...driver.Value) driver.Value
+	DeleteTexture      func(args ...driver.Value) driver.Value
 	BindTexture        func(args ...driver.Value) driver.Value
 	TexParameteri      func(args ...driver.Value) driver.Value
 	TexImage2D         func(args ...driver.Value) driver.Value
