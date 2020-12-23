@@ -61,11 +61,6 @@ func (glx *Context) UnuseProgram() {
 	glx.constants.UseProgram(glx.factory.Null())
 }
 
-type ProgramObject struct {
-	glx   *Context
-	value driver.Value
-}
-
 func (glx *Context) CreateProgram() ProgramObject {
 	programObject := glx.constants.CreateProgram()
 	return ProgramObject{
@@ -73,70 +68,6 @@ func (glx *Context) CreateProgram() ProgramObject {
 		value: programObject,
 	}
 }
-
-func (program ProgramObject) Destroy() {
-	glx := program.glx
-	glx.constants.DeleteProgram(program.value)
-}
-
-func (program ProgramObject) Attach(shader ShaderObject) {
-	glx := program.glx
-	glx.constants.AttachShader(program.value, shader.value)
-}
-
-func (program ProgramObject) TransformFeedbackVaryings(interleaved bool, inputNames []string) {
-	glx := program.glx
-	glBufferMode := glx.constants.SEPARATE_ATTRIBS
-	if interleaved {
-		glBufferMode = glx.constants.INTERLEAVED_ATTRIBS
-	}
-	var arrayValues []driver.Value
-	for _, name := range inputNames {
-		arrayValues = append(arrayValues, glx.factory.String(name))
-	}
-	feedbackNames := glx.factory.Array(arrayValues...)
-	glx.constants.TransformFeedbackVaryings(program.value, feedbackNames, glBufferMode)
-}
-
-func (program ProgramObject) Link() error {
-	glx := program.glx
-	glx.constants.LinkProgram(program.value)
-	linkStatus, ok := glx.constants.GetProgramParameter(program.value, glx.constants.LINK_STATUS).ToBoolean()
-	if !ok {
-		return fmt.Errorf("LINK_STATUS program parameter did not return boolean")
-	}
-	if !linkStatus {
-		info, ok := glx.constants.GetProgramInfoLog(program.value).ToString()
-		if !ok {
-			return fmt.Errorf("program linking error, but programInfoLog did not return string")
-		}
-		return fmt.Errorf("program linking error: %s", info)
-	}
-	return nil
-}
-
-func (program ProgramObject) GetUniformBlockIndex(blockName string) uint {
-	glx := program.glx
-	rv := glx.constants.GetUniformBlockIndex(program.value, glx.factory.String(blockName))
-	f, ok := rv.ToFloat64()
-	if !ok {
-		panic(fmt.Errorf("unknown return type from GetUniformBlockIndex: %T %v", rv, rv))
-	}
-	return uint(f)
-}
-
-type ShaderObject struct {
-	glx   *Context
-	value driver.Value
-}
-
-//go:generate stringer -type=ShaderType
-type ShaderType int
-
-const (
-	VertexShader ShaderType = iota + 1
-	FragmentShader
-)
 
 func (glx *Context) CreateShader(shaderType ShaderType) ShaderObject {
 	var glShaderType driver.Value
@@ -153,34 +84,6 @@ func (glx *Context) CreateShader(shaderType ShaderType) ShaderObject {
 		glx:   glx,
 		value: value,
 	}
-}
-
-func (shader ShaderObject) Destroy() {
-	glx := shader.glx
-	glx.constants.DeleteShader(shader.value)
-}
-
-func (shader ShaderObject) Source(source string) {
-	glx := shader.glx
-	glx.constants.ShaderSource(shader.value, glx.factory.String(source))
-}
-
-func (shader ShaderObject) Compile() error {
-	glx := shader.glx
-	glx.constants.CompileShader(shader.value)
-	csValue := glx.constants.GetShaderParameter(shader.value, glx.constants.COMPILE_STATUS)
-	compileStatus, ok := csValue.ToBoolean()
-	if !ok {
-		return fmt.Errorf("COMPILE_STATUS shader parameteer did not return boolean: %T", csValue)
-	}
-	if !compileStatus {
-		info, ok := glx.constants.GetShaderInfoLog(shader.value).ToString()
-		if !ok {
-			return fmt.Errorf("shaderInfoLog did not return string")
-		}
-		return fmt.Errorf("shader compile error: %s", info)
-	}
-	return nil
 }
 
 func (glx *Context) Targets() Targets {

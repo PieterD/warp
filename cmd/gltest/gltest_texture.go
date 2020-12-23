@@ -63,6 +63,10 @@ void main(void) {
 	if err := program.Link(); err != nil {
 		return fmt.Errorf("linking program: %w", err)
 	}
+	textureUniform, err := program.Uniform("Texture")
+	if err != nil {
+		return fmt.Errorf("getting Texture uniform: %w", err)
+	}
 
 	vertices := []float32{
 		-0.5, -0.5, 0.0, 0.0, 0.0,
@@ -99,12 +103,11 @@ void main(void) {
 	glx.Targets().Array().UnbindBuffer()
 	glx.UnbindVertexArray()
 
-	//TODO: set uniform
-
 	glx.ClearColor(0.75, 0.8, 0.85, 1.0)
 	glx.Clear()
 	glx.UseProgram(program)
 	defer glx.UnuseProgram()
+	textureUniform.Sampler(0)
 	glx.Targets().ActiveTextureUnit(0)
 	glx.Targets().Texture2D().Bind(textureObject)
 	defer glx.Targets().Texture2D().Unbind()
