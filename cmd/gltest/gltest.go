@@ -41,11 +41,8 @@ func run(ctx context.Context) error {
 	glx := raw.NewContext(canvasElem)
 	defer glx.Destroy()
 
-	fmt.Printf("Max texture size: %d\n", glx.Parameters().MaxTextureSize())
-
 	testResults := Run(ctx, glx)
 	for _, testResult := range testResults {
-		fmt.Printf("%s: %s (%v)\n", testResult.Name, testResult.Description, testResult.Error)
 		text := fmt.Sprintf("%s: %s", testResult.Name, testResult.Description)
 		if testResult.Error != nil {
 			text = fmt.Sprintf("%s: %s (%v)", testResult.Name, testResult.Description, testResult.Error)
@@ -59,6 +56,9 @@ func run(ctx context.Context) error {
 					}),
 					doc.CreateElem("div", func(divElem *dom.Elem) {
 						divElem.AppendClasses("clearfix")
+						if testResult.Image == nil {
+							return
+						}
 						divElem.AppendChildren(
 							doc.CreateElem("img", func(imgElem *dom.Elem) {
 								img := dom.AsImage(imgElem)

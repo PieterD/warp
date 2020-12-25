@@ -29,7 +29,7 @@ func New(cfg Config) http.Handler {
 	r.Path("/").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Set("Content-Type", "text/html")
 		if _, err := io.Copy(writer, strings.NewReader(indexHtml)); err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "error copying index.html: %v", err)
+			_, _ = fmt.Fprintf(os.Stderr, "error copying index.html: %v\n", err)
 		}
 	})
 	r.Path("/_binary").Handler(bh)
@@ -38,13 +38,13 @@ func New(cfg Config) http.Handler {
 		wasmExecPath := filepath.Join(bh.goRoot, "misc", "wasm", "wasm_exec.js")
 		wasmExecFile, err := os.Open(wasmExecPath)
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "opening wasm_exec.js: %v", err)
+			_, _ = fmt.Fprintf(os.Stderr, "opening wasm_exec.js: %v\n", err)
 			http.Error(writer, fmt.Sprintf("opening wasm_exec.js: %v", err), http.StatusBadGateway)
 			return
 		}
 		defer func() { _ = wasmExecFile.Close() }()
 		if _, err := io.Copy(writer, wasmExecFile); err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "error copying binary bytes: %v", err)
+			_, _ = fmt.Fprintf(os.Stderr, "error copying binary bytes: %v\n", err)
 			return
 		}
 	})

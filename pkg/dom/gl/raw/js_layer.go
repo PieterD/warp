@@ -48,9 +48,12 @@ type glConstants struct {
 	EnableVertexAttribArray  func(args ...driver.Value) driver.Value
 	DisableVertexAttribArray func(args ...driver.Value) driver.Value
 	ClearColor               func(args ...driver.Value) driver.Value
-	Enable                   func(args ...driver.Value) driver.Value
-	Disable                  func(args ...driver.Value) driver.Value
 	Viewport                 func(args ...driver.Value) driver.Value
+
+	/* Features. */
+
+	Enable  func(args ...driver.Value) driver.Value
+	Disable func(args ...driver.Value) driver.Value
 
 	/* Depth. */
 
@@ -67,7 +70,7 @@ type glConstants struct {
 	/* Parameters. */
 
 	MAX_COMBINED_TEXTURE_IMAGE_UNITS driver.Value
-	MAX_TEXTURE_SIZE  driver.Value
+	MAX_TEXTURE_SIZE                 driver.Value
 	GetParameter                     func(args ...driver.Value) driver.Value
 
 	/* Clearing. */

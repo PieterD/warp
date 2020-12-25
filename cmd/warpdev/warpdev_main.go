@@ -26,16 +26,24 @@ func main() {
 func run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	goRoot := os.Getenv("GOROOT")
+	if goRoot == "" {
+		goRoot = `C:\dev\go1.15.2`
+	}
+
+	cfg := bootstrap.Config{
+		MainPackage: "github.com/PieterD/warp/cmd/gltest",
+		StaticPath:  "cmd/gltest/static",
+		GoRoot:      goRoot,
+	}
+	bootstrapHandler := bootstrap.New(cfg)
+
 	eg, ctx := errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
-		h := bootstrap.New(bootstrap.Config{
-			MainPackage: "github.com/PieterD/warp/cmd/gltest",
-			StaticPath:  "cmd/gltest/static",
-			GoRoot:      `C:\dev\go1.15.2`, //TODO: take from env if empty
-		})
 		srv := &http.Server{
-			Handler:      h,
+			Handler:      bootstrapHandler,
 			Addr:         addr,
 			WriteTimeout: 15 * time.Second,
 			ReadTimeout:  15 * time.Second,

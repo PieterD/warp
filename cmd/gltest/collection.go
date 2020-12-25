@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"sort"
 
 	"github.com/PieterD/warp/pkg/dom/gl/raw"
 )
@@ -130,6 +131,9 @@ func (tc *testCollection) results() (tests []Test) {
 			Error:       result.err,
 		})
 	}
+	sort.Slice(tests, func(i, j int) bool {
+		return tests[i].Name < tests[i].Name
+	})
 	return tests
 }
 
