@@ -1,10 +1,32 @@
+# RAW TODO
+
+## vector texture using texelFetch
+
+`vec4 color = texelFetch(someTexture, ivec2(pixelX, pixelY), 0);`
+
+## Point sprites
+
+Programmatic point size:
+```
+glEnable(GL_PROGRAM_POINT_SIZE)
+void main()
+{
+    gl_Position = projection * view * model * vec4(aPos, 1.0);    
+    gl_PointSize = gl_Position.z;    
+}  
+```
+
+alternatively, fixed point size: `glPointSize()`
+
+In fragment shader:
+`gl_PointCoord` gives the location of the point.
+GL_POINT_SPRITE_COORD_ORIGIN: GL_LOWER_LEFT, GL_UPPER_LEFT (default)
+
 # TODO
 
-- generate texture units
 - glVertexAttrib* to set fixed value for disabled attributes
 - figure out Multi-Draw extensions and default fallback
 - transform feedback: glTransformFeedbackVaryings
-- framebuffers
 - multiple render targets
 - separate driver.Buffer's AsUint16Array and AsFloat32Array, and expand.
 

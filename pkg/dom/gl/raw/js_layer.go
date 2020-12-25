@@ -67,6 +67,7 @@ type glConstants struct {
 	/* Parameters. */
 
 	MAX_COMBINED_TEXTURE_IMAGE_UNITS driver.Value
+	MAX_TEXTURE_SIZE  driver.Value
 	GetParameter                     func(args ...driver.Value) driver.Value
 
 	/* Clearing. */
