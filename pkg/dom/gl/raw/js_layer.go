@@ -105,24 +105,26 @@ type glConstants struct {
 
 	/* Buffer stuff */
 
-	STREAM_DRAW          driver.Value
-	STREAM_READ          driver.Value
-	STREAM_COPY          driver.Value
-	STATIC_DRAW          driver.Value
-	STATIC_READ          driver.Value
-	STATIC_COPY          driver.Value
-	DYNAMIC_DRAW         driver.Value
-	DYNAMIC_READ         driver.Value
-	DYNAMIC_COPY         driver.Value
-	ARRAY_BUFFER         driver.Value
-	ELEMENT_ARRAY_BUFFER driver.Value
-	UNIFORM_BUFFER       driver.Value
-	CreateBuffer         func(args ...driver.Value) driver.Value
-	DeleteBuffer         func(args ...driver.Value) driver.Value
-	BindBuffer           func(args ...driver.Value) driver.Value
-	BufferData           func(args ...driver.Value) driver.Value
-	BindBufferBase       func(args ...driver.Value) driver.Value
-	BindBufferRange      func(args ...driver.Value) driver.Value
+	STREAM_DRAW               driver.Value
+	STREAM_READ               driver.Value
+	STREAM_COPY               driver.Value
+	STATIC_DRAW               driver.Value
+	STATIC_READ               driver.Value
+	STATIC_COPY               driver.Value
+	DYNAMIC_DRAW              driver.Value
+	DYNAMIC_READ              driver.Value
+	DYNAMIC_COPY              driver.Value
+	ARRAY_BUFFER              driver.Value
+	ELEMENT_ARRAY_BUFFER      driver.Value
+	UNIFORM_BUFFER            driver.Value
+	TRANSFORM_FEEDBACK_BUFFER driver.Value
+	CreateBuffer              func(args ...driver.Value) driver.Value
+	DeleteBuffer              func(args ...driver.Value) driver.Value
+	BindBuffer                func(args ...driver.Value) driver.Value
+	BufferData                func(args ...driver.Value) driver.Value
+	BindBufferBase            func(args ...driver.Value) driver.Value
+	BindBufferRange           func(args ...driver.Value) driver.Value
+	GetBufferSubData          func(args ...driver.Value) driver.Value
 
 	/* Transform feedback */
 
@@ -130,6 +132,7 @@ type glConstants struct {
 	INTERLEAVED_ATTRIBS       driver.Value
 	SEPARATE_ATTRIBS          driver.Value
 	CreateTransformFeedback   func(args ...driver.Value) driver.Value
+	DeleteTransformFeedback   func(args ...driver.Value) driver.Value
 	BindTransformFeedback     func(args ...driver.Value) driver.Value
 	TransformFeedbackVaryings func(args ...driver.Value) driver.Value
 	BeginTransformFeedback    func(args ...driver.Value) driver.Value

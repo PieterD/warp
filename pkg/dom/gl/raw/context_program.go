@@ -22,7 +22,7 @@ func (program ProgramObject) Attach(shader ShaderObject) {
 	glx.constants.AttachShader(program.value, shader.value)
 }
 
-func (program ProgramObject) TransformFeedbackVaryings(interleaved bool, inputNames []string) {
+func (program ProgramObject) TransformFeedbackVaryings(interleaved bool, inputNames ...string) {
 	glx := program.glx
 	glBufferMode := glx.constants.SEPARATE_ATTRIBS
 	if interleaved {

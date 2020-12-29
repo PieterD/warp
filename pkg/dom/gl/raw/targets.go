@@ -2,7 +2,6 @@ package raw
 
 import (
 	"fmt"
-
 	"github.com/PieterD/warp/pkg/driver"
 )
 
@@ -262,4 +261,63 @@ func (target UniformTarget) UnbindBase(index int) {
 func (target UniformTarget) BufferData(data []byte, accessUsage AccessUsage, modificationUsage ModificationUsage) {
 	glx := target.glx
 	bufferData(glx, glx.constants.UNIFORM_BUFFER, data, accessUsage, modificationUsage)
+}
+
+type TransformFeedbackTarget struct {
+	glx *Context
+}
+
+func (targets Targets) TransformFeedback() TransformFeedbackTarget {
+	glx := targets.glx
+	return TransformFeedbackTarget{
+		glx: glx,
+	}
+}
+
+func (target TransformFeedbackTarget) Bind(buffer BufferObject) {
+	glx := target.glx
+	glx.constants.BindBuffer(glx.constants.TRANSFORM_FEEDBACK_BUFFER, buffer.value)
+}
+
+func (target TransformFeedbackTarget) Unbind() {
+	glx := target.glx
+	glx.constants.BindBuffer(glx.constants.TRANSFORM_FEEDBACK_BUFFER, glx.factory.Null())
+}
+
+func (target TransformFeedbackTarget) BindBase(index int, buffer BufferObject) {
+	glx := target.glx
+	glx.constants.BindBufferBase(
+		glx.constants.TRANSFORM_FEEDBACK_BUFFER,
+		glx.factory.Number(float64(index)),
+		buffer.value,
+	)
+}
+
+func (target TransformFeedbackTarget) UnbindBase(index int) {
+	glx := target.glx
+	glx.constants.BindBufferBase(
+		glx.constants.TRANSFORM_FEEDBACK_BUFFER,
+		glx.factory.Number(float64(index)),
+		glx.factory.Null(),
+	)
+}
+
+func (target TransformFeedbackTarget) Alloc(size int, accessUsage AccessUsage, modificationUsage ModificationUsage) {
+	glx := target.glx
+	bufferData(glx, glx.constants.TRANSFORM_FEEDBACK_BUFFER, make([]byte, size), accessUsage, modificationUsage)
+}
+
+func (target TransformFeedbackTarget) Contents(data []byte) int {
+	glx := target.glx
+	if len(data) == 0 {
+		return 0
+	}
+	jsBuffer := glx.factory.Buffer(len(data))
+	jsArray := jsBuffer.AsUint8Array()
+	glx.constants.GetBufferSubData(
+		glx.constants.TRANSFORM_FEEDBACK_BUFFER,
+		glx.factory.Number(float64(0)),
+		jsArray,
+	)
+	return jsBuffer.Get(data)
 }

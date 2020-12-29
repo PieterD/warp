@@ -37,6 +37,10 @@ func main() {
 			Description: "Render a texture",
 			TF:          gltTexture,
 		},
+		&Test{
+			Description: "Use a feedback transform",
+			TF:          gltFeedback,
+		},
 	)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "running warplay: %v", err)
