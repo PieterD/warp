@@ -46,11 +46,15 @@ func (target ArrayTarget) UnbindBuffer() {
 
 func (target ArrayTarget) BufferData(data []byte, accessUsage AccessUsage, modificationUsage ModificationUsage) {
 	glx := target.glx
+	bufferData(glx, target.which, data, accessUsage, modificationUsage)
+}
+
+func bufferData(glx *Context, target driver.Value, data []byte, accessUsage AccessUsage, modificationUsage ModificationUsage) {
 	jsBuffer := glx.factory.Buffer(len(data))
 	jsBuffer.Put(data)
 	jsByteArray := jsBuffer.AsUint8Array()
 	glUsage := combineUsage(glx, accessUsage, modificationUsage)
-	glx.constants.BufferData(target.which, jsByteArray, glUsage)
+	glx.constants.BufferData(target, jsByteArray, glUsage)
 }
 
 func combineUsage(glx *Context, accessUsage AccessUsage, modificationUsage ModificationUsage) driver.Value {
@@ -186,7 +190,7 @@ func (target RenderbufferTarget) Storage(cfg RenderbufferConfig) {
 	)
 }
 
-func (targets Targets) FrameBuffer() FramebufferTarget {
+func (targets Targets) Framebuffer() FramebufferTarget {
 	return FramebufferTarget{
 		glx: targets.glx,
 	}
@@ -207,4 +211,55 @@ func (targets Targets) ActiveTextureUnit(unit int) {
 	t0 := int(fTexture0)
 	jsTextureUnit := glx.factory.Number(float64(t0 + unit))
 	glx.constants.ActiveTexture(jsTextureUnit)
+}
+
+type UniformTarget struct {
+	glx *Context
+}
+
+func (targets Targets) Uniform() UniformTarget {
+	return UniformTarget{
+		glx: targets.glx,
+	}
+}
+
+func (target UniformTarget) Bind(buffer BufferObject) {
+	glx := target.glx
+	glx.constants.BindBuffer(
+		glx.constants.UNIFORM_BUFFER,
+		buffer.value,
+	)
+}
+
+func (target UniformTarget) Unbind() {
+	glx := target.glx
+	glx.constants.BindBuffer(
+		glx.constants.UNIFORM_BUFFER,
+		glx.factory.Null(),
+	)
+}
+
+// also Binds
+func (target UniformTarget) BindBase(index int, buffer BufferObject) {
+	glx := target.glx
+	glx.constants.BindBufferBase(
+		glx.constants.UNIFORM_BUFFER,
+		glx.factory.Number(float64(index)),
+		buffer.value,
+	)
+}
+
+// also Unbinds
+func (target UniformTarget) UnbindBase(index int) {
+	glx := target.glx
+	glx.constants.BindBufferBase(
+		glx.constants.UNIFORM_BUFFER,
+		glx.factory.Number(float64(index)),
+		glx.factory.Null(),
+	)
+}
+
+func (target UniformTarget) BufferData(data []byte, accessUsage AccessUsage, modificationUsage ModificationUsage) {
+	glx := target.glx
+	bufferData(glx, glx.constants.UNIFORM_BUFFER, data, accessUsage, modificationUsage)
 }

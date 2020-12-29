@@ -53,14 +53,23 @@ func (program ProgramObject) Link() error {
 	return nil
 }
 
-func (program ProgramObject) GetUniformBlockIndex(blockName string) uint {
+func (program ProgramObject) GetUniformBlockIndex(blockName string) int {
 	glx := program.glx
 	rv := glx.constants.GetUniformBlockIndex(program.value, glx.factory.String(blockName))
 	f, ok := rv.ToFloat64()
 	if !ok {
 		panic(fmt.Errorf("unknown return type from GetUniformBlockIndex: %T %v", rv, rv))
 	}
-	return uint(f)
+	return int(f)
+}
+
+func (program ProgramObject) UniformBlockBinding(uniformBlockIndex, bufferBaseIndex int) {
+	glx := program.glx
+	glx.constants.UniformBlockBinding(
+		program.value,
+		glx.factory.Number(float64(uniformBlockIndex)),
+		glx.factory.Number(float64(bufferBaseIndex)),
+	)
 }
 
 type Uniform struct {

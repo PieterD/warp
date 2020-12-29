@@ -7,10 +7,6 @@ import (
 	"github.com/PieterD/warp/pkg/dom/glunsafe"
 )
 
-func init() {
-	Register("triangle", "Render a triangle", gltTriangle)
-}
-
 func gltTriangle(glx *raw.Context, _ raw.FramebufferObject) error {
 	program := glx.CreateProgram()
 	defer program.Destroy()

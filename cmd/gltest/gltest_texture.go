@@ -7,10 +7,6 @@ import (
 	"github.com/PieterD/warp/pkg/dom/glunsafe"
 )
 
-func init() {
-	Register("texture", "Render a texture", gltTexture)
-}
-
 func gltTexture(glx *raw.Context, _ raw.FramebufferObject) error {
 	textureImage, err := loadTexture("texture.png")
 	if err != nil {

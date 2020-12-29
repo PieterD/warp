@@ -6,10 +6,6 @@ import (
 	"github.com/PieterD/warp/pkg/dom/glunsafe"
 )
 
-func init() {
-	Register("point", "Render some points", gltPoint)
-}
-
 func gltPoint(glx *raw.Context, _ raw.FramebufferObject) error {
 	program := glx.CreateProgram()
 	defer program.Destroy()
@@ -45,7 +41,6 @@ void main(void) {
 	if err := fShader.Compile(); err != nil {
 		return fmt.Errorf("compiling fragment shader: %w", err)
 	}
-
 	program.Attach(vShader)
 	program.Attach(fShader)
 	if err := program.Link(); err != nil {

@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"image"
-	"image/png"
-	"net/http"
 	"os"
 	"time"
 
@@ -16,21 +12,39 @@ import (
 	"github.com/PieterD/warp/pkg/driver/wasmjs"
 )
 
-//Testing:
-//
-//Use framebuffer objects
-//Generate images of set coordinates from opengl code:
+const (
+	fbWidth  = 128
+	fbHeight = 128
+)
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	if err := run(ctx); err != nil {
+	err := run(ctx,
+		&Test{
+			Description: "Render a triangle",
+			TF:          gltTriangle,
+		},
+		&Test{
+			Description: "Use a uniform block",
+			TF:          gltUniformBlock,
+		},
+		&Test{
+			Description: "Render some points with different sizes and colors",
+			TF:          gltPoint,
+		},
+		&Test{
+			Description: "Render a texture",
+			TF:          gltTexture,
+		},
+	)
+	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "running warplay: %v", err)
 	}
 	<-make(chan struct{})
 }
 
-func run(ctx context.Context) error {
+func run(ctx context.Context, tests ...*Test) error {
 	factory := wasmjs.Open()
 	global := dom.Open(factory)
 	doc := global.Window().Document()
@@ -41,11 +55,50 @@ func run(ctx context.Context) error {
 	glx := raw.NewContext(canvasElem)
 	defer glx.Destroy()
 
-	testResults := Run(ctx, glx)
-	for _, testResult := range testResults {
-		text := fmt.Sprintf("%s: %s", testResult.Name, testResult.Description)
-		if testResult.Error != nil {
-			text = fmt.Sprintf("%s: %s (%v)", testResult.Name, testResult.Description, testResult.Error)
+	glx.Viewport(0, 0, fbWidth, fbHeight)
+	fbo, cleanup := newFramebuffer(glx, fbWidth, fbHeight)
+	defer cleanup()
+
+	// Run tests
+	for _, test := range tests {
+		img, err := func() (img image.Image, err error) {
+			defer func() {
+				p := recover()
+				if p == nil {
+					return
+				}
+				if pErr, ok := p.(error); ok {
+					img = nil
+					err = fmt.Errorf("recovered error from panic: %w", pErr)
+					return
+				}
+				panic(p)
+			}()
+			glx.Targets().Framebuffer().Bind(fbo)
+			glx.ClearColor(0, 0, 0, 1)
+			glx.Clear()
+
+			if err := test.TF(glx, fbo); err != nil {
+				return nil, fmt.Errorf("running test function: %w", err)
+			}
+
+			glx.Targets().Framebuffer().Bind(fbo)
+			pixels := glx.Targets().Framebuffer().ReadPixels(0, 0, fbWidth, fbHeight)
+			glx.Targets().Framebuffer().Unbind()
+
+			img = pixelsToImage(fbWidth, fbHeight, pixels)
+			return img, nil
+		}()
+		//TODO: convert rendered context to image
+		test.Image = img
+		test.Error = err
+	}
+
+	// Render test results
+	for _, test := range tests {
+		text := fmt.Sprintf("%s", test.Description)
+		if test.Error != nil {
+			text = fmt.Sprintf("%s (error: %v)", test.Description, test.Error)
 		}
 		doc.Body().AppendChildren(
 			doc.CreateElem("p", func(pElem *dom.Elem) {
@@ -56,13 +109,13 @@ func run(ctx context.Context) error {
 					}),
 					doc.CreateElem("div", func(divElem *dom.Elem) {
 						divElem.AppendClasses("clearfix")
-						if testResult.Image == nil {
+						if test.Image == nil {
 							return
 						}
 						divElem.AppendChildren(
 							doc.CreateElem("img", func(imgElem *dom.Elem) {
 								img := dom.AsImage(imgElem)
-								img.SetSrc(toDataURI(testResult.Image))
+								img.SetSrc(toDataURI(test.Image))
 							}),
 						)
 					}),
@@ -74,63 +127,45 @@ func run(ctx context.Context) error {
 	return nil
 }
 
-func toDataURI(img image.Image) string {
-	buf := &bytes.Buffer{}
-	buf.WriteString("data:image/png;base64,")
-	base64Encoder := base64.NewEncoder(base64.StdEncoding, buf)
-	pngEncoder := png.Encoder{
-		CompressionLevel: png.NoCompression,
-	}
-	if err := pngEncoder.Encode(base64Encoder, img); err != nil {
-		panic(fmt.Errorf("encoding png image: %w", err))
-	}
-	if err := base64Encoder.Close(); err != nil {
-		panic(fmt.Errorf("closing base64 encoder: %w", err))
-	}
-	return buf.String()
+type TestableFunc func(glx *raw.Context, fbo raw.FramebufferObject) error
+
+type Test struct {
+	Description string
+	TF          TestableFunc
+	Image       image.Image
+	Error       error
 }
 
-func flipPixels(width, height int, pixels []byte) []byte {
-	flippedPixels := make([]byte, len(pixels))
-	rowSize := width * 4
-	for y := 0; y < height; y++ {
-		fy := height - 1 - y
-		copy(flippedPixels[fy*rowSize:(fy+1)*rowSize], pixels[y*rowSize:(y+1)*rowSize])
+func newFramebuffer(glx *raw.Context, width, height int) (raw.FramebufferObject, func()) {
+	rboColor := glx.CreateRenderbuffer()
+	//defer rboColor.Destroy()
+	glx.Targets().RenderBuffer().Bind(rboColor)
+	glx.Targets().RenderBuffer().Storage(raw.RenderbufferConfig{
+		Type:   raw.ColorBuffer,
+		Width:  width,
+		Height: height,
+	})
+	rboDepthStencil := glx.CreateRenderbuffer()
+	//defer rboDepthStencil.Destroy()
+	glx.Targets().RenderBuffer().Bind(rboDepthStencil)
+	glx.Targets().RenderBuffer().Storage(raw.RenderbufferConfig{
+		Type:   raw.DepthStencilBuffer,
+		Width:  width,
+		Height: height,
+	})
+	glx.Targets().RenderBuffer().Unbind()
+	fbo := glx.CreateFramebuffer()
+	//defer fbo.Destroy()
+	glx.Targets().Framebuffer().Bind(fbo)
+	glx.Targets().RenderBuffer().Bind(rboColor)
+	glx.Targets().Framebuffer().AttachRenderbuffer(raw.ColorBuffer, rboColor)
+	glx.Targets().RenderBuffer().Bind(rboDepthStencil)
+	glx.Targets().Framebuffer().AttachRenderbuffer(raw.DepthStencilBuffer, rboDepthStencil)
+	glx.Targets().RenderBuffer().Unbind()
+	glx.Targets().Framebuffer().Unbind()
+	return fbo, func() {
+		fbo.Destroy()
+		rboDepthStencil.Destroy()
+		rboColor.Destroy()
 	}
-	return flippedPixels
-}
-
-func pixelsToImage(width, height int, pixels []byte) image.Image {
-	flippedPixels := flipPixels(width, height, pixels)
-	img := &image.NRGBA{
-		Pix:    flippedPixels,
-		Stride: width * 4,
-		Rect: image.Rectangle{
-			Min: image.Point{
-				X: 0,
-				Y: 0,
-			},
-			Max: image.Point{
-				X: width,
-				Y: height,
-			},
-		},
-	}
-	return img
-}
-
-func loadTexture(fileName string) (image.Image, error) {
-	resp, err := http.DefaultClient.Get(fileName)
-	if err != nil {
-		return nil, fmt.Errorf("getting texture: %w", err)
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("unsuccessful status code while getting texture: %d", resp.StatusCode)
-	}
-	img, _, err := image.Decode(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("decoding image: %w", err)
-	}
-	return img, nil
 }
