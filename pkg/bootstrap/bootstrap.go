@@ -48,7 +48,7 @@ func New(cfg Config) http.Handler {
 			return
 		}
 	})
-	r.PathPrefix("/").Handler(http.StripPrefix("", http.FileServer(http.Dir(cfg.StaticPath))))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(cfg.StaticPath)))
 	return r
 }
 

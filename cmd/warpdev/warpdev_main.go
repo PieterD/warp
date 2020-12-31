@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"os"
 	"time"
@@ -26,24 +27,25 @@ func main() {
 func run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
+	eg, ctx := errgroup.WithContext(ctx)
 	goRoot := os.Getenv("GOROOT")
 	if goRoot == "" {
 		goRoot = `C:\dev\go1.15.2`
 	}
 
-	cfg := bootstrap.Config{
-		MainPackage: "github.com/PieterD/warp/cmd/gltest",
-		StaticPath:  "cmd/gltest/static",
-		GoRoot:      goRoot,
-	}
-	bootstrapHandler := bootstrap.New(cfg)
-
-	eg, ctx := errgroup.WithContext(ctx)
-
 	eg.Go(func() error {
+		r := mux.NewRouter()
+		addRoot := func(name string) {
+			r.PathPrefix(fmt.Sprintf("/%s/", name)).Handler(http.StripPrefix(fmt.Sprintf("/%s", name), bootstrap.New(bootstrap.Config{
+				MainPackage: fmt.Sprintf("github.com/PieterD/warp/app/%s", name),
+				StaticPath:  fmt.Sprintf("app/%s/static", name),
+				GoRoot:      goRoot,
+			})))
+		}
+		addRoot("gltest")
+		addRoot("particle")
 		srv := &http.Server{
-			Handler:      bootstrapHandler,
+			Handler:      r,
 			Addr:         addr,
 			WriteTimeout: 15 * time.Second,
 			ReadTimeout:  15 * time.Second,
