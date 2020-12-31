@@ -3,7 +3,7 @@ package dom
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/pkg/dom/gl"
+	"github.com/PieterD/warp/pkg/gfx"
 )
 
 type Canvas struct {
@@ -19,8 +19,8 @@ func AsCanvas(elem *Elem) *Canvas {
 	}
 }
 
-func (c *Canvas) GetContextWebgl() *gl.Context {
-	return gl.NewContext(c.elem)
+func (c *Canvas) GetContextWebgl() *gfx.Context {
+	return gfx.NewContext(c.elem)
 }
 
 func (c *Canvas) InnerSize() (width, height int) {

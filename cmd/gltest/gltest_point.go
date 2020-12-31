@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/PieterD/warp/pkg/dom/gl/raw"
-	"github.com/PieterD/warp/pkg/dom/glunsafe"
+	"github.com/PieterD/warp/pkg/gl"
+	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
-func gltPoint(glx *raw.Context, _ raw.FramebufferObject) error {
+func gltPoint(glx *gl.Context, _ gl.FramebufferObject) error {
 	program := glx.CreateProgram()
 	defer program.Destroy()
 
-	vShader := glx.CreateShader(raw.VertexShader)
+	vShader := glx.CreateShader(gl.VertexShader)
 	defer vShader.Destroy()
 	vShader.Source(`#version 300 es
 precision mediump float;
@@ -28,7 +28,7 @@ void main(void) {
 		return fmt.Errorf("compiling vertex shader: %w", err)
 	}
 
-	fShader := glx.CreateShader(raw.FragmentShader)
+	fShader := glx.CreateShader(gl.FragmentShader)
 	defer fShader.Destroy()
 	fShader.Source(`#version 300 es
 precision mediump float;
@@ -55,7 +55,7 @@ void main(void) {
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(vBuffer)
-	glx.Targets().Array().BufferData(glunsafe.Map(vertices), raw.Static, raw.Draw)
+	glx.Targets().Array().BufferData(glunsafe.Map(vertices), gl.Static, gl.Draw)
 	glx.Targets().Array().UnbindBuffer()
 
 	vao := glx.CreateVertexArray()
@@ -64,13 +64,13 @@ void main(void) {
 	glx.Targets().Array().BindBuffer(vBuffer)
 	stride := 6 * 4
 	offset := 0
-	vao.VertexAttribPointer(0, raw.Vec2, false, stride, 0)
+	vao.VertexAttribPointer(0, gl.Vec2, false, stride, 0)
 	vao.EnableVertexAttribArray(0)
 	offset += 2 * 4
-	vao.VertexAttribPointer(1, raw.Vec3, false, stride, offset)
+	vao.VertexAttribPointer(1, gl.Vec3, false, stride, offset)
 	vao.EnableVertexAttribArray(1)
 	offset += 3 * 4
-	vao.VertexAttribPointer(2, raw.Float, false, stride, offset)
+	vao.VertexAttribPointer(2, gl.Float, false, stride, offset)
 	vao.EnableVertexAttribArray(2)
 	offset += 1 * 4
 	glx.UnbindVertexArray()
@@ -79,7 +79,7 @@ void main(void) {
 	glx.Clear()
 	glx.UseProgram(program)
 	glx.BindVertexArray(vao)
-	glx.DrawArrays(raw.Points, 0, 3)
+	glx.DrawArrays(gl.Points, 0, 3)
 	glx.Targets().ElementArray().UnbindBuffer()
 	glx.UnuseProgram()
 

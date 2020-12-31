@@ -1,4 +1,4 @@
-package gl
+package gfx
 
 import "fmt"
 

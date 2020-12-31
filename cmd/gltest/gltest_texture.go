@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/pkg/dom/gl/raw"
-	"github.com/PieterD/warp/pkg/dom/glunsafe"
+	"github.com/PieterD/warp/pkg/gl"
+	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
-func gltTexture(glx *raw.Context, _ raw.FramebufferObject) error {
+func gltTexture(glx *gl.Context, _ gl.FramebufferObject) error {
 	textureImage, err := loadTexture("texture.png")
 	if err != nil {
 		return fmt.Errorf("loading texture image: %w", err)
@@ -16,13 +16,13 @@ func gltTexture(glx *raw.Context, _ raw.FramebufferObject) error {
 	defer textureObject.Destroy()
 	glx.Targets().ActiveTextureUnit(0)
 	glx.Targets().Texture2D().Bind(textureObject)
-	glx.Targets().Texture2D().Image(textureImage, raw.Texture2DConfig{})
+	glx.Targets().Texture2D().Image(textureImage, gl.Texture2DConfig{})
 	glx.Targets().Texture2D().Unbind()
 
 	program := glx.CreateProgram()
 	defer program.Destroy()
 
-	vShader := glx.CreateShader(raw.VertexShader)
+	vShader := glx.CreateShader(gl.VertexShader)
 	defer vShader.Destroy()
 	vShader.Source(`#version 300 es
 precision mediump float;
@@ -39,7 +39,7 @@ void main(void) {
 		return fmt.Errorf("compiling vertex shader: %w", err)
 	}
 
-	fShader := glx.CreateShader(raw.FragmentShader)
+	fShader := glx.CreateShader(gl.FragmentShader)
 	defer fShader.Destroy()
 	fShader.Source(`#version 300 es
 precision mediump float;
@@ -78,22 +78,22 @@ void main(void) {
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(vBuffer)
-	glx.Targets().Array().BufferData(vData, raw.Static, raw.Draw)
+	glx.Targets().Array().BufferData(vData, gl.Static, gl.Draw)
 	glx.Targets().Array().UnbindBuffer()
 
 	iData := glunsafe.Map(indices)
 	iBuffer := glx.CreateBuffer()
 	defer iBuffer.Destroy()
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
-	glx.Targets().ElementArray().BufferData(iData, raw.Static, raw.Draw)
+	glx.Targets().ElementArray().BufferData(iData, gl.Static, gl.Draw)
 	glx.Targets().ElementArray().UnbindBuffer()
 
 	vao := glx.CreateVertexArray()
 	defer vao.Destroy()
 	glx.BindVertexArray(vao)
 	glx.Targets().Array().BindBuffer(vBuffer)
-	vao.VertexAttribPointer(0, raw.Vec3, false, 5*4, 0)
-	vao.VertexAttribPointer(1, raw.Vec2, false, 5*4, 3*4)
+	vao.VertexAttribPointer(0, gl.Vec3, false, 5*4, 0)
+	vao.VertexAttribPointer(1, gl.Vec2, false, 5*4, 3*4)
 	vao.EnableVertexAttribArray(0)
 	vao.EnableVertexAttribArray(1)
 	glx.Targets().Array().UnbindBuffer()
@@ -111,7 +111,7 @@ void main(void) {
 	defer glx.UnbindVertexArray()
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
 	defer glx.Targets().ElementArray().UnbindBuffer()
-	glx.DrawElements(raw.Triangles, 0, 6, raw.UnsignedShort)
+	glx.DrawElements(gl.Triangles, 0, 6, gl.UnsignedShort)
 
 	return nil
 }

@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/pkg/dom/gl/raw"
-	"github.com/PieterD/warp/pkg/dom/glunsafe"
+	"github.com/PieterD/warp/pkg/gl"
+	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
-func gltTriangle(glx *raw.Context, _ raw.FramebufferObject) error {
+func gltTriangle(glx *gl.Context, _ gl.FramebufferObject) error {
 	program := glx.CreateProgram()
 	defer program.Destroy()
 
-	vShader := glx.CreateShader(raw.VertexShader)
+	vShader := glx.CreateShader(gl.VertexShader)
 	defer vShader.Destroy()
 	vShader.Source(`#version 300 es
 precision mediump float;
@@ -24,7 +24,7 @@ void main(void) {
 		return fmt.Errorf("compiling vertex shader: %w", err)
 	}
 
-	fShader := glx.CreateShader(raw.FragmentShader)
+	fShader := glx.CreateShader(gl.FragmentShader)
 	defer fShader.Destroy()
 	fShader.Source(`#version 300 es
 precision mediump float;
@@ -55,21 +55,21 @@ void main(void) {
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(vBuffer)
-	glx.Targets().Array().BufferData(vData, raw.Static, raw.Draw)
+	glx.Targets().Array().BufferData(vData, gl.Static, gl.Draw)
 	glx.Targets().Array().UnbindBuffer()
 
 	iData := glunsafe.Map(indices)
 	iBuffer := glx.CreateBuffer()
 	defer iBuffer.Destroy()
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
-	glx.Targets().ElementArray().BufferData(iData, raw.Static, raw.Draw)
+	glx.Targets().ElementArray().BufferData(iData, gl.Static, gl.Draw)
 	glx.Targets().ElementArray().UnbindBuffer()
 
 	vao := glx.CreateVertexArray()
 	defer vao.Destroy()
 	glx.BindVertexArray(vao)
 	glx.Targets().Array().BindBuffer(vBuffer)
-	vao.VertexAttribPointer(0, raw.Vec3, false, 3*4, 0)
+	vao.VertexAttribPointer(0, gl.Vec3, false, 3*4, 0)
 	vao.EnableVertexAttribArray(0)
 	glx.Targets().Array().UnbindBuffer()
 	glx.UnbindVertexArray()
@@ -79,7 +79,7 @@ void main(void) {
 	glx.UseProgram(program)
 	glx.BindVertexArray(vao)
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
-	glx.DrawElements(raw.Triangles, 0, 3, raw.UnsignedShort)
+	glx.DrawElements(gl.Triangles, 0, 3, gl.UnsignedShort)
 	glx.Targets().ElementArray().UnbindBuffer()
 	glx.UnuseProgram()
 

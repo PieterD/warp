@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/PieterD/warp/pkg/dom"
-	"github.com/PieterD/warp/pkg/dom/gl/raw"
 	"github.com/PieterD/warp/pkg/driver/wasmjs"
+	"github.com/PieterD/warp/pkg/gl"
 )
 
 const (
@@ -56,7 +56,7 @@ func run(ctx context.Context, tests ...*Test) error {
 	doc.Body().AppendChildren()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	glx := raw.NewContext(canvasElem)
+	glx := gl.NewContext(canvasElem)
 	defer glx.Destroy()
 
 	glx.Viewport(0, 0, fbWidth, fbHeight)
@@ -131,7 +131,7 @@ func run(ctx context.Context, tests ...*Test) error {
 	return nil
 }
 
-type TestableFunc func(glx *raw.Context, fbo raw.FramebufferObject) error
+type TestableFunc func(glx *gl.Context, fbo gl.FramebufferObject) error
 
 type Test struct {
 	Description string
@@ -140,20 +140,20 @@ type Test struct {
 	Error       error
 }
 
-func newFramebuffer(glx *raw.Context, width, height int) (raw.FramebufferObject, func()) {
+func newFramebuffer(glx *gl.Context, width, height int) (gl.FramebufferObject, func()) {
 	rboColor := glx.CreateRenderbuffer()
 	//defer rboColor.Destroy()
 	glx.Targets().RenderBuffer().Bind(rboColor)
-	glx.Targets().RenderBuffer().Storage(raw.RenderbufferConfig{
-		Type:   raw.ColorBuffer,
+	glx.Targets().RenderBuffer().Storage(gl.RenderbufferConfig{
+		Type:   gl.ColorBuffer,
 		Width:  width,
 		Height: height,
 	})
 	rboDepthStencil := glx.CreateRenderbuffer()
 	//defer rboDepthStencil.Destroy()
 	glx.Targets().RenderBuffer().Bind(rboDepthStencil)
-	glx.Targets().RenderBuffer().Storage(raw.RenderbufferConfig{
-		Type:   raw.DepthStencilBuffer,
+	glx.Targets().RenderBuffer().Storage(gl.RenderbufferConfig{
+		Type:   gl.DepthStencilBuffer,
 		Width:  width,
 		Height: height,
 	})
@@ -162,9 +162,9 @@ func newFramebuffer(glx *raw.Context, width, height int) (raw.FramebufferObject,
 	//defer fbo.Destroy()
 	glx.Targets().Framebuffer().Bind(fbo)
 	glx.Targets().RenderBuffer().Bind(rboColor)
-	glx.Targets().Framebuffer().AttachRenderbuffer(raw.ColorBuffer, rboColor)
+	glx.Targets().Framebuffer().AttachRenderbuffer(gl.ColorBuffer, rboColor)
 	glx.Targets().RenderBuffer().Bind(rboDepthStencil)
-	glx.Targets().Framebuffer().AttachRenderbuffer(raw.DepthStencilBuffer, rboDepthStencil)
+	glx.Targets().Framebuffer().AttachRenderbuffer(gl.DepthStencilBuffer, rboDepthStencil)
 	glx.Targets().RenderBuffer().Unbind()
 	glx.Targets().Framebuffer().Unbind()
 	return fbo, func() {

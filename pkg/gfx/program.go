@@ -1,9 +1,9 @@
-package gl
+package gfx
 
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/pkg/dom/glutil"
+	"github.com/PieterD/warp/pkg/gl/glutil"
 
 	"github.com/PieterD/warp/pkg/driver"
 )

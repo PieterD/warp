@@ -7,7 +7,7 @@ import (
 	"math"
 	"os"
 
-	"github.com/PieterD/warp/pkg/dom/glutil"
+	"github.com/PieterD/warp/pkg/gl/glutil"
 	"github.com/go-gl/mathgl/mgl32"
 
 	"github.com/PieterD/warp/pkg/dom"

@@ -1,8 +1,8 @@
-package gl
+package gfx
 
 import (
-	"github.com/PieterD/warp/pkg/dom/glunsafe"
 	"github.com/PieterD/warp/pkg/driver"
+	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
 type Buffer struct {

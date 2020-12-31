@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/PieterD/warp/pkg/dom/glutil"
+	"github.com/PieterD/warp/pkg/gl/glutil"
 
-	"github.com/PieterD/warp/pkg/dom/gl"
+	"github.com/PieterD/warp/pkg/gfx"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -18,16 +18,16 @@ type HeartProgram struct {
 		LightLocation  mgl32.Vec3
 		CameraLocation mgl32.Vec3
 	}
-	glx              *gl.Context
+	glx              *gfx.Context
 	verticesToRender int
-	vertexBuffer     *gl.Buffer
-	elementBuffer    *gl.Buffer
-	vao              *gl.VertexArray
-	texture          *gl.Texture2D
-	program          *gl.Program
+	vertexBuffer     *gfx.Buffer
+	elementBuffer    *gfx.Buffer
+	vao              *gfx.VertexArray
+	texture          *gfx.Texture2D
+	program          *gfx.Program
 }
 
-func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*HeartProgram, error) {
+func NewHeartProgram(glx *gfx.Context, modelPath string, texturePath string) (*HeartProgram, error) {
 	model, err := loadModel(modelPath)
 	if err != nil {
 		return nil, fmt.Errorf("getting model: %w", err)
@@ -49,23 +49,23 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 	p.elementBuffer = glx.Buffer()
 	p.elementBuffer.IndexData(heartIndices)
 
-	dc, err := gl.NewDataCoupling(gl.DataCouplingConfig{
-		Vertices: []gl.VertexConfig{
+	dc, err := gfx.NewDataCoupling(gfx.DataCouplingConfig{
+		Vertices: []gfx.VertexConfig{
 			{
 				Name:    "Coordinates",
-				Type:    gl.Vec3,
+				Type:    gfx.Vec3,
 				Buffer:  "vertex",
 				Padding: 0,
 			},
 			{
 				Name:    "TexCoord",
-				Type:    gl.Vec2,
+				Type:    gfx.Vec2,
 				Buffer:  "vertex",
 				Padding: 4,
 			},
 			{
 				Name:    "Normal",
-				Type:    gl.Vec3,
+				Type:    gfx.Vec3,
 				Buffer:  "vertex",
 				Padding: 0,
 			},
@@ -76,20 +76,20 @@ func NewHeartProgram(glx *gl.Context, modelPath string, texturePath string) (*He
 	}
 	adc := dc.Active("Coordinates", "TexCoord", "Normal")
 
-	p.vao, err = glx.VertexArray(adc, map[string]*gl.Buffer{
+	p.vao, err = glx.VertexArray(adc, map[string]*gfx.Buffer{
 		"vertex": p.vertexBuffer,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("creating vertex array object: %w", err)
 	}
 
-	programConfig := gl.ProgramConfig{
+	programConfig := gfx.ProgramConfig{
 		HighPrecision: true,
 		Uniforms:      &p.Uniforms,
 		Attributes:    adc,
-		Textures: []gl.ProgramSamplerConfig{{
+		Textures: []gfx.ProgramSamplerConfig{{
 			Name: "Texture",
-			Mode: gl.Sample2D,
+			Mode: gfx.Sample2D,
 		}},
 		VertexCode: `
 out vec2 texCoord;
@@ -138,7 +138,7 @@ void main(void) {
 		return nil, fmt.Errorf("compiling shader: %w", err)
 	}
 
-	p.texture = glx.Texture(gl.Texture2DConfig{}, texture)
+	p.texture = glx.Texture(gfx.Texture2DConfig{}, texture)
 
 	return p, nil
 }
@@ -150,17 +150,17 @@ func (p *HeartProgram) Draw(camera *glutil.Camera, rot float64) error {
 	lightLocation := mgl32.Vec3{0, 0, 20}
 	lightLocation = mgl32.Rotate3DY(lightAngle).Mul3x1(lightLocation)
 
-	drawConfig := gl.DrawConfig{
+	drawConfig := gfx.DrawConfig{
 		Use:          p.program,
 		VAO:          p.vao,
-		Textures:     map[string]*gl.Texture2D{"Texture": p.texture},
+		Textures:     map[string]*gfx.Texture2D{"Texture": p.texture},
 		ElementArray: p.elementBuffer,
-		DrawMode:     gl.Triangles,
-		Vertices: gl.VertexRange{
+		DrawMode:     gfx.Triangles,
+		Vertices: gfx.VertexRange{
 			FirstOffset: 0,
 			VertexCount: p.verticesToRender,
 		},
-		Options: gl.DrawOptions{
+		Options: gfx.DrawOptions{
 			DepthTest: true,
 		},
 	}
