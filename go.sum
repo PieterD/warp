@@ -1,5 +1,7 @@
 github.com/go-gl/mathgl v1.0.0 h1:t9DznWJlXxxjeeKLIdovCOVJQk/GzDEL7h/h+Ro2B68=
 github.com/go-gl/mathgl v1.0.0/go.mod h1:yhpkQzEiH9yPyxDUGzkmgScbaBVlhC06qodikEM0ZwQ=
+github.com/google/btree v1.0.0 h1:0udJVsspx3VBr5FwtLhQQtuAsVc79tTq0ocGIPAU6qo=
+github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 golang.org/x/image v0.0.0-20190321063152-3fc05d484e9f h1:FO4MZ3N56GnxbqxGKqh+YTzUWQ2sDwtFQEZgLOxh9Jc=
