@@ -1,4 +1,4 @@
-package ecsdb
+package ecs
 
 import (
 	"fmt"
@@ -59,6 +59,7 @@ func (rec *indexRecord) Less(than btree.Item) bool {
 		return false
 	}
 	// rec.id == thanRec.id
+
 	return false
 }
 

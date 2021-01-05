@@ -1,4 +1,4 @@
-package ecsdb
+package ecs
 
 import (
 	"fmt"
@@ -29,14 +29,14 @@ type dbType struct {
 	index *btree.BTree
 }
 
-func New(singletTypes, multiTypes []Lesser) (*DB, error) {
-	if len(multiTypes)+len(singletTypes) == 0 {
+func New(singleTypes, multiTypes []Lesser) (*DB, error) {
+	if len(multiTypes)+len(singleTypes) == 0 {
 		return nil, fmt.Errorf("must supply at least one type for storage")
 	}
 	db := &DB{
 		sequences:    make(map[string]ID),
 		typesReverse: make(map[reflect.Type]int),
-		types:        make([]dbType, len(multiTypes)),
+		types:        make([]dbType, len(singleTypes)+len(multiTypes)),
 	}
 	create := func(typeIndex int, storageType Lesser, singlet bool) error {
 		rType := reflect.TypeOf(storageType)
@@ -50,10 +50,11 @@ func New(singletTypes, multiTypes []Lesser) (*DB, error) {
 		db.types[typeIndex] = dbType{
 			rType: rType,
 			data:  btree.New(btreeDegree),
+			index: btree.New(btreeDegree),
 		}
 		return nil
 	}
-	for typeIndex, storageType := range singletTypes {
+	for typeIndex, storageType := range singleTypes {
 		if err := create(typeIndex, storageType, true); err != nil {
 			return nil, fmt.Errorf("creating singlet table %T: %w", storageType, err)
 		}
@@ -73,7 +74,7 @@ func validateType(rType reflect.Type) error {
 	return nil
 }
 
-func (db *DB) Sequence(name string) ID {
+func (db *DB) Seq(name string) ID {
 	db.sequences[name]++
 	return db.sequences[name]
 }
@@ -99,14 +100,14 @@ func (db *DB) SetComponent(id ID, componentData Lesser) {
 	})
 }
 
-func (db *DB) GetComponent(id ID, searchKey Lesser) (componentData Lesser) {
+func (db *DB) GetComponent(id ID, searchKey Lesser) (ok bool) {
 	typ := db.typeLookup(searchKey)
 	found := typ.data.Get(&record{
 		id:    id,
 		value: searchKey,
 	})
 	if found == nil {
-		return nil
+		return false
 	}
 	foundRec, ok := found.(*record)
 	if !ok {
@@ -115,7 +116,8 @@ func (db *DB) GetComponent(id ID, searchKey Lesser) (componentData Lesser) {
 	if foundRec.value == nil {
 		panic(fmt.Errorf("found record has no data"))
 	}
-	return foundRec.value
+	reflect.ValueOf(searchKey).Elem().Set(reflect.ValueOf(foundRec.value).Elem())
+	return true
 }
 
 func (db *DB) DelComponent(id ID, searchKey Lesser) bool {
