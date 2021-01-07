@@ -51,38 +51,70 @@ func TestDB(t *testing.T) {
 	db.Assign(&EntityID{1}, &Age{19}, &Name{"Alice"})
 	db.Assign(&EntityID{2}, &Name{"Ellie"}, &Name{"Alice"}, &Age{52})
 
-	t.Run("NextValue", func(t *testing.T) {
+	t.Run("find Values", func(t *testing.T) {
 		id := &EntityID{1}
 		name := &Name{}
-		if ok := db.NextValue(id, name); !ok {
-			t.Fatalf("expected next value")
+		if ok := db.FirstValue(id, name); !ok {
+			t.Fatalf("expected first value")
 		}
 		if name.Name != "Alice" {
-			t.Fatalf("expected Alice, got %s", name.Name)
+			t.Errorf("expected Alice, got %s", name.Name)
 		}
 		if ok := db.NextValue(id, name); !ok {
 			t.Fatalf("expected next value")
 		}
 		if name.Name != "Alicia" {
-			t.Fatalf("expected Alicia, got %s", name.Name)
+			t.Errorf("expected Alicia, got %s", name.Name)
 		}
 		if ok := db.NextValue(id, name); !ok {
 			t.Fatalf("expected next value")
 		}
 		if name.Name != "Allison" {
-			t.Fatalf("expected Allison, got %s", name.Name)
+			t.Errorf("expected Allison, got %s", name.Name)
 		}
 		if ok := db.NextValue(id, name); ok {
 			t.Fatalf("expected no more values")
 		}
 	})
 
+	t.Run("find Primaries", func(t *testing.T) {
+		id := &EntityID{1}
+		name := &Name{"Alice"}
+		if ok := db.FirstPrimary(id, name); !ok {
+			t.Fatalf("expected first primary")
+		}
+		if id.ID != 1 {
+			t.Errorf("invalid id, got %d", id.ID)
+		}
+		if name.Name != "Alice" {
+			t.Errorf("invalid name, got %s", name.Name)
+		}
+		if ok := db.NextPrimary(id, name); !ok {
+			t.Fatalf("expected next primary")
+		}
+		if id.ID != 2 {
+			t.Errorf("invalid id, got %d", id.ID)
+		}
+		if name.Name != "Alice" {
+			t.Errorf("invalid name, got %s", name.Name)
+		}
+		if ok := db.NextPrimary(id, name); ok {
+			t.Fatalf("expected no more primary")
+		}
+		age := &Age{}
+		id.ID = 0
+		if ok := db.NextPrimary(id, age); !ok {
+			t.Fatalf("expected first primary")
+		}
+	})
+
 	t.Run("Search", func(t *testing.T) {
+		t.Skip("not implemented")
 		id := &EntityID{}
 		name := &Name{"Alice"}
 		age := &Age{}
 
-		if ok := db.Search(id, name, age); !ok {
+		if ok := db.NextSearch(id, name, age); !ok {
 			t.Fatalf("expected search value")
 		}
 		if id.ID != 1 {
@@ -95,7 +127,7 @@ func TestDB(t *testing.T) {
 			t.Errorf("invalid age: %d", age.Age)
 		}
 
-		if ok := db.Search(id, name, age); !ok {
+		if ok := db.NextSearch(id, name, age); !ok {
 			t.Fatalf("expected search value")
 		}
 		if id.ID != 2 {
@@ -107,7 +139,7 @@ func TestDB(t *testing.T) {
 		if age.Age != 52 {
 			t.Errorf("invalid age: %d", age.Age)
 		}
-		if ok := db.Search(id, name, age); ok {
+		if ok := db.NextSearch(id, name, age); ok {
 			t.Fatalf("expected no more values")
 		}
 	})

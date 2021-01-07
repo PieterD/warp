@@ -55,8 +55,8 @@ func (r forwardRecord) Less(than btree.Item) bool {
 var _ btree.Item = forwardRecord{}
 
 type reverseRecord struct {
-	primary   Value
 	secondary Value
+	primary   Value
 }
 
 func (r reverseRecord) Less(than btree.Item) bool {
