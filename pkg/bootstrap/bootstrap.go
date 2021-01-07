@@ -89,7 +89,7 @@ func (bh *binaryHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	}
 	writer.Header().Set("Content-Type", "application/wasm")
 	if _, err := io.Copy(writer, bytes.NewBuffer(data)); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "error copying binary bytes: %w\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "error copying binary bytes: %v\n", err)
 		return
 	}
 }

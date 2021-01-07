@@ -161,6 +161,14 @@ func (vao VertexArrayObject) DisableVertexAttribArray(attrIndex int) {
 	glx.constants.DisableVertexAttribArray(glx.factory.Number(float64(attrIndex)))
 }
 
+func (vao VertexArrayObject) VertexAttribDivisor(attrIndex int, divisor int) {
+	glx := vao.glx
+	glx.constants.VertexAttribDivisor(
+		glx.factory.Number(float64(attrIndex)),
+		glx.factory.Number(float64(divisor)),
+	)
+}
+
 func (glx *Context) BindVertexArray(vao VertexArrayObject) {
 	glx.constants.BindVertexArray(vao.value)
 }
@@ -197,7 +205,7 @@ func (glx *Context) DrawArrays(mode PrimitiveDrawMode, vertexOffset, vertexCount
 	)
 }
 
-func (glx *Context) DrawElements(mode PrimitiveDrawMode, elementArrayByteOffset, vertexCount int, elementArrayType Type) {
+func (glx *Context) DrawElements(mode PrimitiveDrawMode, vertexCount int, elementArrayType Type, elementArrayByteOffset int) {
 	var glDrawMode driver.Value
 	switch mode {
 	case Points:
@@ -214,6 +222,27 @@ func (glx *Context) DrawElements(mode PrimitiveDrawMode, elementArrayByteOffset,
 		glx.factory.Number(float64(vertexCount)),
 		glx.typeConverter.ToJs(elementArrayType),
 		glx.factory.Number(float64(elementArrayByteOffset)),
+	)
+}
+
+func (glx *Context) DrawElementsInstanced(mode PrimitiveDrawMode, vertexCount int, elementArrayType Type, elementArrayByteOffset int, instanceCount int) {
+	var glDrawMode driver.Value
+	switch mode {
+	case Points:
+		glDrawMode = glx.constants.POINTS
+	case Lines:
+		glDrawMode = glx.constants.LINES
+	case Triangles:
+		glDrawMode = glx.constants.TRIANGLES
+	default:
+		panic(fmt.Errorf("unsupported draw mode: %v", mode))
+	}
+	glx.constants.DrawElementsInstanced(
+		glDrawMode,
+		glx.factory.Number(float64(vertexCount)),
+		glx.typeConverter.ToJs(elementArrayType),
+		glx.factory.Number(float64(elementArrayByteOffset)),
+		glx.factory.Number(float64(instanceCount)),
 	)
 }
 

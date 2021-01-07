@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"reflect"
+
 	"github.com/PieterD/warp/pkg/gl"
 	"github.com/PieterD/warp/pkg/gl/glunsafe"
-	"reflect"
 )
 
 func gltFeedback(glx *gl.Context, _ gl.FramebufferObject) error {
@@ -103,8 +104,12 @@ void main(void) {
 	glx.Targets().TransformFeedback().Bind(tfBuffer)
 	tfFloats := make([]float32, 3)
 	tfBytes := glunsafe.Map(tfFloats)
-	glx.Targets().TransformFeedback().Contents(tfBytes)
+	n := glx.Targets().TransformFeedback().Contents(tfBytes)
 	glx.Targets().TransformFeedback().Unbind()
+
+	if n != 4*3 {
+		return fmt.Errorf("transform feedback contents call returned %d bytes read, expected 12", n)
+	}
 
 	if got, want := tfFloats, []float32{10.0, 15.0, 20.0}; !reflect.DeepEqual(got, want) {
 		return fmt.Errorf("invalid data read from transform feedback: %v", got)

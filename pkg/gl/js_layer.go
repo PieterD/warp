@@ -49,6 +49,7 @@ type glConstants struct {
 	DisableVertexAttribArray func(args ...driver.Value) driver.Value
 	ClearColor               func(args ...driver.Value) driver.Value
 	Viewport                 func(args ...driver.Value) driver.Value
+	VertexAttribDivisor      func(args ...driver.Value) driver.Value
 
 	/* Features. */
 
@@ -81,11 +82,13 @@ type glConstants struct {
 
 	/* Drawing. */
 
-	POINTS       driver.Value
-	LINES        driver.Value
-	TRIANGLES    driver.Value
-	DrawArrays   func(args ...driver.Value) driver.Value
-	DrawElements func(args ...driver.Value) driver.Value
+	POINTS                driver.Value
+	LINES                 driver.Value
+	TRIANGLES             driver.Value
+	DrawArrays            func(args ...driver.Value) driver.Value
+	DrawElements          func(args ...driver.Value) driver.Value
+	DrawArraysInstanced   func(args ...driver.Value) driver.Value
+	DrawElementsInstanced func(args ...driver.Value) driver.Value
 
 	/* Data types. */
 

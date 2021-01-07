@@ -22,8 +22,16 @@ func main() {
 	defer cancel()
 	err := run(ctx,
 		&Test{
-			Description: "Render a triangle",
-			TF:          gltTriangle,
+			Description: "Use instanced rendering",
+			TF:          gltInstancedQuads,
+		},
+		&Test{
+			Description: "Use a feedback transform",
+			TF:          gltFeedback,
+		},
+		&Test{
+			Description: "Render a texture",
+			TF:          gltTexture,
 		},
 		&Test{
 			Description: "Use a uniform block",
@@ -34,12 +42,8 @@ func main() {
 			TF:          gltPoint,
 		},
 		&Test{
-			Description: "Render a texture",
-			TF:          gltTexture,
-		},
-		&Test{
-			Description: "Use a feedback transform",
-			TF:          gltFeedback,
+			Description: "Render a triangle",
+			TF:          gltTriangle,
 		},
 	)
 	if err != nil {

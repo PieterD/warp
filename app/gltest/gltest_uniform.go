@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/PieterD/warp/pkg/gl"
 	"github.com/PieterD/warp/pkg/gl/glunsafe"
 	"github.com/go-gl/mathgl/mgl32"
@@ -47,7 +48,8 @@ void main(void) {
 		return fmt.Errorf("linking program: %w", err)
 	}
 	uniformBlockIndex := program.GetUniformBlockIndex("Uniform")
-	program.UniformBlockBinding(uniformBlockIndex, 5)
+	const uniformBufferIndex = 5
+	program.UniformBlockBinding(uniformBlockIndex, uniformBufferIndex)
 
 	color := mgl32.Vec4{
 		0.0, 1.0, 0.0, 1.0,
@@ -94,11 +96,11 @@ void main(void) {
 	glx.Clear()
 	glx.UseProgram(program)
 	glx.BindVertexArray(vao)
-	glx.Targets().Uniform().BindBase(5, uniformBuffer)
+	glx.Targets().Uniform().BindBase(uniformBufferIndex, uniformBuffer)
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
-	glx.DrawElements(gl.Triangles, 0, 3, gl.UnsignedShort)
+	glx.DrawElements(gl.Triangles, 3, gl.UnsignedShort, 0)
 	glx.Targets().ElementArray().UnbindBuffer()
-	glx.Targets().Uniform().UnbindBase(5)
+	glx.Targets().Uniform().UnbindBase(uniformBufferIndex)
 	glx.UnuseProgram()
 
 	return nil

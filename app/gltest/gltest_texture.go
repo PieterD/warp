@@ -111,7 +111,7 @@ void main(void) {
 	defer glx.UnbindVertexArray()
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
 	defer glx.Targets().ElementArray().UnbindBuffer()
-	glx.DrawElements(gl.Triangles, 0, 6, gl.UnsignedShort)
+	glx.DrawElements(gl.Triangles, 6, gl.UnsignedShort, 0)
 
 	return nil
 }

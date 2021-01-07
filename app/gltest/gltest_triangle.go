@@ -79,7 +79,7 @@ void main(void) {
 	glx.UseProgram(program)
 	glx.BindVertexArray(vao)
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
-	glx.DrawElements(gl.Triangles, 0, 3, gl.UnsignedShort)
+	glx.DrawElements(gl.Triangles, 3, gl.UnsignedShort, 0)
 	glx.Targets().ElementArray().UnbindBuffer()
 	glx.UnuseProgram()
 
