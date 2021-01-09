@@ -104,7 +104,7 @@ func (target Texture2DTarget) Allocate(width, height, level int) {
 	glx := target.glx
 	glx.constants.TexImage2D(
 		glx.constants.TEXTURE_2D,
-		glx.factory.Number(float64(level)),
+		glx.factory.Number(float64(0)),
 		glx.constants.RGBA,
 		glx.factory.Number(float64(width)),
 		glx.factory.Number(float64(height)),
@@ -122,7 +122,7 @@ func (target Texture2DTarget) SubImage(x, y, level int, img image.Image) {
 	jsImageData.Put(imageData)
 	glx.constants.TexSubImage2D(
 		glx.constants.TEXTURE_2D,
-		glx.factory.Number(float64(level)),
+		glx.factory.Number(float64(0)),
 		glx.factory.Number(float64(x)),
 		glx.factory.Number(float64(y)),
 		glx.factory.Number(float64(imageWidth)),

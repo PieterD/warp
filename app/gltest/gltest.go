@@ -22,6 +22,10 @@ func main() {
 	defer cancel()
 	err := run(ctx,
 		&Test{
+			Description: "Use sprite map",
+			TF:          gltSpriteMap,
+		},
+		&Test{
 			Description: "Use instanced rendering",
 			TF:          gltInstancedQuads,
 		},
