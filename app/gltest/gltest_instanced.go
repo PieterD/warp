@@ -3,20 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/PieterD/warp/pkg/gl/glunsafe"
-
 	"github.com/PieterD/warp/pkg/gl"
+	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
-//TODO: instanced rendering (quads)
-
 func gltInstancedQuads(glx *gl.Context, _ gl.FramebufferObject) error {
-	program := glx.CreateProgram()
-	defer program.Destroy()
-
-	vShader := glx.CreateShader(gl.VertexShader)
-	defer vShader.Destroy()
-	vShader.Source(`#version 300 es
+	var (
+		vSource = `#version 300 es
 precision mediump float;
 layout (location = 0) in vec3 Position;
 
@@ -28,18 +21,42 @@ out vec4 color;
 void main(void) {
 	gl_Position = vec4(Position*Scale + Translation, 1.0);
 	color = vec4(Color, 1.0);
-}`)
-
-	fShader := glx.CreateShader(gl.FragmentShader)
-	defer fShader.Destroy()
-	fShader.Source(`#version 300 es
+}`
+		fSource = `#version 300 es
 precision mediump float;
 in vec4 color;
 out vec4 FragColor;
 
 void main(void) {
 	FragColor = color;
-}`)
+}`
+		quadVertices = []float32{
+			-0.5, -0.5, 0.0,
+			0.5, -0.5, 0.0,
+			0.5, 0.5, 0.0,
+			-0.5, 0.5, 0.0,
+		}
+		quadIndices = []uint16{
+			0, 1, 2,
+			2, 3, 0,
+		}
+		instanceData = []float32{
+			-0.5, -0.5, 0.0, 0.2, 1.0, 0.0, 0.0,
+			0.5, -0.5, 0.0, 0.3, 0.0, 1.0, 0.0,
+			0.5, 0.5, 0.0, 0.4, 0.0, 0.0, 1.0,
+			-0.5, 0.5, 0.0, 0.5, 1.0, 1.0, 1.0,
+		}
+	)
+	program := glx.CreateProgram()
+	defer program.Destroy()
+
+	vShader := glx.CreateShader(gl.VertexShader)
+	defer vShader.Destroy()
+	vShader.Source(vSource)
+
+	fShader := glx.CreateShader(gl.FragmentShader)
+	defer fShader.Destroy()
+	fShader.Source(fSource)
 
 	vShader.Compile()
 	fShader.Compile()
@@ -53,22 +70,6 @@ void main(void) {
 		return fmt.Errorf("complex error linking program, see log")
 	}
 
-	quadVertices := []float32{
-		-0.5, -0.5, 0.0,
-		0.5, -0.5, 0.0,
-		0.5, 0.5, 0.0,
-		-0.5, 0.5, 0.0,
-	}
-	quadIndices := []uint16{
-		0, 1, 2,
-		2, 3, 0,
-	}
-	instanceData := []float32{
-		-0.5, -0.5, 0.0, 0.2, 1.0, 0.0, 0.0,
-		0.5, -0.5, 0.0, 0.3, 0.0, 1.0, 0.0,
-		0.5, 0.5, 0.0, 0.4, 0.0, 0.0, 1.0,
-		-0.5, 0.5, 0.0, 0.5, 1.0, 1.0, 1.0,
-	}
 	quadBuffer := glx.CreateBuffer()
 	defer quadBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(quadBuffer)
@@ -90,22 +91,20 @@ void main(void) {
 	vao := glx.CreateVertexArray()
 	defer vao.Destroy()
 	glx.BindVertexArray(vao)
-	{
-		glx.Targets().Array().BindBuffer(quadBuffer)
-		vao.VertexAttribPointer(0, gl.Vec3, false, 3*4, 0)
-		vao.EnableVertexAttribArray(0)
-		glx.Targets().Array().BindBuffer(instanceBuffer)
-		vao.VertexAttribPointer(1, gl.Vec3, false, 7*4, 0)
-		vao.VertexAttribDivisor(1, 1)
-		vao.EnableVertexAttribArray(1)
-		vao.VertexAttribPointer(2, gl.Float, false, 7*4, 3*4)
-		vao.VertexAttribDivisor(2, 1)
-		vao.EnableVertexAttribArray(2)
-		vao.VertexAttribPointer(3, gl.Vec3, false, 7*4, 4*4)
-		vao.VertexAttribDivisor(3, 1)
-		vao.EnableVertexAttribArray(3)
-		glx.Targets().Array().UnbindBuffer()
-	}
+	glx.Targets().Array().BindBuffer(quadBuffer)
+	vao.VertexAttribPointer(0, gl.Vec3, false, 3*4, 0)
+	vao.EnableVertexAttribArray(0)
+	glx.Targets().Array().BindBuffer(instanceBuffer)
+	vao.VertexAttribPointer(1, gl.Vec3, false, 7*4, 0)
+	vao.VertexAttribDivisor(1, 1)
+	vao.EnableVertexAttribArray(1)
+	vao.VertexAttribPointer(2, gl.Float, false, 7*4, 3*4)
+	vao.VertexAttribDivisor(2, 1)
+	vao.EnableVertexAttribArray(2)
+	vao.VertexAttribPointer(3, gl.Vec3, false, 7*4, 4*4)
+	vao.VertexAttribDivisor(3, 1)
+	vao.EnableVertexAttribArray(3)
+	glx.Targets().Array().UnbindBuffer()
 	glx.UnbindVertexArray()
 
 	glx.ClearColor(0.75, 0.8, 0.85, 1.0)

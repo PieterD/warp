@@ -8,6 +8,39 @@ import (
 )
 
 func gltTexture(glx *gl.Context, _ gl.FramebufferObject) error {
+	var (
+		vSource = `#version 300 es
+precision mediump float;
+
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec2 TexCoord;
+out vec2 texCoord;
+
+void main(void) {
+	gl_Position = vec4(Position, 1.0);
+	texCoord = TexCoord;
+}`
+		fSource = `#version 300 es
+precision mediump float;
+in vec2 texCoord;
+uniform sampler2D Texture;
+out vec4 FragColor;
+
+void main(void) {
+	FragColor = texture(Texture, texCoord);
+}`
+		vertices = []float32{
+			-0.5, -0.5, 0.0, 0.0, 0.0,
+			0.5, -0.5, 0.0, 1.0, 0.0,
+			0.5, 0.5, 0.0, 1.0, 1.0,
+			-0.5, 0.5, 0.0, 0.0, 1.0,
+		}
+		indices = []uint16{
+			0, 1, 2,
+			2, 3, 0,
+		}
+	)
+
 	textureImage, err := loadTexture("texture.png")
 	if err != nil {
 		return fmt.Errorf("loading texture image: %w", err)
@@ -30,33 +63,12 @@ func gltTexture(glx *gl.Context, _ gl.FramebufferObject) error {
 
 	program := glx.CreateProgram()
 	defer program.Destroy()
-
 	vShader := glx.CreateShader(gl.VertexShader)
 	defer vShader.Destroy()
-	vShader.Source(`#version 300 es
-precision mediump float;
-
-layout (location = 0) in vec3 Position;
-layout (location = 1) in vec2 TexCoord;
-out vec2 texCoord;
-
-void main(void) {
-	gl_Position = vec4(Position, 1.0);
-	texCoord = TexCoord;
-}`)
-
+	vShader.Source(vSource)
 	fShader := glx.CreateShader(gl.FragmentShader)
 	defer fShader.Destroy()
-	fShader.Source(`#version 300 es
-precision mediump float;
-in vec2 texCoord;
-uniform sampler2D Texture;
-out vec4 FragColor;
-
-void main(void) {
-	FragColor = texture(Texture, texCoord);
-}`)
-
+	fShader.Source(fSource)
 	vShader.Compile()
 	fShader.Compile()
 	program.Attach(vShader)
@@ -68,21 +80,12 @@ void main(void) {
 		glx.Log("prog linker log: %s", program.InfoLog())
 		return fmt.Errorf("complex error linking program, see log")
 	}
+
 	textureUniform, err := program.Uniform("Texture")
 	if err != nil {
 		return fmt.Errorf("getting Texture uniform: %w", err)
 	}
 
-	vertices := []float32{
-		-0.5, -0.5, 0.0, 0.0, 0.0,
-		0.5, -0.5, 0.0, 1.0, 0.0,
-		0.5, 0.5, 0.0, 1.0, 1.0,
-		-0.5, 0.5, 0.0, 0.0, 1.0,
-	}
-	indices := []uint16{
-		0, 1, 2,
-		2, 3, 0,
-	}
 	vData := glunsafe.Map(vertices)
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()

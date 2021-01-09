@@ -9,22 +9,15 @@ import (
 )
 
 func gltUniformBlock(glx *gl.Context, _ gl.FramebufferObject) error {
-	program := glx.CreateProgram()
-	defer program.Destroy()
-
-	vShader := glx.CreateShader(gl.VertexShader)
-	defer vShader.Destroy()
-	vShader.Source(`#version 300 es
+	var (
+		vSource = `#version 300 es
 precision mediump float;
 layout (location = 0) in vec3 Position;
 
 void main(void) {
 	gl_Position = vec4(Position, 1.0);
-}`)
-
-	fShader := glx.CreateShader(gl.FragmentShader)
-	defer fShader.Destroy()
-	fShader.Source(`#version 300 es
+}`
+		fSource = `#version 300 es
 precision mediump float;
 out vec4 FragColor;
 
@@ -34,8 +27,25 @@ uniform Uniform {
 
 void main(void) {
 	FragColor = Color;
-}`)
+}`
+		vertices = []float32{
+			-0.5, -0.5, 0.0,
+			0.5, -0.5, 0.0,
+			0.0, 0.5, 0.0,
+		}
+		indices = []uint16{
+			0, 1, 2,
+		}
+	)
 
+	program := glx.CreateProgram()
+	defer program.Destroy()
+	vShader := glx.CreateShader(gl.VertexShader)
+	defer vShader.Destroy()
+	vShader.Source(vSource)
+	fShader := glx.CreateShader(gl.FragmentShader)
+	defer fShader.Destroy()
+	fShader.Source(fSource)
 	vShader.Compile()
 	fShader.Compile()
 	program.Attach(vShader)
@@ -62,14 +72,6 @@ void main(void) {
 	glx.Targets().Uniform().BufferData(uniformData, gl.Static, gl.Draw)
 	glx.Targets().Uniform().Unbind()
 
-	vertices := []float32{
-		-0.5, -0.5, 0.0,
-		0.5, -0.5, 0.0,
-		0.0, 0.5, 0.0,
-	}
-	indices := []uint16{
-		0, 1, 2,
-	}
 	vData := glunsafe.Map(vertices)
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()

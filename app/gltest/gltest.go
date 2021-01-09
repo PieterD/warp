@@ -22,31 +22,38 @@ func main() {
 	defer cancel()
 	err := run(ctx,
 		&Test{
-			Description: "Sprite atlas with alpha blending and instanced rendering",
-			TF:          gltSpriteMap,
+			Description: "Sprite atlas, alpha blending, instanced rendering",
+			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_spriteatlas.go`,
+			TF:          gltSpriteAtlas,
 		},
 		&Test{
-			Description: "Use instanced rendering",
+			Description: "Instanced rendering",
+			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_instanced.go`,
 			TF:          gltInstancedQuads,
 		},
 		&Test{
-			Description: "Use a feedback transform",
+			Description: "Feedback transform",
+			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_feedback.go`,
 			TF:          gltFeedback,
 		},
 		&Test{
-			Description: "Render a texture",
+			Description: "Texture",
+			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_texture.go`,
 			TF:          gltTexture,
 		},
 		&Test{
-			Description: "Use a uniform block",
+			Description: "Uniform block",
+			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_uniform.go`,
 			TF:          gltUniformBlock,
 		},
 		&Test{
-			Description: "Render some points with different sizes and colors",
+			Description: "Points with different sizes and colors",
+			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_point.go`,
 			TF:          gltPoint,
 		},
 		&Test{
-			Description: "Render a triangle",
+			Description: "Simple triangle",
+			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_triangle.go`,
 			TF:          gltTriangle,
 		},
 	)
@@ -116,6 +123,13 @@ func run(ctx context.Context, tests ...*Test) error {
 			doc.CreateElem("p", func(pElem *dom.Elem) {
 				pElem.AppendClasses("testResult")
 				pElem.AppendChildren(
+					doc.CreateElem("a", func(anchorElem *dom.Elem) {
+						anchorElem.SetPropString("href", test.URL)
+						anchorElem.SetText("[github]")
+					}),
+					doc.CreateElem("label", func(labelElem *dom.Elem) {
+						labelElem.SetText(" ")
+					}),
 					doc.CreateElem("label", func(labelElem *dom.Elem) {
 						labelElem.SetText(text)
 					}),
@@ -143,6 +157,7 @@ type TestableFunc func(glx *gl.Context, fbo gl.FramebufferObject) error
 
 type Test struct {
 	Description string
+	URL         string
 	TF          TestableFunc
 	Image       image.Image
 	Error       error

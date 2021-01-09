@@ -9,12 +9,8 @@ import (
 )
 
 func gltFeedback(glx *gl.Context, _ gl.FramebufferObject) error {
-	program := glx.CreateProgram()
-	defer program.Destroy()
-
-	vShader := glx.CreateShader(gl.VertexShader)
-	defer vShader.Destroy()
-	vShader.Source(`#version 300 es
+	var (
+		vSource = `#version 300 es
 precision mediump float;
 layout (location = 0) in vec2 Position;
 layout (location = 1) in vec3 Color;
@@ -27,18 +23,30 @@ void main(void) {
 	gl_PointSize = Size;
 	fragColor = vec4(Color, 1.0);
 	FeedbackSize = Size;
-}`)
-
-	fShader := glx.CreateShader(gl.FragmentShader)
-	defer fShader.Destroy()
-	fShader.Source(`#version 300 es
+}`
+		fSource = `#version 300 es
 precision mediump float;
 in vec4 fragColor;
 out vec4 FragColor;
 
 void main(void) {
 	FragColor = fragColor;
-}`)
+}`
+		vertices = []float32{
+			-0.5, -0.5, 1.0, 0.0, 0.0, 10.0,
+			0.5, -0.5, 0.0, 1.0, 0.0, 15.0,
+			0.0, 0.5, 0.0, 0.0, 1.0, 20.0,
+		}
+	)
+
+	program := glx.CreateProgram()
+	defer program.Destroy()
+	vShader := glx.CreateShader(gl.VertexShader)
+	defer vShader.Destroy()
+	vShader.Source(vSource)
+	fShader := glx.CreateShader(gl.FragmentShader)
+	defer fShader.Destroy()
+	fShader.Source(fSource)
 	vShader.Compile()
 	fShader.Compile()
 	program.Attach(vShader)
@@ -61,11 +69,6 @@ void main(void) {
 	feedback := glx.CreateFeedback()
 	defer feedback.Destroy()
 
-	vertices := []float32{
-		-0.5, -0.5, 1.0, 0.0, 0.0, 10.0,
-		0.5, -0.5, 0.0, 1.0, 0.0, 15.0,
-		0.0, 0.5, 0.0, 0.0, 1.0, 20.0,
-	}
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(vBuffer)

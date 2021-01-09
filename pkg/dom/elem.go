@@ -29,6 +29,10 @@ func (e *Elem) SetText(text string) {
 	e.obj.Set("innerText", e.factory.String(text))
 }
 
+func (e *Elem) SetPropString(propName string, propValue string) {
+	e.obj.Set(propName, e.factory.String(propValue))
+}
+
 func (e *Elem) Classes() []string {
 	allClasses, ok := e.obj.Get("className").ToString()
 	if !ok {

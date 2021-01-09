@@ -2,13 +2,57 @@ package main
 
 import (
 	"fmt"
-	"github.com/PieterD/warp/pkg/gl/glutil"
 
 	"github.com/PieterD/warp/pkg/gl"
 	"github.com/PieterD/warp/pkg/gl/glunsafe"
+	"github.com/PieterD/warp/pkg/gl/glutil"
 )
 
-func gltSpriteMap(glx *gl.Context, _ gl.FramebufferObject) error {
+func gltSpriteAtlas(glx *gl.Context, _ gl.FramebufferObject) error {
+	var (
+		vSource = `#version 300 es
+precision mediump float;
+
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec2 TexCoord;
+
+layout (location = 2) in vec3 Translation;
+layout (location = 3) in float Scale;
+layout (location = 4) in vec2 GridCoord;
+uniform float SpriteMapScale;
+out vec2 texCoord;
+
+void main(void) {
+	gl_Position = vec4(Position*Scale + Translation, 1.0);
+	texCoord = SpriteMapScale*(TexCoord + GridCoord);
+}`
+		fSource = `#version 300 es
+precision mediump float;
+in vec2 texCoord;
+uniform sampler2D Texture;
+out vec4 FragColor;
+
+void main(void) {
+	FragColor = texture(Texture, texCoord);
+}`
+		vertices = []float32{
+			-0.5, -0.5, 0.0, 0.0, 0.0,
+			0.5, -0.5, 0.0, 1.0, 0.0,
+			0.5, 0.5, 0.0, 1.0, 1.0,
+			-0.5, 0.5, 0.0, 0.0, 1.0,
+		}
+		indices = []uint16{
+			0, 1, 2,
+			2, 3, 0,
+		}
+		instanceData = []float32{
+			-0.5, -0.5, 0.0, 0.2,
+			0.5, -0.5, 0.0, 0.3,
+			0.5, 0.5, 0.0, 0.4,
+			-0.5, 0.5, 0.0, 0.5,
+		}
+	)
+
 	sprite1Image, err := loadTexture("sprite-1.png")
 	if err != nil {
 		return fmt.Errorf("loading texture image: %w", err)
@@ -35,41 +79,22 @@ func gltSpriteMap(glx *gl.Context, _ gl.FramebufferObject) error {
 	}
 	atlas.GenerateMipmaps()
 	atlas.Unbind()
+	
+	texIndexData := [][2]float32{
+		sprite1Coord,
+		sprite2Coord,
+		sprite1Coord,
+		sprite2Coord,
+	}
 
 	program := glx.CreateProgram()
 	defer program.Destroy()
-
 	vShader := glx.CreateShader(gl.VertexShader)
 	defer vShader.Destroy()
-	vShader.Source(`#version 300 es
-precision mediump float;
-
-layout (location = 0) in vec3 Position;
-layout (location = 1) in vec2 TexCoord;
-
-layout (location = 2) in vec3 Translation;
-layout (location = 3) in float Scale;
-layout (location = 4) in vec2 GridCoord;
-uniform float SpriteMapScale;
-out vec2 texCoord;
-
-void main(void) {
-	gl_Position = vec4(Position*Scale + Translation, 1.0);
-	texCoord = SpriteMapScale*(TexCoord + GridCoord);
-}`)
-
+	vShader.Source(vSource)
 	fShader := glx.CreateShader(gl.FragmentShader)
 	defer fShader.Destroy()
-	fShader.Source(`#version 300 es
-precision mediump float;
-in vec2 texCoord;
-uniform sampler2D Texture;
-out vec4 FragColor;
-
-void main(void) {
-	FragColor = texture(Texture, texCoord);
-}`)
-
+	fShader.Source(fSource)
 	vShader.Compile()
 	fShader.Compile()
 	program.Attach(vShader)
@@ -90,28 +115,6 @@ void main(void) {
 		return fmt.Errorf("getting SpriteMapScale uniform: %w", err)
 	}
 
-	vertices := []float32{
-		-0.5, -0.5, 0.0, 0.0, 0.0,
-		0.5, -0.5, 0.0, 1.0, 0.0,
-		0.5, 0.5, 0.0, 1.0, 1.0,
-		-0.5, 0.5, 0.0, 0.0, 1.0,
-	}
-	indices := []uint16{
-		0, 1, 2,
-		2, 3, 0,
-	}
-	instanceData := []float32{
-		-0.5, -0.5, 0.0, 0.2,
-		0.5, -0.5, 0.0, 0.3,
-		0.5, 0.5, 0.0, 0.4,
-		-0.5, 0.5, 0.0, 0.5,
-	}
-	texIndexData := [][2]float32{
-		sprite1Coord,
-		sprite2Coord,
-		sprite1Coord,
-		sprite2Coord,
-	}
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(vBuffer)
