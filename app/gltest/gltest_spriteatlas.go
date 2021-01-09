@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"image"
-
-	"github.com/PieterD/warp/pkg/gl/glunsafe"
+	"github.com/PieterD/warp/pkg/gl/glutil"
 
 	"github.com/PieterD/warp/pkg/gl"
+	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
 func gltSpriteMap(glx *gl.Context, _ gl.FramebufferObject) error {
@@ -18,7 +17,7 @@ func gltSpriteMap(glx *gl.Context, _ gl.FramebufferObject) error {
 	if err != nil {
 		return fmt.Errorf("loading texture image: %w", err)
 	}
-	atlas := NewSpriteMap(glx, SpriteMapConfig{
+	atlas := glutil.NewSpriteAtlas(glx, glutil.SpriteMapConfig{
 		SpriteSize: 32,
 		GridSize:   2,
 	})
@@ -26,10 +25,12 @@ func gltSpriteMap(glx *gl.Context, _ gl.FramebufferObject) error {
 
 	atlas.Bind(0)
 	atlas.Allocate()
-	if err := atlas.Add(sprite1Image); err != nil {
+	sprite1Coord, err := atlas.Add(sprite1Image)
+	if err != nil {
 		return fmt.Errorf("adding image 1: %w", err)
 	}
-	if err := atlas.Add(sprite2Image); err != nil {
+	sprite2Coord, err := atlas.Add(sprite2Image)
+	if err != nil {
 		return fmt.Errorf("adding image 2: %w", err)
 	}
 	atlas.GenerateMipmaps()
@@ -100,29 +101,37 @@ void main(void) {
 		2, 3, 0,
 	}
 	instanceData := []float32{
-		-0.5, -0.5, 0.0, 0.2, 1.0, 0.0,
-		0.5, -0.5, 0.0, 0.3, 0.0, 0.0,
-		0.5, 0.5, 0.0, 0.4, 1.0, 0.0,
-		-0.5, 0.5, 0.0, 0.5, 0.0, 0.0,
+		-0.5, -0.5, 0.0, 0.2,
+		0.5, -0.5, 0.0, 0.3,
+		0.5, 0.5, 0.0, 0.4,
+		-0.5, 0.5, 0.0, 0.5,
 	}
-	vData := glunsafe.Map(vertices)
+	texIndexData := [][2]float32{
+		sprite1Coord,
+		sprite2Coord,
+		sprite1Coord,
+		sprite2Coord,
+	}
 	vBuffer := glx.CreateBuffer()
 	defer vBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(vBuffer)
-	glx.Targets().Array().BufferData(vData, gl.Static, gl.Draw)
-	glx.Targets().Array().UnbindBuffer()
+	glx.Targets().Array().BufferData(glunsafe.Map(vertices), gl.Static, gl.Draw)
 
-	iData := glunsafe.Map(indices)
 	iBuffer := glx.CreateBuffer()
 	defer iBuffer.Destroy()
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
-	glx.Targets().ElementArray().BufferData(iData, gl.Static, gl.Draw)
-	glx.Targets().ElementArray().UnbindBuffer()
+	glx.Targets().ElementArray().BufferData(glunsafe.Map(indices), gl.Static, gl.Draw)
 
 	instanceBuffer := glx.CreateBuffer()
 	defer instanceBuffer.Destroy()
 	glx.Targets().Array().BindBuffer(instanceBuffer)
 	glx.Targets().Array().BufferData(glunsafe.Map(instanceData), gl.Static, gl.Draw)
+
+	texIndexBuffer := glx.CreateBuffer()
+	defer texIndexBuffer.Destroy()
+	glx.Targets().Array().BindBuffer(texIndexBuffer)
+	glx.Targets().Array().BufferData(glunsafe.Map(texIndexData), gl.Static, gl.Draw)
+
 	glx.Targets().Array().UnbindBuffer()
 
 	vao := glx.CreateVertexArray()
@@ -134,13 +143,14 @@ void main(void) {
 	vao.VertexAttribPointer(1, gl.Vec2, false, 5*4, 3*4)
 	vao.EnableVertexAttribArray(1)
 	glx.Targets().Array().BindBuffer(instanceBuffer)
-	vao.VertexAttribPointer(2, gl.Vec3, false, 6*4, 0)
+	vao.VertexAttribPointer(2, gl.Vec3, false, 4*4, 0)
 	vao.VertexAttribDivisor(2, 1)
 	vao.EnableVertexAttribArray(2)
-	vao.VertexAttribPointer(3, gl.Float, false, 6*4, 3*4)
+	vao.VertexAttribPointer(3, gl.Float, false, 4*4, 3*4)
 	vao.VertexAttribDivisor(3, 1)
 	vao.EnableVertexAttribArray(3)
-	vao.VertexAttribPointer(4, gl.Vec2, false, 6*4, 4*4)
+	glx.Targets().Array().BindBuffer(texIndexBuffer)
+	vao.VertexAttribPointer(4, gl.Vec2, false, 2*4, 0)
 	vao.VertexAttribDivisor(4, 1)
 	vao.EnableVertexAttribArray(4)
 	glx.Targets().Array().UnbindBuffer()
@@ -166,82 +176,4 @@ void main(void) {
 	glx.DrawElementsInstanced(gl.Triangles, 6, gl.UnsignedShort, 0, 4)
 
 	return nil
-}
-
-type SpriteMapConfig struct {
-	SpriteSize int // Square
-	GridSize   int // Square
-}
-
-type SpriteMap struct {
-	glx        *gl.Context
-	spriteSize int
-	gridSize   int
-	used       int
-	texture    gl.TextureObject
-}
-
-func NewSpriteMap(glx *gl.Context, cfg SpriteMapConfig) *SpriteMap {
-	m := &SpriteMap{
-		glx:        glx,
-		spriteSize: cfg.SpriteSize,
-		gridSize:   cfg.GridSize,
-		used:       0,
-		texture:    glx.CreateTexture(),
-	}
-	return m
-}
-
-func (m *SpriteMap) Destroy() {
-	m.texture.Destroy()
-}
-
-func (m *SpriteMap) Bind(textureUnit int) {
-	glx := m.glx
-	glx.Targets().ActiveTextureUnit(textureUnit)
-	glx.Targets().Texture2D().Bind(m.texture)
-}
-
-func (m *SpriteMap) Unbind() {
-	glx := m.glx
-	glx.Targets().Texture2D().Unbind()
-}
-
-func (m *SpriteMap) Allocate() {
-	glx := m.glx
-	glx.Targets().Texture2D().Allocate(m.gridSize*m.spriteSize, m.gridSize*m.spriteSize, 0)
-	glx.Targets().Texture2D().Settings(gl.Texture2DConfig{
-		Minify:  gl.Nearest,
-		Magnify: gl.Nearest,
-		WrapS:   gl.ClampToEdge,
-		WrapT:   gl.ClampToEdge,
-	})
-}
-
-func (m *SpriteMap) Add(imgs ...image.Image) error {
-	glx := m.glx
-	for _, img := range imgs {
-		if size := img.Bounds().Size(); size.X != m.spriteSize || size.Y != m.spriteSize {
-			return fmt.Errorf("image size %v does not match sprite map's sprite size %d", size, m.spriteSize)
-		}
-		index := m.used
-		if index >= m.gridSize*m.gridSize {
-			return fmt.Errorf("sprite map full: it only fits %d images", m.gridSize*m.gridSize)
-		}
-		col := index % m.gridSize
-		row := index / m.gridSize
-
-		glx.Targets().Texture2D().SubImage(col*m.spriteSize, row*m.spriteSize, 0, img)
-		m.used++
-	}
-	return nil
-}
-
-func (m *SpriteMap) Scale() float32 {
-	return 1.0 / float32(m.gridSize)
-}
-
-func (m *SpriteMap) GenerateMipmaps() {
-	glx := m.glx
-	glx.Targets().Texture2D().GenerateMipmap()
 }

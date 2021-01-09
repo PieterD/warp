@@ -22,7 +22,7 @@ func main() {
 	defer cancel()
 	err := run(ctx,
 		&Test{
-			Description: "Use sprite map",
+			Description: "Sprite atlas with alpha blending and instanced rendering",
 			TF:          gltSpriteMap,
 		},
 		&Test{
