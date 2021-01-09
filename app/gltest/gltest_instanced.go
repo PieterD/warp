@@ -28,9 +28,6 @@ void main(void) {
 	gl_Position = vec4(Position*Scale + Translation, 1.0);
 	color = vec4(Color, 1.0);
 }`)
-	if err := vShader.Compile(); err != nil {
-		return fmt.Errorf("compiling vertex shader: %w", err)
-	}
 
 	fShader := glx.CreateShader(gl.FragmentShader)
 	defer fShader.Destroy()
@@ -42,14 +39,17 @@ out vec4 FragColor;
 void main(void) {
 	FragColor = color;
 }`)
-	if err := fShader.Compile(); err != nil {
-		return fmt.Errorf("compiling fragment shader: %w", err)
-	}
 
+	vShader.Compile()
+	fShader.Compile()
 	program.Attach(vShader)
 	program.Attach(fShader)
-	if err := program.Link(); err != nil {
-		return fmt.Errorf("linking program: %w", err)
+	program.Link()
+	if !program.LinkSuccess() {
+		glx.Log("vert shader log: %s", vShader.InfoLog())
+		glx.Log("frag shader log: %s", fShader.InfoLog())
+		glx.Log("prog linker log: %s", program.InfoLog())
+		return fmt.Errorf("complex error linking program, see log")
 	}
 
 	quadVertices := []float32{

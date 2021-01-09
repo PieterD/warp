@@ -1,4 +1,4 @@
-package axiom
+package ecs
 
 import (
 	"fmt"
@@ -16,7 +16,6 @@ type DB struct {
 
 type dbTable struct {
 	typeName     string
-	rType        reflect.Type
 	forwardIndex *btree.BTree
 	reverseIndex *btree.BTree
 }
@@ -67,6 +66,10 @@ func (db *DB) Assign(primary Value, vs ...Value) {
 			secondary: v,
 		})
 	}
+}
+
+func (db *DB) Unassign(primary Value, vs ...Value) {
+	panic("not implemented")
 }
 
 // FirstValue finds (for primary's record) the value equal to or greater than valuePtr, and sets it to valuePtr.
@@ -151,56 +154,6 @@ func (db *DB) nextPrimary(first bool, primaryPtr Value, valuePtr Value) bool {
 		return false
 	})
 	return found
-}
-
-func (db *DB) FirstSearch(primaryPtr Value, vs ...Value) bool {
-	//if len(vs) == 0 {
-	//	return false
-	//}
-	//type tuple struct {
-	//	p Value
-	//	v Value
-	//}
-	//tuples := make([]tuple, len(vs))
-	//for i, v := range vs {
-	//	p := copyValue(primaryPtr)
-	//	tuples[i].p = p
-	//	tuples[i].v = v
-	//	if !db.FirstPrimary(tuples[i].p, tuples[i].v) {
-	//		return false
-	//	}
-	//}
-	//for {
-	//
-	//	sort.Slice(tuples, func(i, j int) bool {
-	//		return tuples[i].p.Less(true, tuples[j].p)
-	//	})
-	//	allEqual := true
-	//	for i := 1; i < len(tuples); i++ {
-	//		if tuples[i-1].p.Less(true, tuples[i].p) {
-	//			allEqual = false
-	//			break
-	//		}
-	//	}
-	//	highestPrimary := tuples[len(tuples)-1].p
-	//	if allEqual {
-	//		copyValueToValue(primaryPtr, highestPrimary)
-	//		return true
-	//	}
-	//	for i := range tuples {
-	//		copyValueToValue(tuples[i].p, highestPrimary)
-	//		if !db.FirstPrimary(highestPrimary, tuples[i].v) {
-	//			return false
-	//		}
-	//	}
-	//}
-	panic("not implemented")
-}
-
-// Search finds the next record after primaryPtr which matches all the given Values,
-// and assigns its primary key to primaryPtr, and record data to vs.
-func (db *DB) NextSearch(primaryPtr Value, vs ...Value) bool {
-	panic("not implemented")
 }
 
 func copyValue(v Value) Value {

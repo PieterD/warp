@@ -1,4 +1,4 @@
-package axiom
+package ecs
 
 import (
 	"fmt"
@@ -105,42 +105,6 @@ func TestDB(t *testing.T) {
 		id.ID = 0
 		if ok := db.NextPrimary(id, age); !ok {
 			t.Fatalf("expected first primary")
-		}
-	})
-
-	t.Run("Search", func(t *testing.T) {
-		t.Skip("not implemented")
-		id := &EntityID{}
-		name := &Name{"Alice"}
-		age := &Age{}
-
-		if ok := db.NextSearch(id, name, age); !ok {
-			t.Fatalf("expected search value")
-		}
-		if id.ID != 1 {
-			t.Errorf("invalid id: %d", id.ID)
-		}
-		if name.Name != "Alice" {
-			t.Errorf("invalid name: %s", name.Name)
-		}
-		if age.Age != 19 {
-			t.Errorf("invalid age: %d", age.Age)
-		}
-
-		if ok := db.NextSearch(id, name, age); !ok {
-			t.Fatalf("expected search value")
-		}
-		if id.ID != 2 {
-			t.Errorf("invalid id: %d", id.ID)
-		}
-		if name.Name != "Alice" {
-			t.Errorf("invalid name: %s", name.Name)
-		}
-		if age.Age != 52 {
-			t.Errorf("invalid age: %d", age.Age)
-		}
-		if ok := db.NextSearch(id, name, age); ok {
-			t.Fatalf("expected no more values")
 		}
 	})
 }

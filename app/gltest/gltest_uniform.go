@@ -21,9 +21,6 @@ layout (location = 0) in vec3 Position;
 void main(void) {
 	gl_Position = vec4(Position, 1.0);
 }`)
-	if err := vShader.Compile(); err != nil {
-		return fmt.Errorf("compiling vertex shader: %w", err)
-	}
 
 	fShader := glx.CreateShader(gl.FragmentShader)
 	defer fShader.Destroy()
@@ -38,15 +35,19 @@ uniform Uniform {
 void main(void) {
 	FragColor = Color;
 }`)
-	if err := fShader.Compile(); err != nil {
-		return fmt.Errorf("compiling fragment shader: %w", err)
-	}
 
+	vShader.Compile()
+	fShader.Compile()
 	program.Attach(vShader)
 	program.Attach(fShader)
-	if err := program.Link(); err != nil {
-		return fmt.Errorf("linking program: %w", err)
+	program.Link()
+	if !program.LinkSuccess() {
+		glx.Log("vert shader log: %s", vShader.InfoLog())
+		glx.Log("frag shader log: %s", fShader.InfoLog())
+		glx.Log("prog linker log: %s", program.InfoLog())
+		return fmt.Errorf("complex error linking program, see log")
 	}
+
 	uniformBlockIndex := program.GetUniformBlockIndex("Uniform")
 	const uniformBufferIndex = 5
 	program.UniformBlockBinding(uniformBlockIndex, uniformBufferIndex)

@@ -36,21 +36,27 @@ func (program ProgramObject) TransformFeedbackVaryings(interleaved bool, inputNa
 	glx.constants.TransformFeedbackVaryings(program.value, feedbackNames, glBufferMode)
 }
 
-func (program ProgramObject) Link() error {
+func (program ProgramObject) Link() {
 	glx := program.glx
 	glx.constants.LinkProgram(program.value)
+}
+
+func (program ProgramObject) LinkSuccess() bool {
+	glx := program.glx
 	linkStatus, ok := glx.constants.GetProgramParameter(program.value, glx.constants.LINK_STATUS).ToBoolean()
 	if !ok {
-		return fmt.Errorf("LINK_STATUS program parameter did not return boolean")
+		panic(fmt.Errorf("LINK_STATUS program parameter did not return boolean"))
 	}
-	if !linkStatus {
-		info, ok := glx.constants.GetProgramInfoLog(program.value).ToString()
-		if !ok {
-			return fmt.Errorf("program linking error, but programInfoLog did not return string")
-		}
-		return fmt.Errorf("program linking error: %s", info)
+	return linkStatus
+}
+
+func (program ProgramObject) InfoLog() string {
+	glx := program.glx
+	info, ok := glx.constants.GetProgramInfoLog(program.value).ToString()
+	if !ok {
+		panic(fmt.Errorf("program linking error, but programInfoLog did not return string"))
 	}
-	return nil
+	return info
 }
 
 func (program ProgramObject) GetUniformBlockIndex(blockName string) int {
@@ -159,20 +165,26 @@ func (shader ShaderObject) Source(source string) {
 	glx.constants.ShaderSource(shader.value, glx.factory.String(source))
 }
 
-func (shader ShaderObject) Compile() error {
+func (shader ShaderObject) Compile() {
 	glx := shader.glx
 	glx.constants.CompileShader(shader.value)
+}
+
+func (shader ShaderObject) CompilationSuccess() bool {
+	glx := shader.glx
 	csValue := glx.constants.GetShaderParameter(shader.value, glx.constants.COMPILE_STATUS)
 	compileStatus, ok := csValue.ToBoolean()
 	if !ok {
-		return fmt.Errorf("COMPILE_STATUS shader parameteer did not return boolean: %T", csValue)
+		panic(fmt.Errorf("COMPILE_STATUS shader parameteer did not return boolean: %T", csValue))
 	}
-	if !compileStatus {
-		info, ok := glx.constants.GetShaderInfoLog(shader.value).ToString()
-		if !ok {
-			return fmt.Errorf("shaderInfoLog did not return string")
-		}
-		return fmt.Errorf("shader compile error: %s", info)
+	return compileStatus
+}
+
+func (shader ShaderObject) InfoLog() string {
+	glx := shader.glx
+	info, ok := glx.constants.GetShaderInfoLog(shader.value).ToString()
+	if !ok {
+		panic(fmt.Errorf("shaderInfoLog did not return string"))
 	}
-	return nil
+	return info
 }

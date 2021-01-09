@@ -53,6 +53,10 @@ func (glx *Context) Destroy() {
 	loseContext()
 }
 
+func (glx *Context) Log(f string, args ...interface{}) {
+	driver.Log(glx.factory, glx.factory.String(fmt.Sprintf(f, args...)))
+}
+
 func (glx *Context) UseProgram(program ProgramObject) {
 	glx.constants.UseProgram(program.value)
 }
