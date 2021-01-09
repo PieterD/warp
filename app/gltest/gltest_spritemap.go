@@ -32,6 +32,7 @@ func gltSpriteMap(glx *gl.Context, _ gl.FramebufferObject) error {
 	if err := atlas.Add(sprite2Image); err != nil {
 		return fmt.Errorf("adding image 2: %w", err)
 	}
+	atlas.GenerateMipmaps()
 	atlas.Unbind()
 
 	program := glx.CreateProgram()
@@ -44,12 +45,15 @@ precision mediump float;
 
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec2 TexCoord;
-layout (location = 2) in vec2 GridCoord;
+
+layout (location = 2) in vec3 Translation;
+layout (location = 3) in float Scale;
+layout (location = 4) in vec2 GridCoord;
 uniform float SpriteMapScale;
 out vec2 texCoord;
 
 void main(void) {
-	gl_Position = vec4(Position, 1.0);
+	gl_Position = vec4(Position*Scale + Translation, 1.0);
 	texCoord = SpriteMapScale*(TexCoord + GridCoord);
 }`)
 
@@ -86,14 +90,20 @@ void main(void) {
 	}
 
 	vertices := []float32{
-		-0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 0.0,
-		0.5, -0.5, 0.0, 1.0, 0.0, 1.0, 0.0,
-		0.5, 0.5, 0.0, 1.0, 1.0, 1.0, 0.0,
-		-0.5, 0.5, 0.0, 0.0, 1.0, 1.0, 0.0,
+		-0.5, -0.5, 0.0, 0.0, 0.0,
+		0.5, -0.5, 0.0, 1.0, 0.0,
+		0.5, 0.5, 0.0, 1.0, 1.0,
+		-0.5, 0.5, 0.0, 0.0, 1.0,
 	}
 	indices := []uint16{
 		0, 1, 2,
 		2, 3, 0,
+	}
+	instanceData := []float32{
+		-0.5, -0.5, 0.0, 0.2, 1.0, 0.0,
+		0.5, -0.5, 0.0, 0.3, 0.0, 0.0,
+		0.5, 0.5, 0.0, 0.4, 1.0, 0.0,
+		-0.5, 0.5, 0.0, 0.5, 0.0, 0.0,
 	}
 	vData := glunsafe.Map(vertices)
 	vBuffer := glx.CreateBuffer()
@@ -109,19 +119,38 @@ void main(void) {
 	glx.Targets().ElementArray().BufferData(iData, gl.Static, gl.Draw)
 	glx.Targets().ElementArray().UnbindBuffer()
 
+	instanceBuffer := glx.CreateBuffer()
+	defer instanceBuffer.Destroy()
+	glx.Targets().Array().BindBuffer(instanceBuffer)
+	glx.Targets().Array().BufferData(glunsafe.Map(instanceData), gl.Static, gl.Draw)
+	glx.Targets().Array().UnbindBuffer()
+
 	vao := glx.CreateVertexArray()
 	defer vao.Destroy()
 	glx.BindVertexArray(vao)
 	glx.Targets().Array().BindBuffer(vBuffer)
-	vao.VertexAttribPointer(0, gl.Vec3, false, 7*4, 0)
-	vao.VertexAttribPointer(1, gl.Vec2, false, 7*4, 3*4)
-	vao.VertexAttribPointer(2, gl.Vec2, false, 7*4, 5*4)
+	vao.VertexAttribPointer(0, gl.Vec3, false, 5*4, 0)
 	vao.EnableVertexAttribArray(0)
+	vao.VertexAttribPointer(1, gl.Vec2, false, 5*4, 3*4)
 	vao.EnableVertexAttribArray(1)
+	glx.Targets().Array().BindBuffer(instanceBuffer)
+	vao.VertexAttribPointer(2, gl.Vec3, false, 6*4, 0)
+	vao.VertexAttribDivisor(2, 1)
 	vao.EnableVertexAttribArray(2)
+	vao.VertexAttribPointer(3, gl.Float, false, 6*4, 3*4)
+	vao.VertexAttribDivisor(3, 1)
+	vao.EnableVertexAttribArray(3)
+	vao.VertexAttribPointer(4, gl.Vec2, false, 6*4, 4*4)
+	vao.VertexAttribDivisor(4, 1)
+	vao.EnableVertexAttribArray(4)
 	glx.Targets().Array().UnbindBuffer()
 	glx.UnbindVertexArray()
 
+	glx.Features().Blend(true)
+	glx.Features().BlendFunc(gl.BlendFuncConfig{
+		Source:      gl.SrcAlpha,
+		Destination: gl.OneMinusSrcAlpha,
+	})
 	glx.ClearColor(0.75, 0.8, 0.85, 1.0)
 	glx.Clear()
 	glx.UseProgram(program)
@@ -134,7 +163,7 @@ void main(void) {
 	defer glx.UnbindVertexArray()
 	glx.Targets().ElementArray().BindBuffer(iBuffer)
 	defer glx.Targets().ElementArray().UnbindBuffer()
-	glx.DrawElements(gl.Triangles, 6, gl.UnsignedShort, 0)
+	glx.DrawElementsInstanced(gl.Triangles, 6, gl.UnsignedShort, 0, 4)
 
 	return nil
 }

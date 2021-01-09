@@ -51,8 +51,29 @@ type glConstants struct {
 	Viewport                 func(args ...driver.Value) driver.Value
 	VertexAttribDivisor      func(args ...driver.Value) driver.Value
 
+	/* Alpha blending. */
+
+	ZERO                  driver.Value
+	ONE                   driver.Value
+	SRC_COLOR             driver.Value
+	ONE_MINUS_SRC_COLOR   driver.Value
+	DST_COLOR             driver.Value
+	ONE_MINUS_DST_COLOR   driver.Value
+	SRC_ALPHA             driver.Value
+	ONE_MINUS_SRC_ALPHA   driver.Value
+	DST_ALPHA             driver.Value
+	ONE_MINUS_DST_ALPHA   driver.Value
+	FUNC_ADD              driver.Value
+	FUNC_SUBTRACT         driver.Value
+	FUNC_REVERSE_SUBTRACT driver.Value
+	MIN                   driver.Value
+	MAX                   driver.Value
+	BlendFunc             func(args ...driver.Value) driver.Value
+	BlendEquation         func(args ...driver.Value) driver.Value
+
 	/* Features. */
 
+	BLEND   driver.Value
 	Enable  func(args ...driver.Value) driver.Value
 	Disable func(args ...driver.Value) driver.Value
 

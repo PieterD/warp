@@ -19,6 +19,7 @@ func gltInstancedQuads(glx *gl.Context, _ gl.FramebufferObject) error {
 	vShader.Source(`#version 300 es
 precision mediump float;
 layout (location = 0) in vec3 Position;
+
 layout (location = 1) in vec3 Translation;
 layout (location = 2) in float Scale;
 layout (location = 3) in vec3 Color;

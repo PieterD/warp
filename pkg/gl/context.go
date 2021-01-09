@@ -102,6 +102,12 @@ func (glx *Context) Parameters() Parameters {
 	}
 }
 
+func (glx *Context) Features() Features {
+	return Features{
+		glx: glx,
+	}
+}
+
 type BufferObject struct {
 	glx   *Context
 	value driver.Value
