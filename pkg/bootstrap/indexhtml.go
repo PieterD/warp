@@ -29,3 +29,7 @@ const indexHtml = `<!DOCTYPE html>
 </head>
     <body></body>
 </html>`
+
+func IndexHtml() string {
+	return indexHtml
+}
