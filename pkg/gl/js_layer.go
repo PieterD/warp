@@ -160,7 +160,9 @@ type glConstants struct {
 	LINEAR             driver.Value
 	TEXTURE_WRAP_S     driver.Value
 	TEXTURE_WRAP_T     driver.Value
+	REPEAT             driver.Value
 	CLAMP_TO_EDGE      driver.Value
+	MIRRORED_REPEAT    driver.Value
 	TEXTURE0           driver.Value
 	ActiveTexture      func(args ...driver.Value) driver.Value
 	CreateTexture      func(args ...driver.Value) driver.Value
@@ -168,6 +170,7 @@ type glConstants struct {
 	BindTexture        func(args ...driver.Value) driver.Value
 	TexParameteri      func(args ...driver.Value) driver.Value
 	TexImage2D         func(args ...driver.Value) driver.Value
+	TexSubImage2D      func(args ...driver.Value) driver.Value
 	GenerateMipmap     func(args ...driver.Value) driver.Value
 
 	/* Renderbuffer stuff */

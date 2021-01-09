@@ -16,7 +16,16 @@ func gltTexture(glx *gl.Context, _ gl.FramebufferObject) error {
 	defer textureObject.Destroy()
 	glx.Targets().ActiveTextureUnit(0)
 	glx.Targets().Texture2D().Bind(textureObject)
-	glx.Targets().Texture2D().Image(textureImage, gl.Texture2DConfig{})
+	textureSize := textureImage.Bounds().Size()
+	glx.Targets().Texture2D().Settings(gl.Texture2DConfig{
+		Minify:  gl.Linear,
+		Magnify: gl.Linear,
+		WrapS:   gl.ClampToEdge,
+		WrapT:   gl.ClampToEdge,
+	})
+	glx.Targets().Texture2D().Allocate(textureSize.X, textureSize.Y, 0)
+	glx.Targets().Texture2D().SubImage(0, 0, 0, textureImage)
+	glx.Targets().Texture2D().GenerateMipmap()
 	glx.Targets().Texture2D().Unbind()
 
 	program := glx.CreateProgram()
