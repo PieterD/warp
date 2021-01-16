@@ -53,13 +53,13 @@ void main(void) {
 		}
 	)
 
-	sprite1Image, err := loadTexture("sprite-1.png")
+	sprite1Image, err := loadTexture("sprite_0.png")
 	if err != nil {
-		return fmt.Errorf("loading texture image: %w", err)
+		return fmt.Errorf("loading texture image 0: %w", err)
 	}
-	sprite2Image, err := loadTexture("sprite-2.png")
+	sprite2Image, err := loadTexture("sprite_1.png")
 	if err != nil {
-		return fmt.Errorf("loading texture image: %w", err)
+		return fmt.Errorf("loading texture image 1: %w", err)
 	}
 	atlas := glutil.NewSpriteAtlas(glx, glutil.SpriteMapConfig{
 		SpriteSize: 32,
@@ -79,7 +79,7 @@ void main(void) {
 	}
 	atlas.GenerateMipmaps()
 	atlas.Unbind()
-	
+
 	texIndexData := [][2]float32{
 		sprite1Coord,
 		sprite2Coord,

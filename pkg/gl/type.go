@@ -11,7 +11,7 @@ import (
 type Type int
 
 const (
-	Float Type = iota
+	Float Type = iota + 1
 	Vec2
 	Vec3
 	Vec4
@@ -51,12 +51,12 @@ func (t Type) glSize() int {
 	}
 }
 
-func (t Type) glString() string {
+func (t Type) GLSL() string {
 	switch t {
 	case Vec2, Vec3, Vec4, Mat2, Mat3, Mat4:
 		return strings.ToLower(t.String())
 	default:
-		panic(fmt.Errorf("unimplemented %s.glString", t.String()))
+		panic(fmt.Errorf("unimplemented %s.GLSL", t.String()))
 	}
 }
 
@@ -75,6 +75,7 @@ func (t Type) asAttribute() (bufferType Type, itemsPerVertex int, err error) {
 	}
 }
 
+//TODO: replace this with Type.glType()
 type typeConverter struct {
 	jsConstants map[Type]driver.Value
 	reverse     map[int]Type
