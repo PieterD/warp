@@ -115,11 +115,10 @@ void main(void) {
 		if available {
 			return fmt.Errorf("query result available too early")
 		}
-		wd, err := query.Wait(ctx)
+		_, err := query.Wait(ctx)
 		if err != nil {
 			return fmt.Errorf("waiting for query: %w", err)
 		}
-		glx.Log("wait duration: %v", wd)
 		v, available = query.Result()
 		if !available {
 			return fmt.Errorf("expected query result after Query.Wait")
