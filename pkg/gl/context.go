@@ -355,6 +355,7 @@ func (glx *Context) CreateQuery() QueryObject {
 func (query QueryObject) Wait(ctx context.Context) (time.Duration, error) {
 	start := time.Now()
 	glx := query.glx
+	glx.Flush()
 	for {
 		select {
 		case <-ctx.Done():
