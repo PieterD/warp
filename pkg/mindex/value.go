@@ -5,6 +5,14 @@ import (
 	"reflect"
 )
 
+type Singleton struct{}
+
+func (s Singleton) Less(value Value) bool {
+	return false
+}
+
+var _ Value = Singleton{}
+
 type Value interface {
 	Less(value Value) bool
 }

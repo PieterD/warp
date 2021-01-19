@@ -60,7 +60,11 @@ func (db *DB) relation(primary Value, value Value) (relPrimary, relValue Value, 
 
 func (table *dbTable) assign(primary, value Value) {
 	db := table.db
-	table.index.ReplaceOrInsert(tupleCopy(primary, value))
+
+	if exact(db, primary, value) {
+		db.Remove(primary, value)
+	}
+	_ = table.index.ReplaceOrInsert(tupleCopy(primary, value))
 	if relPrimary, relValue, relTable, ok := db.relation(primary, value); ok {
 		relTable.assign(relPrimary, relValue)
 	}

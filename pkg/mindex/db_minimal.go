@@ -69,6 +69,10 @@ func (db *DB) Next(primaryPtr Value, valuePtr Value) bool {
 	return found
 }
 
+func (db *DB) Exact(primaryPtr Value, valuePtr Value) bool {
+	return exact(db, primaryPtr, valuePtr)
+}
+
 func (db *DB) FirstValue(primaryPtr Value, valuePtr Value) bool {
 	return firstValue(db, primaryPtr, valuePtr)
 }
@@ -84,10 +88,12 @@ func (db *DB) TraverseFrom(primaryPtr Value, valuePtr Value, f func() bool) {
 //func (db *DB) TraverseFixedPrimary(primaryPtr Value, valuePtr Value, f func() bool) {
 //	panic("not implemented")
 //}
-//
-//func (db *DB) ReverseFixedValue(primaryPtr Value, valuePtr Value, f func() bool) {
-//	relPrimary, relValue := MustRelation(valuePtr).Relate(primaryPtr)
-//	_ = relPrimary
-//	_ = relValue
-//	panic("not implemented")
-//}
+
+func (db *DB) TraverseFixedValueReverse(primaryPtr Value, valuePtr Value, f func() bool) {
+	relPrimary, relValue := MustRelation(valuePtr).Relate(primaryPtr)
+	db.TraverseFrom(relPrimary, relValue, func() bool {
+		CopyValueToValue(primaryPtr, relPrimary)
+		db.First(primaryPtr, valuePtr)
+		return f()
+	})
+}

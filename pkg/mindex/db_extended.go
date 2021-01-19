@@ -7,6 +7,23 @@ type dbMini interface {
 	Next(primaryPtr Value, valuePtr Value) bool
 }
 
+func exact(db dbMini, primaryPtr Value, valuePtr Value) bool {
+	primaryOrig := primaryPtr
+	primaryCopy := CopyValue(primaryPtr)
+	valueOrig := valuePtr
+	valueCopy := CopyValue(valuePtr)
+	if !db.First(primaryCopy, valueCopy) {
+		return false
+	}
+	if primaryOrig.Less(primaryCopy) {
+		return false
+	}
+	if valueOrig.Less(valueCopy) {
+		return false
+	}
+	return true
+}
+
 func firstValue(db dbMini, primaryPtr Value, valuePtr Value) bool {
 	primaryOrig := primaryPtr
 	primaryCopy := CopyValue(primaryPtr)
