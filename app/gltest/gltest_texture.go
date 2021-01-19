@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/PieterD/warp/pkg/gl"
 	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
-func gltTexture(glx *gl.Context, _ gl.FramebufferObject) error {
+func gltTexture(_ context.Context, glx *gl.Context, _ gl.FramebufferObject) error {
 	var (
 		vSource = `#version 300 es
 precision mediump float;

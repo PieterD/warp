@@ -1,7 +1,9 @@
 package gl
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/PieterD/warp/pkg/driver"
 )
@@ -55,6 +57,14 @@ func (glx *Context) Destroy() {
 
 func (glx *Context) Log(f string, args ...interface{}) {
 	driver.Log(glx.factory, glx.factory.String(fmt.Sprintf(f, args...)))
+}
+
+func (glx *Context) Flush() {
+	glx.constants.Flush()
+}
+
+func (glx *Context) Finish() {
+	glx.constants.Finish()
 }
 
 func (glx *Context) UseProgram(program ProgramObject) {
@@ -329,39 +339,111 @@ func (glx *Context) CreateTexture() TextureObject {
 	}
 }
 
-type FeedbackObject struct {
+type QueryObject struct {
 	glx   *Context
 	value driver.Value
 }
 
-func (glx *Context) CreateFeedback() FeedbackObject {
-	feedbackObject := glx.constants.CreateTransformFeedback()
-	return FeedbackObject{
+func (glx *Context) CreateQuery() QueryObject {
+	value := glx.constants.CreateQuery()
+	return QueryObject{
 		glx:   glx,
-		value: feedbackObject,
+		value: value,
 	}
 }
 
-func (tfo FeedbackObject) Destroy() {
-	glx := tfo.glx
-	glx.constants.DeleteTransformFeedback(tfo.value)
-}
-
-func (tfo FeedbackObject) Begin(m PrimitiveDrawMode) {
-	glx := tfo.glx
-	var jsMode driver.Value
-	switch m {
-	case Points:
-		jsMode = glx.constants.POINTS
-	case Lines:
-		jsMode = glx.constants.LINES
-	case Triangles:
-		jsMode = glx.constants.TRIANGLES
+func (query QueryObject) Wait(ctx context.Context) (time.Duration, error) {
+	start := time.Now()
+	glx := query.glx
+	for {
+		select {
+		case <-ctx.Done():
+			return 0, ctx.Err()
+		case <-time.After(time.Millisecond / 10):
+		}
+		glBool := glx.constants.GetQueryParameter(query.value, glx.constants.QUERY_RESULT_AVAILABLE)
+		resultAvailable, ok := glBool.ToBoolean()
+		if !ok {
+			panic(fmt.Errorf("GetQueryParameter(QUERY_RESULT_AVAILABLE) should return a boolean: %v", glBool))
+		}
+		if resultAvailable {
+			return time.Now().Sub(start), nil
+		}
 	}
-	glx.constants.BeginTransformFeedback(jsMode)
 }
 
-func (tfo FeedbackObject) End() {
-	glx := tfo.glx
-	glx.constants.EndTransformFeedback()
+func (query QueryObject) Result() (value uint, available bool) {
+	glx := query.glx
+	glBool := glx.constants.GetQueryParameter(query.value, glx.constants.QUERY_RESULT_AVAILABLE)
+	resultAvailable, ok := glBool.ToBoolean()
+	if !ok {
+		panic(fmt.Errorf("GetQueryParameter(QUERY_RESULT_AVAILABLE) should return a boolean: %v", glBool))
+	}
+	if !resultAvailable {
+		return 0, false
+	}
+	glResult := glx.constants.GetQueryParameter(query.value, glx.constants.QUERY_RESULT)
+	f, ok := glResult.ToFloat64()
+	if !ok {
+		panic(fmt.Errorf("GetQueryParameter(QUERY_RESULT) should return a number: %v", glResult))
+	}
+	return uint(f), true
+}
+
+func (query QueryObject) Destroy() {
+	glx := query.glx
+	glx.constants.DeleteQuery(query.value)
+}
+
+type SyncObject struct {
+	glx   *Context
+	value driver.Value
+}
+
+func (glx *Context) FenceSync() SyncObject {
+	value := glx.constants.FenceSync(
+		glx.constants.SYNC_GPU_COMMANDS_COMPLETE,
+		glx.factory.Number(0),
+	)
+	return SyncObject{
+		glx:   glx,
+		value: value,
+	}
+}
+
+func (so SyncObject) Destroy() {
+	glx := so.glx
+	glx.constants.DeleteSync(so.value)
+}
+
+func (so SyncObject) Wait() {
+	glx := so.glx
+	glx.Flush()
+	zero := glx.factory.Number(0)
+	glx.constants.WaitSync(so.value, zero, glx.constants.TIMEOUT_IGNORED)
+}
+
+func (so SyncObject) ClientWait(ctx context.Context) (done bool) {
+	glx := so.glx
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+		timeout := glx.factory.Number(float64(1000000))
+		rv := glx.constants.ClientWaitSync(so.value, glx.constants.SYNC_FLUSH_COMMANDS_BIT, timeout)
+		if glx.factory.Equal(rv, glx.constants.TIMEOUT_EXPIRED) {
+			continue
+		}
+		if glx.factory.Equal(rv, glx.constants.ALREADY_SIGNALED) {
+			return true
+		}
+		if glx.factory.Equal(rv, glx.constants.CONDITION_SATISFIED) {
+			return true
+		}
+		if glx.factory.Equal(rv, glx.constants.WAIT_FAILED) {
+			panic(fmt.Errorf("ClientWaitSync failed"))
+		}
+	}
 }

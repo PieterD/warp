@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/PieterD/warp/pkg/gl"
 	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
-func gltInstancedQuads(glx *gl.Context, _ gl.FramebufferObject) error {
+func gltInstancedQuads(_ context.Context, glx *gl.Context, _ gl.FramebufferObject) error {
 	var (
 		vSource = `#version 300 es
 precision mediump float;

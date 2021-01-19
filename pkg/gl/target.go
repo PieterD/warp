@@ -2,6 +2,7 @@ package gl
 
 import (
 	"fmt"
+
 	"github.com/PieterD/warp/pkg/driver"
 )
 
@@ -320,4 +321,11 @@ func (target TransformFeedbackTarget) Contents(data []byte) int {
 		jsArray,
 	)
 	return jsBuffer.Get(data)
+}
+
+func (targets Targets) QueryTransformFeedbackPrimitivesWritten() QueryTarget {
+	return QueryTarget{
+		glx:    targets.glx,
+		target: targets.glx.constants.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
+	}
 }

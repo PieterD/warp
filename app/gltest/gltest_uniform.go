@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/PieterD/warp/pkg/gl"
@@ -8,7 +9,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-func gltUniformBlock(glx *gl.Context, _ gl.FramebufferObject) error {
+func gltUniformBlock(_ context.Context, glx *gl.Context, _ gl.FramebufferObject) error {
 	var (
 		vSource = `#version 300 es
 precision mediump float;

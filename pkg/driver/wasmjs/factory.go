@@ -14,6 +14,12 @@ type vValue interface {
 
 type jsFactory struct{}
 
+func (j jsFactory) Equal(v1, v2 driver.Value) (equal bool) {
+	js1 := value2js(v1)
+	js2 := value2js(v2)
+	return js1.Equal(js2)
+}
+
 func (j jsFactory) Array(values ...driver.Value) driver.Object {
 	var jsValues []interface{}
 	for _, value := range values {

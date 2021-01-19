@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/PieterD/warp/pkg/gl/glunsafe"
 )
 
-func gltFeedback(glx *gl.Context, _ gl.FramebufferObject) error {
+func gltFeedback(ctx context.Context, glx *gl.Context, _ gl.FramebufferObject) error {
 	var (
 		vSource = `#version 300 es
 precision mediump float;
@@ -92,17 +93,41 @@ void main(void) {
 	offset += 1 * 4
 	glx.UnbindVertexArray()
 
+	query := glx.CreateQuery()
+	defer query.Destroy()
+
 	glx.ClearColor(0.75, 0.8, 0.85, 1.0)
 	glx.Clear()
 	glx.UseProgram(program)
 	glx.Targets().TransformFeedback().BindBase(0, tfBuffer)
+	glx.Targets().QueryTransformFeedbackPrimitivesWritten().Begin(query)
 	feedback.Begin(gl.Points)
 	glx.BindVertexArray(vao)
 	glx.DrawArrays(gl.Points, 0, 3)
 	glx.UnbindVertexArray()
 	feedback.End()
+	glx.Targets().QueryTransformFeedbackPrimitivesWritten().End()
 	glx.Targets().TransformFeedback().UnbindBase(0)
 	glx.UnuseProgram()
+
+	{
+		v, available := query.Result()
+		if available {
+			return fmt.Errorf("query result available too early")
+		}
+		wd, err := query.Wait(ctx)
+		if err != nil {
+			return fmt.Errorf("waiting for query: %w", err)
+		}
+		glx.Log("wait duration: %v", wd)
+		v, available = query.Result()
+		if !available {
+			return fmt.Errorf("expected query result after Query.Wait")
+		}
+		if v != 3 {
+			return fmt.Errorf("expected three primitives, got: %d", v)
+		}
+	}
 
 	glx.Targets().TransformFeedback().Bind(tfBuffer)
 	tfFloats := make([]float32, 3)

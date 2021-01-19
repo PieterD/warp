@@ -2,6 +2,7 @@ package driver
 
 type (
 	Factory interface {
+		Equal(v1, v2 Value) (equal bool)
 		Global() Object
 		Undefined() Value
 		Null() Value
@@ -15,7 +16,7 @@ type (
 	Value interface {
 		IsUndefined() (ok bool)
 		IsNull() (ok bool)
-		
+
 		ToBoolean() (value, ok bool)
 		ToFloat64() (value float64, ok bool)
 		ToString() (value string, ok bool)

@@ -103,3 +103,41 @@ func (fs Features) BlendFunc(cfg BlendFuncConfig) {
 		glx.constants.BlendEquation(cfg.Equation.glValue(glx))
 	}
 }
+
+//go:generate stringer -type=CullFace
+type CullFace int
+
+const (
+	FrontFace CullFace = iota + 1
+	BackFace
+)
+
+func (cf CullFace) glValue(glx *Context) driver.Value {
+	switch cf {
+	case FrontFace:
+		return glx.constants.FRONT
+	case BackFace:
+		return glx.constants.BACK
+	default:
+		panic(fmt.Errorf("invalid CullFace value: %v", cf))
+	}
+}
+
+func (fs Features) CullFace(enable bool, cullWhich CullFace) {
+	glx := fs.glx
+	if enable {
+		glx.constants.Enable(glx.constants.CULL_FACE)
+		glx.constants.CullFace(cullWhich.glValue(glx))
+	} else {
+		glx.constants.Disable(glx.constants.CULL_FACE)
+	}
+}
+
+func (fs Features) Rasterizer(enable bool) {
+	glx := fs.glx
+	if enable {
+		glx.constants.Disable(glx.constants.RASTERIZER_DISCARD)
+	} else {
+		glx.constants.Enable(glx.constants.RASTERIZER_DISCARD)
+	}
+}

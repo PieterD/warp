@@ -16,6 +16,8 @@ type glConstants struct {
 	COMPILE_STATUS           driver.Value
 	LINK_STATUS              driver.Value
 	DEPTH_TEST               driver.Value
+	Flush                    func(args ...driver.Value) driver.Value
+	Finish                   func(args ...driver.Value) driver.Value
 	CreateShader             func(args ...driver.Value) driver.Value
 	DeleteShader             func(args ...driver.Value) driver.Value
 	ShaderSource             func(args ...driver.Value) driver.Value
@@ -51,6 +53,20 @@ type glConstants struct {
 	Viewport                 func(args ...driver.Value) driver.Value
 	VertexAttribDivisor      func(args ...driver.Value) driver.Value
 
+	/* Sync */
+
+	SYNC_GPU_COMMANDS_COMPLETE driver.Value
+	SYNC_FLUSH_COMMANDS_BIT    driver.Value
+	ALREADY_SIGNALED           driver.Value
+	TIMEOUT_EXPIRED            driver.Value
+	CONDITION_SATISFIED        driver.Value
+	WAIT_FAILED                driver.Value
+	TIMEOUT_IGNORED            driver.Value
+	FenceSync                  func(args ...driver.Value) driver.Value
+	DeleteSync                 func(args ...driver.Value) driver.Value
+	WaitSync                   func(args ...driver.Value) driver.Value
+	ClientWaitSync             func(args ...driver.Value) driver.Value
+
 	/* Alpha blending. */
 
 	ZERO                  driver.Value
@@ -73,9 +89,17 @@ type glConstants struct {
 
 	/* Features. */
 
-	BLEND   driver.Value
-	Enable  func(args ...driver.Value) driver.Value
-	Disable func(args ...driver.Value) driver.Value
+	BLEND              driver.Value
+	CULL_FACE          driver.Value
+	RASTERIZER_DISCARD driver.Value
+	Enable             func(args ...driver.Value) driver.Value
+	Disable            func(args ...driver.Value) driver.Value
+
+	/* Face culling */
+
+	FRONT    driver.Value
+	BACK     driver.Value
+	CullFace func(args ...driver.Value) driver.Value
 
 	/* Depth. */
 
@@ -93,6 +117,7 @@ type glConstants struct {
 
 	MAX_COMBINED_TEXTURE_IMAGE_UNITS driver.Value
 	MAX_TEXTURE_SIZE                 driver.Value
+	MAX_CLIENT_WAIT_TIMEOUT_WEBGL    driver.Value
 	GetParameter                     func(args ...driver.Value) driver.Value
 
 	/* Clearing. */
@@ -152,15 +177,16 @@ type glConstants struct {
 
 	/* Transform feedback */
 
-	TRANSFORM_FEEDBACK        driver.Value
-	INTERLEAVED_ATTRIBS       driver.Value
-	SEPARATE_ATTRIBS          driver.Value
-	CreateTransformFeedback   func(args ...driver.Value) driver.Value
-	DeleteTransformFeedback   func(args ...driver.Value) driver.Value
-	BindTransformFeedback     func(args ...driver.Value) driver.Value
-	TransformFeedbackVaryings func(args ...driver.Value) driver.Value
-	BeginTransformFeedback    func(args ...driver.Value) driver.Value
-	EndTransformFeedback      func(args ...driver.Value) driver.Value
+	TRANSFORM_FEEDBACK                    driver.Value
+	INTERLEAVED_ATTRIBS                   driver.Value
+	SEPARATE_ATTRIBS                      driver.Value
+	TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN driver.Value
+	CreateTransformFeedback               func(args ...driver.Value) driver.Value
+	DeleteTransformFeedback               func(args ...driver.Value) driver.Value
+	BindTransformFeedback                 func(args ...driver.Value) driver.Value
+	TransformFeedbackVaryings             func(args ...driver.Value) driver.Value
+	BeginTransformFeedback                func(args ...driver.Value) driver.Value
+	EndTransformFeedback                  func(args ...driver.Value) driver.Value
 
 	/* Internal formats */
 
@@ -193,6 +219,17 @@ type glConstants struct {
 	TexImage2D         func(args ...driver.Value) driver.Value
 	TexSubImage2D      func(args ...driver.Value) driver.Value
 	GenerateMipmap     func(args ...driver.Value) driver.Value
+
+	/* Query object stuff */
+
+	QUERY_RESULT           driver.Value
+	QUERY_RESULT_AVAILABLE driver.Value
+	CreateQuery            func(args ...driver.Value) driver.Value
+	DeleteQuery            func(args ...driver.Value) driver.Value
+	BeginQuery             func(args ...driver.Value) driver.Value
+	EndQuery               func(args ...driver.Value) driver.Value
+	GetQuery               func(args ...driver.Value) driver.Value
+	GetQueryParameter      func(args ...driver.Value) driver.Value
 
 	/* Renderbuffer stuff */
 

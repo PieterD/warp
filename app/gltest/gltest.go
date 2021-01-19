@@ -13,8 +13,9 @@ import (
 )
 
 const (
-	fbWidth  = 128
-	fbHeight = 128
+	fbWidth     = 128
+	fbHeight    = 128
+	testTimeout = time.Second * 2
 )
 
 func main() {
@@ -32,7 +33,7 @@ func main() {
 			TF:          gltInstancedQuads,
 		},
 		&Test{
-			Description: "Feedback transform",
+			Description: "Feedback transform, query object",
 			URL:         `https://github.com/PieterD/warp/blob/master/app/gltest/gltest_feedback.go`,
 			TF:          gltFeedback,
 		},
@@ -69,7 +70,7 @@ func run(ctx context.Context, tests ...*Test) error {
 	doc := global.Window().Document()
 	canvasElem := doc.CreateElem("canvas", func(canvasElem *dom.Elem) {})
 	doc.Body().AppendChildren()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 	defer cancel()
 	glx := gl.NewContext(canvasElem)
 	defer glx.Destroy()
@@ -97,7 +98,7 @@ func run(ctx context.Context, tests ...*Test) error {
 			glx.ClearColor(0, 0, 0, 1)
 			glx.Clear()
 
-			if err := test.TF(glx, fbo); err != nil {
+			if err := test.TF(ctx, glx, fbo); err != nil {
 				return nil, fmt.Errorf("running test function: %w", err)
 			}
 
@@ -153,7 +154,7 @@ func run(ctx context.Context, tests ...*Test) error {
 	return nil
 }
 
-type TestableFunc func(glx *gl.Context, fbo gl.FramebufferObject) error
+type TestableFunc func(ctx context.Context, glx *gl.Context, fbo gl.FramebufferObject) error
 
 type Test struct {
 	Description string

@@ -25,3 +25,14 @@ func (ps Parameters) MaxTextureSize() int {
 	}
 	return int(f)
 }
+
+func (ps Parameters) MaxClientWaitTimeout() int {
+	glx := ps.glx
+	paramValue := glx.constants.GetParameter(glx.constants.MAX_CLIENT_WAIT_TIMEOUT_WEBGL)
+	f, ok := paramValue.ToFloat64()
+	if !ok {
+		panic(fmt.Errorf("parameter MAX_CLIENT_WAIT_TIMEOUT_WEBGL should return number: %T", paramValue))
+	}
+	return int(f)
+
+}
