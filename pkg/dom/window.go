@@ -12,6 +12,10 @@ type Window struct {
 	obj     driver.Object
 }
 
+func (w *Window) Driver() (factory driver.Factory, obj driver.Object) {
+	return w.factory, w.obj
+}
+
 func (w *Window) Document() *Document {
 	dValue := w.obj.Get("document")
 	dObj, ok := dValue.ToObject()

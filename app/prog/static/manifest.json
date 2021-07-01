@@ -1,0 +1,18 @@
+{
+  "short_name": "PWA Test",
+  "name": "PWS Test",
+  "description": "Testing basic PWA functions",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#3367D6",
+  "theme_color": "#3367D6",
+  "display": "standalone",
+  "orientation": "landscape"
+}

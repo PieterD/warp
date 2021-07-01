@@ -1,12 +1,19 @@
 package bootstrap
 
+import (
+	"fmt"
+	"html/template"
+	"strings"
+)
+
 const indexHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Go wasm</title>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="style.css"/>{{if .ManifestJson}}
+	<link rel="manifest" href="manifest.json">{{end}}
     <script src="_wasm_exec.js"></script>
     <script>
         // Start webassembly
@@ -28,8 +35,19 @@ const indexHtml = `<!DOCTYPE html>
     </script>
 </head>
     <body></body>
-</html>`
+</html>
+`
 
-func IndexHtml() string {
-	return indexHtml
+var tmpl = template.Must(template.New("indexhtml").Parse(indexHtml))
+
+type IndexConfig struct {
+	ManifestJson bool
+}
+
+func IndexHtml(cfg IndexConfig) (string, error) {
+	buf := &strings.Builder{}
+	if err := tmpl.Execute(buf, cfg); err != nil {
+		return "", fmt.Errorf("executing template: %w", err)
+	}
+	return buf.String(), nil
 }
